@@ -1,0 +1,1 @@
+BAM files to which this routine is applied should be validated before and after, using GATK's ValidateSamFile or samtools quickcheck -vv and gunzip -t
