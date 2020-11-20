@@ -2,7 +2,7 @@
 Source code for all three components of the InvertypeR process:
 1. Composite file creation
 2. InvertypeR genotyping (soon to be an R package)
-3. Inversion visualization with links to the UCSC genome browser
+3. Inversion visualization with links to the UCSC Genome Browser
 
 Composite file creation
 -----------------------
@@ -17,5 +17,5 @@ Dependencies:
   - R package StrandPhaseR (0.99)
   - R package BSgenome.Hsapiens.UCSC.hg38 (1.4.1)
 
-These scripts create two Strand-seq composite files given a set of single-cell Strand-seq libraries for an individual (BAM format, indexed). Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run "bash master_WWCC_composite.sh" in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run "bash master_WCCW_composite.sh". Both master scripts must first be edited to set user-specific variables (e.g. # threads, directory containing scripts). 
+These scripts create two Strand-seq composite files, given a set of single-cell Strand-seq libraries for an individual (BAM format, indexed). Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run "bash master_WWCC_composite.sh" in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run "bash master_WCCW_composite.sh". Both master scripts must first be edited to set user-specific variables (e.g. # threads, directory containing scripts). 
 
