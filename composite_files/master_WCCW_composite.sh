@@ -3,15 +3,28 @@
 
 ############################## User sets variables here ###################################################
 
-#Set the variables below:
+
+#parallelize the composite file creation
 threads=12
+
+#are the reads in the BAM files paired-end?
 paired="TRUE" 
+
+#path to the directory containing these scripts
 scripts="/projects/lansdorp/composite_BAM_scripts/"
+
 #The path to a SPACE-delimited two-column BED file containing the positions of heterozygous SNPs; if empty, freebayes will be used to call SNPs
 snps="" 
+
+#reference genome
 ref="/projects/lansdorp/sspipe/refseq/GRCh38.fasta"
+
+#sex of the sample
 sex="male"
 
+
+
+##########################################################################################################
 ##########################################################################################################
 ################################# StrandPhaseR ###########################################################
 

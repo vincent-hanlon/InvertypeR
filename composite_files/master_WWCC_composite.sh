@@ -2,14 +2,23 @@
 
 ################################## User sets variables here #############################################
 
-#Set the variables below as needed
-
+#Paralellize composite file creation
 threads=12
+
+#Are the reads in the BAM files paired-end?
 paired="TRUE"
+
+#Path to the directory containing these scripts
 scripts="/projects/lansdorp/composite_BAM_scripts/"
+
+#reference genome
 ref="/projects/lansdorp/sspipe/refseq/GRCh38.fasta"
+
+#sex of the sample
 sex="male"
 
+
+##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################
 
