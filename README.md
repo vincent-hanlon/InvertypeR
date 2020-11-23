@@ -40,8 +40,8 @@ Dependencies:
   - R package psych (2.0.9)
   - ImageMagick (7.0.10-0)
   - python package img2pdf (0.4.0)
-  - PDF-API2 (2.038)
-  - LWP (6.49)
+  - perl package PDF::API2 (2.038)
+  - perl package LWP::UserAgent (6.49)
   
 (Courtesy of Victor Guryev and Carl-Adam Mattsson)
 These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, put an InvertypeR output file in the "in" directory, and run "bash haploplot_run.sh". A PDF ideogram linked to a UCSC Genome Browser session will be created automatically. To visualize the Strand-seq data as well, upload the BreakpointR browserfiles produced during composite file creation to the genome browser as well. 
