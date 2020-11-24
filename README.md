@@ -1,8 +1,8 @@
 # InvertypeR
 Source code for all three components of the InvertypeR process:
 1. Composite file creation
-2. InvertypeR genotyping (soon to be an R package)
-3. Inversion visualization (with links to the UCSC Genome Browser)
+2. InvertypeR genotyping 
+3. Inversion visualization
 
 Composite file creation
 -----------------------
@@ -45,4 +45,4 @@ Dependencies:
   - perl package LWP::UserAgent (6.49)
   
 (Courtesy of Victor Guryev and Carl-Adam Mattsson)
-These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the "in/" directory, and put the two BreakpointR browserfiles for the WW and WC composite files (i.e. sample_name.WW.CC.bam_reads.bed.gz and sample_name.WC.CW.bam_reads.bed.gz from the composite file creation procedure) in the "in/bed_reads/" directory. Then run "bash haploplot_run.sh". A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
+These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the "in/" directory, and put the two BreakpointR browserfiles for the WW and WC composite files (i.e. "sample_name.WW.CC.bam_reads.bed.gz" and "sample_name.WC.CW.bam_reads.bed.gz" from the composite file creation procedure) in the "in/bed_reads/" directory. Then run "bash haploplot_run.sh". A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
