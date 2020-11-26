@@ -17,20 +17,22 @@ Dependencies:
   - R package [StrandPhaseR](https://github.com/daewoooo/StrandPhaseR) (0.99)
   - R package BSgenome.Hsapiens.UCSC.hg38 (1.4.1)
 
-These scripts create two Strand-seq composite files, given a set of single-cell Strand-seq libraries for an individual (BAM format, indexed). Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run "bash master_WWCC_composite.sh" in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run "bash master_WCCW_composite.sh". You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). 
+These scripts create two Strand-seq composite files, given a set of single-cell Strand-seq libraries for an individual (BAM format, indexed). Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run `bash master_WWCC_composite.sh` in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run `bash master_WCCW_composite.sh`. You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). 
 
 InvertypeR genotyping
 -----------------------
 Dependencies:
   - *tool (version we use)*
   - R (3.5.1)
-  - R package invertyper (0.0.1)
+  - R package invertyper (0.0.0.1)
 
-This is done by an R package called "invertyper" that genotypes inversions in Strand-seq data. It will install a few dependencies (R packages).
+This is done by an R package called "invertyper" that genotypes inversions in Strand-seq data. It will install a few further R packages as dependencies.
 
 The package implements a Bayesian binomial model to genotype inversions in Strand-seq data, which must be pre-processed into two composite files (WW and WC, the latter phased). In a sense, InvertypeR can also be used to discover inversions that were not already known to be present in the data. This can be done when many putative inversions are genotyped, for example, if all inversions recorded in dbVar are genotyped with an appropriate prior. This package can also adjust the start and end coordinates of inversions in a variety of ways.
 
-For instructions on how to run the invertyper wrapper function, load the package in R and write "?invertyper".
+To install invertyper, run `devtools::install_github("vincent-hanlon/InvertypeR/invertyper")`. You might need to install [devtools](https://cran.r-project.org/web/packages/devtools/index.html) first, if you don't already have it. 
+
+For instructions on how to run the main invertyper wrapper function, load the package in R and write `?invertyper`.
 
 Inversion visualization
 -----------------------
@@ -48,4 +50,4 @@ Dependencies:
   - perl package LWP::UserAgent (6.49)
   
 (Courtesy of Victor Guryev and Carl-Adam Mattsson)
-These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the "in/" directory, and put the two BreakpointR browserfiles for the WW and WC composite files (i.e. "sample_name.WW.CC.bam_reads.bed.gz" and "sample_name.WC.CW.bam_reads.bed.gz" from the composite file creation procedure) in the "in/bed_reads/" directory. Then run "bash haploplot_run.sh". A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
+These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the `in/` directory, and put the two BreakpointR browserfiles for the WW and WC composite files (i.e. `sample_name.WW.CC.bam_reads.bed.gz` and `sample_name.WC.CW.bam_reads.bed.gz` from the composite file creation procedure) in the `in/bed_reads/` directory. Then run `bash haploplot_run.sh`. A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
