@@ -24,13 +24,15 @@ InvertypeR genotyping
 Dependencies:
   - *tool (version we use)*
   - R (3.5.1)
-  - R package invertyper (0.0.1)
+  - R package invertyper (0.0.0.1)
 
-This is done by an R package called "invertyper" that genotypes inversions in Strand-seq data. It will install a few dependencies (R packages).
+This is done by an R package called "invertyper" that genotypes inversions in Strand-seq data. It will install a few further R packages as dependencies.
 
 The package implements a Bayesian binomial model to genotype inversions in Strand-seq data, which must be pre-processed into two composite files (WW and WC, the latter phased). In a sense, InvertypeR can also be used to discover inversions that were not already known to be present in the data. This can be done when many putative inversions are genotyped, for example, if all inversions recorded in dbVar are genotyped with an appropriate prior. This package can also adjust the start and end coordinates of inversions in a variety of ways.
 
-For instructions on how to run the invertyper wrapper function, load the package in R and write "?invertyper".
+To install invertyper, run `install_github("vincent-hanlon/InvertypeR/invertyper")`
+
+For instructions on how to run the main invertyper wrapper function, load the package in R and write `?invertyper`.
 
 Inversion visualization
 -----------------------
