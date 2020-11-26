@@ -27,7 +27,9 @@ Dependencies:
   - R package GenomicAlignments (1.18.1)
   - R package BreakpointR (1.5.1)
 
-This series of functions is run using the invertyper() wrapper function, which takes as arguments two composite BAM files (as above), a set of intervals to genotype, priors, and a few other options (Soon to be an R package; see source code for now). 
+This is done by an R package called "invertyper" that genotypes inversions in Strand-seq data
+
+The package implements a Bayesian binomial model to genotype inversions in Strand-seq data, which must be pre-processed into two composite files (WW and WC, the latter phased). In a sense, InvertypeR can also be used to discover inversions that were not already known to be present in the data. This can be done when many putative inversions are genotyped, for example, if all inversions recorded in dbVar are genotyped with an appropriate prior. This package can also adjust the start and end coordinates of inversions in a variety of ways.
 
 Inversion visualization
 -----------------------
