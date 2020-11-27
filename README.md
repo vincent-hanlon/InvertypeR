@@ -30,7 +30,7 @@ This is done by an R package called "invertyper" that genotypes inversions in St
 
 The package implements a Bayesian binomial model to genotype inversions in Strand-seq data, which must be pre-processed into two composite files (WW and WC, the latter phased). In a sense, InvertypeR can also be used to discover inversions that were not already known to be present in the data. This can be done when many putative inversions are genotyped, for example, if all inversions recorded in dbVar are genotyped with an appropriate prior. This package can also adjust the start and end coordinates of inversions in a variety of ways.
 
-To install invertyper, run `devtools::install_git(url="https://github.com/vincent-hanlon/InvertypeR", branch="main", subdir="invertyper")`. You might need to install [devtools](https://cran.r-project.org/web/packages/devtools/index.html) first, if you don't already have it. [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) doesn't always download automatically this way, though, so you may need to install it first. 
+To install invertyper, you should make sure you have [devtools](https://cran.r-project.org/web/packages/devtools/index.html) installed first. Once that's done, run `devtools::install_github(repo="vincent-hanlon/InvertypeR", subdir="invertyper")`. If that doesn't work, you could try `devtools::install_git(url="https://github.com/vincent-hanlon/InvertypeR", branch="main", subdir="invertyper")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) first.
 
 For instructions on how to run the main invertyper wrapper function, load the package in R and write `?invertyper`.
 
