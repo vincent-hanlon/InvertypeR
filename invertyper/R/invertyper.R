@@ -60,7 +60,7 @@ invertyper <- function(WW_bam, WC_bam, bed, blacklist="", paired_reads=TRUE, sex
 	if( adjust_method != "raw" ){
 		
 		inversions <- adjust_intervals(inversions=inversions, reads=reads, confidence=confidence, base=base,  sex=sex, prior=prior, prior_male=prior_male, 
-			adjust_method=adjust_method, paired_reads=paired_reads,blacklist=blacklist)
+			adjust_method=adjust_method, paired_reads=paired_reads)
 	}
 
 	#Marking inversions with <0.001 reads per bp as being low-density, because they may span centromeres or chromosome ends/
