@@ -1,0 +1,1 @@
+These file contains the raw InvertypeR output generated for the paper (InvertypeR: Bayesian inversion genotyping with Strand-seq data). 
