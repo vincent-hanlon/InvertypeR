@@ -104,6 +104,11 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
 
         }
 
+print(head(inversions))
+print(head(new))
+print(length(new))
+print(length(inversions))
+
         #Removing new intervals if they don't overlap the original interval obtained by merging all overlapping inversions of the same genotype
         #A better way to do with would be to choose the two peaks so that the left one is left of GenomicRanges::end(inversions) and the right one is right of GenomicRanges::start(inversions)
         new <- new[GenomicRanges::pintersect(inversions,new)$hit]
