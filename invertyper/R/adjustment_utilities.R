@@ -77,6 +77,7 @@ if(length(df$deltaW)==0){
 
 }else if(length(df$deltaW)==1){
 
+        print(data.frame(seqnames=as.character(GenomicRanges::seqnames(df[,1])),start=GenomicRanges::start(df[,1]),width=GenomicRanges::width(df[,1]) ))
 	return(data.frame(seqnames=as.character(GenomicRanges::seqnames(df[,1])),start=GenomicRanges::start(df[,1]),width=GenomicRanges::width(df[,1]) ))
 
 }
