@@ -77,7 +77,7 @@ print(length(wide_inversions))
         WC_select <- rbind(WC_select, WC_replace)
 
 print("1st wc_select")
-print(length(WC_select))
+print(nrow(WC_select))
 
         WW_select <- IRanges::mergeByOverlaps(wide_inversions, WW_d)
 	WW_missing <- inversions[!IRanges::overlapsAny(wide_inversions,WW_d)]
@@ -86,7 +86,7 @@ print(length(WC_select))
         WW_select <- rbind(WW_select, WW_replace)
 
 print("1st ww_select")
-print(length(WW_select))
+print(nrow(WW_select))
 
 
         #Finding the two highest deltaW peaks per interval
@@ -94,8 +94,8 @@ print(length(WW_select))
         WC_coords <- do.call(rbind, as.list(IRanges::by(WC_select, WC_select[,1], function(x) boundaries(x))))
 
 print("WC_coords and WW_coords")
-print(length(WC_coords))
-print(length(WW_coords))
+print(nrow(WC_coords))
+print(nrow(WW_coords))
 
         if(genotype=="hom" | genotype=="low") {
 
@@ -120,6 +120,9 @@ print(length(WW_coords))
 
         }
 
+
+print("new before final pintersect")
+print(length(new))
 	
         #Removing new intervals if they don't overlap the original interval obtained by merging all overlapping inversions of the same genotype
         #A better way to do with would be to choose the two peaks so that the left one is left of GenomicRanges::end(inversions) and the right one is right of GenomicRanges::start(inversions)
