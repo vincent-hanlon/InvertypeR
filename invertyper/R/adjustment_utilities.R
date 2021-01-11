@@ -38,6 +38,8 @@ if(length(t$length) > 1){
 	m <- sort(c(m1,m2))
 
 	#Returning the inner coordinates of the peaks
+
+
 	coords <- c(sum(t$lengths[1:m[1]]), sum(t$lengths[1:(m[2]-1)])+1)
 
 } else if (length(t$length) == 1){
