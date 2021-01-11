@@ -146,8 +146,8 @@ process_reads <- function(WW_reads, WC_reads, paired_reads=TRUE){
 
         } else {
 
-                WW_reads <- GenomicRanges::GRanges(seqnames=GenomicRanges::seqnames(WW_reads),ranges=IRanges::IRanges(start=GenomicRanges::start(WW_reads), end=GenomicRanges::end(WW_reads)), strand=GenomicRanges::strand(WW_reads), GenomicRanges::mcols(WW_reads), seqlengths=GenomicRanges::seqlengths(WW_reads))
-                WC_reads <- GenomicRanges::GRanges(seqnames=GenomicRanges::seqnames(WC_reads),ranges=IRanges::IRanges(start=GenomicRanges::start(WC_reads), end=GenomicRanges::end(WC_reads)), strand=GenomicRanges::strand(WC_reads), GenomicRanges::mcols(WC_reads), seqlengths=GenomicRanges::seqlengths(WC_reads))
+                WW_reads <- GenomicRanges::GRanges(seqnames=GenomicRanges::seqnames(WW_reads),ranges=IRanges::IRanges(start=GenomicRanges::start(WW_reads), end=GenomicRanges::end(WW_reads)), strand=GenomicRanges::strand(WW_reads), GenomicRanges::mcols(WW_reads), seqlengths=GenomeInfoDb::seqlengths(WW_reads))
+                WC_reads <- GenomicRanges::GRanges(seqnames=GenomicRanges::seqnames(WC_reads),ranges=IRanges::IRanges(start=GenomicRanges::start(WC_reads), end=GenomicRanges::end(WC_reads)), strand=GenomicRanges::strand(WC_reads), GenomicRanges::mcols(WC_reads), seqlengths=GenomeInfoDb::seqlengths(WC_reads))
 
         }
 

@@ -57,7 +57,7 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
         #The new intervals are usually 3x as wide as the originals
         start_inversions <- ifelse(as.character(GenomicRanges::seqnames(WW_reads[pmax(1,f_inversions - num_inversions)]))==as.character(GenomicRanges::seqnames(inversions)), GenomicRanges::start(WW_reads[pmax(1,f_inversions - num_inversions)]),1)
         end_inversions <- ifelse(as.character(GenomicRanges::seqnames(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]))==as.character(GenomicRanges::seqnames(inversions)),
-                GenomicRanges::end(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]), GenomicRanges::seqlengths(WW_reads)[as.character(GenomicRanges::seqnames(inversions))])
+                GenomicRanges::end(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]), GenomeInfoDb::seqlengths(WW_reads)[as.character(GenomicRanges::seqnames(inversions))])
 
         #Assembling the new wide intervals
         wide_inversions <- GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions))
