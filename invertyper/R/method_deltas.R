@@ -62,9 +62,11 @@ print(length(inversions))
                 GenomicRanges::end(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]), GenomeInfoDb::seqlengths(WW_reads)[as.character(GenomicRanges::seqnames(inversions))])
 
         #Assembling the new wide intervals
+        wide_inversions <- GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions))
+
 print("wide_inversions")
 print(length(wide_inversions))
-        wide_inversions <- GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions))
+
 
         #Finding reads that overlap the wide intervals
 	#And then some annoying checks and formatting in case the wide intervals overlap 0 reads, because the pair2frgm step removes a few
