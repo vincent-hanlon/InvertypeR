@@ -22,6 +22,7 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
 
         #Next I want to merge and expand the inversions. The wider, expanded inversion intervals will be used to look for alternative breakpoints
         inversions <- GenomicRanges::sort(GenomicRanges::reduce(inversions))
+	inversions$index <- c(1:length(inversions))
 
         #It's simpler to get rid of strands----otherwise, precede and follow misbehave
         GenomicRanges::strand(WW_reads) <- "*"
@@ -60,8 +61,12 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
         end_inversions <- ifelse(as.character(GenomicRanges::seqnames(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]))==as.character(GenomicRanges::seqnames(inversions)),
                 GenomicRanges::end(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]), GenomeInfoDb::seqlengths(WW_reads)[as.character(GenomicRanges::seqnames(inversions))])
 
-        #Assembling the new wide intervals
-        wide_inversions <- GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions))
+        #Assembling the new wide intervals, and recording the sort order as well as duplicate entries so that the comparison with "inversions" in pintersect (at the end) can be done correctly.
+        rough_wide_inversions <- sort(GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions), mcols=mcols(inversions)))
+        order <- mcols(rough_wide_inversions)[,1]
+        mcols(rough_wide_inversions) <- NULL
+        wide_inversions <- unique(rough_wide_inversions)
+        rle <- countOverlaps(wide_inversions,rough_wide_inversions,type="equal")
 
         #Finding reads that overlap the wide intervals
 	#And then some annoying checks and formatting in case the wide intervals overlap 0 reads, because the pair2frgm step removes a few
@@ -105,7 +110,9 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
 
         }
 
-
+        #reconstructing the list of inversions for comparison
+        new <- rep(new, times=rle)
+        new <- new[GenomicRanges::pintersect(inversions[order],new)$hit]
 	
         #Removing new intervals if they don't overlap the original interval obtained by merging all overlapping inversions of the same genotype
         #A better way to do with would be to choose the two peaks so that the left one is left of GenomicRanges::end(inversions) and the right one is right of GenomicRanges::start(inversions)
