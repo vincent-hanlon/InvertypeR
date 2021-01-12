@@ -55,7 +55,6 @@ invertyper <- function(WW_bam, WC_bam, bed, blacklist="", paired_reads=TRUE, sex
 	inversions <- genotype_inversions(WW_reads=reads[[1]], WC_reads=reads[[2]], regions=regions, background=base[[1]], base_state=base[[2]],  sex=sex, 
 		prior=prior, prior_male=prior_male)
 
-return(list(inversions, reads, confidence, base, sex, prior, prior_male, adjust_method,paired_reads))
 	#two methods under development for dealing with overlapping intervals
 	if( adjust_method != "raw" ){
 		
