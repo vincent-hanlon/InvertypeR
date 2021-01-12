@@ -22,8 +22,7 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
 
         #Next I want to merge and expand the inversions. The wider, expanded inversion intervals will be used to look for alternative breakpoints
         inversions <- GenomicRanges::sort(GenomicRanges::reduce(inversions))
-print("initial reduce of Inversions")
-print(length(inversions))
+
         #It's simpler to get rid of strands----otherwise, precede and follow misbehave
         GenomicRanges::strand(WW_reads) <- "*"
 
@@ -64,10 +63,6 @@ print(length(inversions))
         #Assembling the new wide intervals
         wide_inversions <- GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions))
 
-print("wide_inversions")
-print(length(wide_inversions))
-
-
         #Finding reads that overlap the wide intervals
 	#And then some annoying checks and formatting in case the wide intervals overlap 0 reads, because the pair2frgm step removes a few
         WC_select <- IRanges::mergeByOverlaps(wide_inversions, WC_d)
@@ -76,26 +71,16 @@ print(length(wide_inversions))
         colnames(WC_replace) <- colnames(WC_select)
         WC_select <- rbind(WC_select, WC_replace)
 
-print("1st wc_select")
-print(nrow(WC_select))
-
         WW_select <- IRanges::mergeByOverlaps(wide_inversions, WW_d)
 	WW_missing <- inversions[!IRanges::overlapsAny(wide_inversions,WW_d)]
 	WW_replace <- cbind(IRanges::mergeByOverlaps(WW_missing, WW_missing, type="equal"), as.data.frame(matrix(20, ncol=6, nrow=length(WW_missing))))
         colnames(WW_replace) <- colnames(WW_select)
         WW_select <- rbind(WW_select, WW_replace)
 
-print("1st ww_select")
-print(nrow(WW_select))
-
 
         #Finding the two highest deltaW peaks per interval
         WW_coords <- do.call(rbind, as.list(IRanges::by(WW_select, WW_select[,1], function(x) boundaries(x))))
         WC_coords <- do.call(rbind, as.list(IRanges::by(WC_select, WC_select[,1], function(x) boundaries(x))))
-
-print("WC_coords and WW_coords")
-print(nrow(WC_coords))
-print(nrow(WW_coords))
 
         if(genotype=="hom" | genotype=="low") {
 
@@ -121,8 +106,6 @@ print(nrow(WW_coords))
         }
 
 
-print("new before final pintersect")
-print(length(new))
 	
         #Removing new intervals if they don't overlap the original interval obtained by merging all overlapping inversions of the same genotype
         #A better way to do with would be to choose the two peaks so that the left one is left of GenomicRanges::end(inversions) and the right one is right of GenomicRanges::start(inversions)
