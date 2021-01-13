@@ -62,11 +62,11 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
                 GenomicRanges::end(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]), GenomeInfoDb::seqlengths(WW_reads)[as.character(GenomicRanges::seqnames(inversions))])
 
         #Assembling the new wide intervals, and recording the sort order as well as duplicate entries so that the comparison with "inversions" in pintersect (at the end) can be done correctly.
-        rough_wide_inversions <- sort(GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions), mcols=mcols(inversions)))
-        order <- mcols(rough_wide_inversions)[,1]
-        mcols(rough_wide_inversions) <- NULL
+        rough_wide_inversions <- GenomicRanges::sort(GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions), mcols=GenomicRanges::mcols(inversions)))
+        order <- GenomicRanges::mcols(rough_wide_inversions)[,1]
+        GenomicRanges::mcols(rough_wide_inversions) <- NULL
         wide_inversions <- unique(rough_wide_inversions)
-        rle <- countOverlaps(wide_inversions,rough_wide_inversions,type="equal")
+        rle <- IRanges::countOverlaps(wide_inversions,rough_wide_inversions,type="equal")
 
         #Finding reads that overlap the wide intervals
 	#And then some annoying checks and formatting in case the wide intervals overlap 0 reads, because the pair2frgm step removes a few
