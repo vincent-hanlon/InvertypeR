@@ -34,6 +34,8 @@ To install invertyper, you should make sure you have [devtools](https://cran.r-p
 
 For instructions on how to run the main invertyper wrapper function, load the package in R and write `?invertyper`.
 
+Results for the submitted manuscript are from the InvertypeR version in commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf. The newest version produces essentially identical results, up to one or two minor shifts to inversion breakpoints per sample. 
+
 Inversion visualization
 -----------------------
 Dependencies:
