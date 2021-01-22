@@ -22,7 +22,10 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
 
         #Next I want to merge and expand the inversions. The wider, expanded inversion intervals will be used to look for alternative breakpoints
         inversions <- GenomicRanges::sort(GenomicRanges::reduce(inversions))
-	inversions$index <- c(1:length(inversions))
+
+	if(length(inversions)>0){
+		inversions$index <- c(1:length(inversions))
+	}
 
         #It's simpler to get rid of strands----otherwise, precede and follow misbehave
         GenomicRanges::strand(WW_reads) <- "*"
@@ -64,7 +67,13 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
 
         #Assembling the new wide intervals, and recording the sort order as well as duplicate entries so that the comparison with "inversions" in pintersect (at the end) can be done correctly.
         rough_wide_inversions <- GenomicRanges::sort(GenomicRanges::GRanges(seqnames = GenomicRanges::seqnames(inversions), ranges=IRanges::IRanges(start = start_inversions, end = end_inversions), mcols=GenomicRanges::mcols(inversions)))
-        order <- GenomicRanges::mcols(rough_wide_inversions)[,1]
+
+	if(length(inversions)>0){
+	        order <- GenomicRanges::mcols(rough_wide_inversions)[,1]
+	}else{
+		order <- NULL
+	}
+
         GenomicRanges::mcols(rough_wide_inversions) <- NULL
         wide_inversions <- unique(rough_wide_inversions)
         rle <- IRanges::countOverlaps(wide_inversions,rough_wide_inversions,type="equal")
