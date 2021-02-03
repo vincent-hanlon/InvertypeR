@@ -134,7 +134,7 @@ pair2frgm <- function(data.raw){
 #'
 #'
 #' @export
-process_reads <- function(WW_reads, WC_reads, paired_reads=TRUE){
+process_reads <- function(WW_reads, WC_reads, sex, paired_reads=TRUE){
 
         #Processing input reads for Aaron's deltaWCalculator
 
@@ -150,6 +150,16 @@ process_reads <- function(WW_reads, WC_reads, paired_reads=TRUE){
                 WC_reads <- GenomicRanges::GRanges(seqnames=GenomicRanges::seqnames(WC_reads),ranges=IRanges::IRanges(start=GenomicRanges::start(WC_reads), end=GenomicRanges::end(WC_reads)), strand=GenomicRanges::strand(WC_reads), GenomicRanges::mcols(WC_reads), seqlengths=GenomeInfoDb::seqlengths(WC_reads))
 
         }
+
+	# in rare cases when a few reads in a female misalign to chrY, deltaWCalculator will sometimes return objects of different lengths for different binsizes, which causes a warning
+	# this avoids the issue
+	if (sex == "female") {
+
+		WW_reads <- WW_reads[GenomicRanges::seqnames(WW_reads)!="chrY"]
+                WC_reads <- WC_reads[GenomicRanges::seqnames(WC_reads)!="chrY"]
+
+	}
+
 
         #Calculating deltaW values
         WW_d <- suppressWarnings(breakpointR::deltaWCalculator(WW_reads, 5))

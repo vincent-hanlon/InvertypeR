@@ -28,7 +28,7 @@ adjust_intervals <- function(inversions, reads, confidence=0.95, base,  sex="fem
 
 		if (adjust_method == "deltas" | adjust_method == "all" | adjust_method=="low") {
         	
-			new_reads <- process_reads(reads[[1]],reads[[2]], paired_reads=paired_reads)
+			new_reads <- process_reads(reads[[1]],reads[[2]], paired_reads=paired_reads, sex=sex)
 		}
 
 		if (adjust_method == "deltas" | adjust_method == "all") {
