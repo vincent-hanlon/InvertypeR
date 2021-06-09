@@ -8,6 +8,9 @@ Composite file creation
 -----------------------
 Dependencies:
   - *tool (version we use)*
+  - cutadapt (1.8.1)
+  - bowtie2 (2.3.5.1)
+  - Picard MarkDuplicates (2.20.0-SNAPSHOT)
   - samtools (1.10)
   - freebayes (1.3.2)
   - bcftools (1.10.2)
