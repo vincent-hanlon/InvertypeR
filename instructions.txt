@@ -24,27 +24,27 @@ adapters used in sequencing, try running a tool such as FASTQC (https://www.bioi
 Sequences" section to see what adapter sequences are present. Finally, substitute the path to your bowtie2-indexed copy of the GRCh38 reference genome (the
 indexing can be done using bowtie2-build) in the alignment script, and also substitute the path to your picard.jar file. 
 
-The alignment script is now ready to use. Make sure your FASTQ files have names like "LIBRARYNAME_R1_001.fastq.gz" and "LIBRARYNAME_R2_001.fastq.gz". Then the
+The alignment script is now ready to use. Make sure your FASTQ files have names like LIBRARYNAME_R1_001.fastq.gz and LIBRARYNAME_R2_001.fastq.gz. Then the
 alignment script can be run for any library.
 
 	code:
-		bash Invertyper/composite_files/alignment.sh "LIBRARYNAME"
+		bash InvertypeR/composite_files/alignment.sh "LIBRARYNAME"
 
 To automate the procedure for all libraries, you could put this in a loop.
 
 	code:
 		for i in *R1_001.fastq.gz
 		do 
-			LIBRARYNAME=$(echo $i | sed 's/R1_001\.fastq\.gz$//')
-			bash Invertyper/composite_files/alignment.sh "$LIBRARYNAME"
+			LIBRARYNAME=$(echo $i | sed 's/_R1_001\.fastq\.gz$//')
+			bash InvertypeR/composite_files/alignment.sh "$LIBRARYNAME"
 		done
 
 Alternatively, you could use GNU parallel (https://www.gnu.org/software/parallel/).
 
 	code: 
-		ls *R1_001.fastq.gz | sed 's/R1_001\.fastq\.gz$//' | parallel --jobs 12 bash Invertyper/composite_files/alignment.sh {}
+		ls *R1_001.fastq.gz | sed 's/_R1_001\.fastq\.gz$//' | parallel --jobs 12 bash InvertypeR/composite_files/alignment.sh {}
 
-Now you should have a set of aligned BAM files with names like "LIBRARYNAME.trimmed.sorted.mdup.bam". Move these to a new directory with their index files (.bai).
+Now you should have a set of aligned BAM files with names like LIBRARYNAME.trimmed.sorted.mdup.bam. Move these to a new directory with their index files (.bai).
 At this point you should discard poor-quality Strand-seq libraries. Experts in the field may do this manually by inspecting the ideograms produced by BreakpointR 
 (https://bioconductor.org/packages/release/bioc/html/breakpointR.html), but an automated alternative was recently published (Gros et al. 2021; 
 https://doi.org/10.1093/bioinformatics/btab221). Clone the GitHub repository (https://github.com/friendsofstrandseq/ashleys-qc) and install the dependencies
@@ -55,7 +55,7 @@ flag "-j 12" controls the number of threads to use.
 		/PATH/TO/FILE/ashleys.py -j 12 features -f ./ -w 5000000 2000000 1000000 800000 600000 400000 200000 -o ./features.tsv
 		/PATH/TO/FILE/ashleys.py predict -p ./features.tsv -o ./quality.txt -m /PATH/TO/OTHER/FILE/svc_default.pkl
 
-Using the file "quality.txt", remove libraries with probability < 0.5. 
+Using the file quality.txt, remove libraries with probability < 0.5. 
 
 Now you have a directory containing only high-quality, aligned, sorted BAM files for your Strand-seq libraries. 
 
@@ -63,25 +63,25 @@ Now you have a directory containing only high-quality, aligned, sorted BAM files
 
 2. COMPOSITE FILES
 
-The headers of the two composite file scripts ("InvertypeR/composite_files/master_WCCW_composite.sh" and "InvertypeR/composite_files/master_WWCC_composite.sh")
+The headers of the two composite file scripts (InvertypeR/composite_files/master_WCCW_composite.sh and InvertypeR/composite_files/master_WWCC_composite.sh)
 need to be altered to match your requirements. For each, input the number of threads you wish to use for parallelization, the path to your copy of the GRCh38
 reference genome (FASTA), the sex of the sample ("male" or "female"), and the path to the directory containing the composite bam scripts (e.g., 
-"PATH/TO/DIR/InvertypeR/composite_files/"). Optionally, you can also input the path to a two-column, space-delimited file with the positions of known het. SNPs
+PATH/TO/DIR/InvertypeR/composite_files/). Optionally, you can also input the path to a two-column, space-delimited file with the positions of known het. SNPs
 for your sample (for the WC composite file). Then, simply run the following.
 
 	code:
 		bash InvertypeR/composite_files/master_WCCW_composite.sh
 		bash InvertypeR/composite_files/master_WWCC_composite.sh
 
-Once the scripts run (generally overnight), two composite BAM files should appear in the directories "./WW_CC" and "./WC_CW". Examine the breakpoint plots
-(e.g., "./WC_CW/BPR_output/plots/breaksPlot.pdf") and verify that all chromosomes are present. For female samples, both files should contain chromosomes
+Once the scripts run (generally overnight), two composite BAM files should appear in the directories ./WW_CC and ./WC_CW. Examine the breakpoint plots
+(e.g., ./WC_CW/BPR_output/plots/breaksPlot.pdf) and verify that all chromosomes are present. For female samples, both files should contain chromosomes
 1-22,X. For male samples, the WC file should contain chromosomes 1-22 and the WW file should contain chromosomes 1-22,X,Y. The reads in the WW files should
 all be in the same direction (i.e., appearing orange in the breakpoint plot), and the reads in the WC files should be in both directions (i.e., half 
 orange and half green for each chromosome). In rare cases, a chromosome may be missing from the composite files because of a large SV that interfered with
-composite file creation (usually visible in the breakpoint plots for individual libraries in "./BPR_output/plots/breaksPlot.pdf"). If it affects a whole 
+composite file creation (usually visible in the breakpoint plots for individual libraries in ./BPR_output/plots/breaksPlot.pdf). If it affects a whole 
 chromosome (e.g. 3-somy of chr7), proceed with the analysis but discard any inversion calls from the affected chromosome. If the SV affects only part of a 
-chromosome, use the library-specific breakpoint plots or the UCSC Genome Browser files in "./BPR_output/browserfiles" to estimate its coordinates, and add
-those coordinates to the blacklist file "InvertypeR/composite_files/blacklist.highdepth.centromeres.bed". Then, re-run the composite file scripts. 
+chromosome, use the library-specific breakpoint plots or the UCSC Genome Browser files in ./BPR_output/browserfiles to estimate its coordinates, and add
+those coordinates to the blacklist file InvertypeR/composite_files/blacklist.highdepth.centromeres.bed. Then, re-run the composite file scripts. 
 However, such problems are rare and this is usually unnecessary. 
 
 A second useful check of the integrity of your composite files is below. If errors appear, it may mean that the scripts crashed and the files are incomplete.
@@ -109,28 +109,28 @@ you know that for a given set of 10 inversions a different sample had 1 HET inve
 as c("REF","HET","HOM")=c(0.8,0.1,0.1). For putative inversion coordinates about which you have no genotype information, we do not recommend using an
 uninformative prior (e.g., c(0.33,0.33,0.33)). In our experience, REF is by far the most likely genotype for putative inversions. If you don't have a set of 
 inversions in mind, consider using the list of 8787 (overlapping) putative inversion coordinates provided as Supplementary Data 24 in the InvertypeR paper
-(also on GitHub under "example_output"). For this we recommend using the prior c("REF","HET","HOM")=c(0.9866,0.0067,0.0067). For male samples, you will also
+(also on GitHub under example_output). For this we recommend using the prior c("REF","HET","HOM")=c(0.9866,0.0067,0.0067). For male samples, you will also
 need to provide prior probabilities for inversion on the X and Y chromoosomes. For the 8787 inversion coordinates, we use c(0.9866,2*0.0067). Similarly, choose an 
 adjust_method that fits your analysis. If using the 8787 inversion coordinates provided, we recommend adjust_method="all". However, if you wish to leave the
 inversion coordinates you provided unchanged, consider using adjust_method="raw". Finally, you should also provide a list of blacklisted regions, which can be the
-same file used for composite file creation, above. For more information on the options available, open R, load invertyper, and run the command "?invertyper".
+same file used for composite file creation, above. For more information on the options available, open R, load invertyper, and run the command ?invertyper.
 
 Here is an example of the code used to run InvertypeR.
 
 	code:
 		library(invertyper)
-		invertyper("WW_CC/merged.WW.CC.bam", "WC_CW/merged.WC.CW.bam", bed="sup_table_24_inversions.bed", 
+		invertyper("WW_CC/merged.WW.CC.bam", "WC_CW/merged.WC.CW.bam", bed="InvertypeR/example_output/sup_table_24_inversions.bed", 
 			blacklist="InvertypeR/composite_files/blacklist.highdepth.centromeres.bed", paired_reads=TRUE, sex="male", confidence=0.95, 
 			prior=c(0.9866,0.0067,0.0067), prior_male=c(0.9866,2*0.0067), adjust_method="all")
 
 InvertypeR's output file contains one line per inversion, with the inversion coordinates, the read counts separated by composite file (WW or WC) and by strand
-(W or C), the most likely genotype, the posterior genotype probability, and an optional column called "low_read_density". For plotting, or for further analysis,
+(W or C), the most likely genotype, the posterior genotype probability, and an optional column called low_read_density. For plotting, or for further analysis,
 you may want to discard genotypes with low posterior probabilities (e.g., <0.95) or REF genotypes, and this is easily done using awk. 
 
 	code:
 		awk '$1=="chr" || ($8!="0" && $8!="0|0" && $9>=0.95)' inversions.txt
 
-Moreover, some inversions may have "low read density: check for inaccurate inversion coordinates" in the "low_read_density" column. Often, such inversions span
+Moreover, some inversions may have "low read density: check for inaccurate inversion coordinates" in the low_read_density column. Often, such inversions span
 long read-poor stretches of the genome, such as centromeres, and may be supported by only a handful of reads. The coordinates of these inversions should be
 inspected, and perhaps adjusted, using the UCSC Genome Browser files produced for composite files in the previous section. 
 

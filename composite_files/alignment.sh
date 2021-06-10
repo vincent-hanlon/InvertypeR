@@ -15,7 +15,7 @@ cutadapt \
 # Aligning reads to the GRCh38 reference genome.
 # TO DO: The user needs to substitute the path to their copy of the bowtie-indexed reference genome.
 
-bowtie2 -x '/projects/lansdorp/sspipe/refseq/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bowtie_index' -1 $1".trimmed.1.fastq.gz" -2 $1".trimmed.2.fastq.gz" -S $1".trimmed.sam"
+bowtie2 -x '/home/vhanlon/sspipe/refseq/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bowtie_index' -1 $1".trimmed.1.fastq.gz" -2 $1".trimmed.2.fastq.gz" -S $1".trimmed.sam"
 
 #####################################################################################################################################
 # Sorting SAM files and compressing them into BAM files (plus retaining only high-quality reads).
