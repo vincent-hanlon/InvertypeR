@@ -9,10 +9,10 @@ threads=12
 paired="TRUE"
 
 #Path to the directory containing these scripts
-scripts="/projects/lansdorp/composite_BAM_scripts/"
+scripts="/projects/lansdorp/analysis/test/InvertypeR/composite_files/"
 
 #reference genome
-ref="/projects/lansdorp/sspipe/refseq/GRCh38.fasta"
+ref="/home/vhanlon/sspipe/refseq/GRCh38.fasta"
 
 #sex of the sample
 sex="male"

@@ -11,13 +11,13 @@ threads=12
 paired="TRUE" 
 
 #path to the directory containing these scripts
-scripts="/projects/lansdorp/composite_BAM_scripts/"
+scripts="/projects/lansdorp/analysis/test/InvertypeR/composite_files/"
 
 #The path to a SPACE-delimited two-column BED file containing the positions of heterozygous SNPs; if empty, freebayes will be used to call SNPs
 snps="" 
 
 #reference genome
-ref="/projects/lansdorp/sspipe/refseq/GRCh38.fasta"
+ref="/home/vhanlon/sspipe/refseq/GRCh38.fasta"
 
 #sex of the sample
 sex="male"

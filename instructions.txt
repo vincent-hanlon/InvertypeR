@@ -44,12 +44,12 @@ Alternatively, you could use GNU parallel (https://www.gnu.org/software/parallel
 	code: 
 		ls *R1_001.fastq.gz | sed 's/_R1_001\.fastq\.gz$//' | parallel --jobs 12 bash InvertypeR/composite_files/alignment.sh {}
 
-Now you should have a set of aligned BAM files with names like LIBRARYNAME.trimmed.sorted.mdup.bam. Move these to a new directory with their index files (.bai).
-At this point you should discard poor-quality Strand-seq libraries. Experts in the field may do this manually by inspecting the ideograms produced by BreakpointR 
-(https://bioconductor.org/packages/release/bioc/html/breakpointR.html), but an automated alternative was recently published (Gros et al. 2021; 
-https://doi.org/10.1093/bioinformatics/btab221). Clone the GitHub repository (https://github.com/friendsofstrandseq/ashleys-qc) and install the dependencies
-as instructed. Once this is done, the automated quality selection can be run on your aligned BAM files as follows (in the conda environment provided). The 
-flag "-j 12" controls the number of threads to use. 
+Now you should have a set of aligned BAM files with names like LIBRARYNAME.trimmed.sorted.mdup.bam, with their index files (.bai). Remove all other files in the 
+directory (e.g., FASTQ files, SAM files, intermediate BAM files). At this point you should discard poor-quality Strand-seq libraries. Experts in the field may do
+this manually, and more quickly, by inspecting the ideograms produced by BreakpointR (https://bioconductor.org/packages/release/bioc/html/breakpointR.html), but
+an automated alternative was recently published (Gros et al. 2021; https://doi.org/10.1093/bioinformatics/btab221). Clone the GitHub repository 
+(https://github.com/friendsofstrandseq/ashleys-qc) and install the dependencies as instructed. Once this is done, the automated quality selection can be run on 
+your aligned BAM files as follows (in the conda environment provided). The flag "-j 12" controls the number of threads to use. 
 
 	code: 
 		/PATH/TO/FILE/ashleys.py -j 12 features -f ./ -w 5000000 2000000 1000000 800000 600000 400000 200000 -o ./features.tsv
@@ -84,11 +84,12 @@ chromosome, use the library-specific breakpoint plots or the UCSC Genome Browser
 those coordinates to the blacklist file InvertypeR/composite_files/blacklist.highdepth.centromeres.bed. Then, re-run the composite file scripts. 
 However, such problems are rare and this is usually unnecessary. 
 
-A second useful check of the integrity of your composite files is below. If errors appear, it may mean that the scripts crashed and the files are incomplete.
+A second useful check of the integrity of your composite files is below. If errors appear (other than missing read groups), it may mean that the scripts 
+crashed and the files are incomplete.
 
 	code:
-		java -jar '/home/vhanlon/programs/picard.jar' ValidateSamFile I="merged.WC.CW.bam" MODE=SUMMARY
-		gunzip -t "merged.WC.CW.bam" && printf "$1\tVALID\n"
+		java -jar '/PATH/TO/picard.jar' ValidateSamFile I="WC_CW/merged.WC.CW.bam" MODE=SUMMARY
+		gunzip -t "WC_CW/merged.WC.CW.bam" && printf "VALID\n"
 
 
 
@@ -132,7 +133,8 @@ you may want to discard genotypes with low posterior probabilities (e.g., <0.95)
 
 Moreover, some inversions may have "low read density: check for inaccurate inversion coordinates" in the low_read_density column. Often, such inversions span
 long read-poor stretches of the genome, such as centromeres, and may be supported by only a handful of reads. The coordinates of these inversions should be
-inspected, and perhaps adjusted, using the UCSC Genome Browser files produced for composite files in the previous section. 
+inspected, and perhaps adjusted, using the UCSC Genome Browser files produced for composite files in the previous section. Remember that some of the inversions
+may actually be misoriented contigs in the reference genome; these cannot be identified with data from just one individual. 
 
 
 
@@ -145,6 +147,9 @@ haploplotR/in. Then put the Genome Browser files for the composite files, create
 WC_CW/BPR_output/browserfiles/*reads*) in the directory haploplotR/in/bed_reads/. Then move to the directory haplotplotR and execute the master script.
 
 	code:
-		https://github.com/mattssca/haploplotR.git
-		cd haplotplotR # and mv the InvertypeR and composite browser files as described above
-		bash haploplot_run.sh
+		git clone https://github.com/mattssca/haploplotR.git
+		cd haploplotR # and mv the InvertypeR and composite browser files as described above
+		cd ..
+		bash haploplot_run.sh # You'll need to input the sex of the sample
+
+The PDF ideogram should be visible in haploplotR/out/ideograms/. 
