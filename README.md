@@ -4,6 +4,8 @@ Source code for all three components of the InvertypeR process:
 2. InvertypeR genotyping 
 3. Inversion visualization
 
+For a detailed, step-by-step guide to the analysis, from raw FASTQ files to finished InvertypeR ideograms, see the file "instructions.txt" in this repository.
+
 Composite file creation
 -----------------------
 Dependencies:
