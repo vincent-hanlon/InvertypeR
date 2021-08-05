@@ -6,6 +6,8 @@ Source code for all three components of the InvertypeR process:
 
 For a detailed, step-by-step guide to the analysis, from raw FASTQ files to finished InvertypeR ideograms, see the file "instructions.txt" in this repository. For summaries of each component of the InvertypeR process, and for a list of dependencies, see the README, below.
 
+For more information or to cite this tool, please see the InvertypeR paper at https://doi.org/10.1186/s12864-021-07892-9 
+
 Composite file creation
 -----------------------
 Dependencies:
