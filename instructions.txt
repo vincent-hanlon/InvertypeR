@@ -4,8 +4,7 @@ These step-by-step instructions detail how to turn a set of FASTQ-formatted Stra
 and select high-quality Strand-seq libraries. Second, we use the aligned BAM files to generate two composite files for the sample. Third, we install and run 
 InvertypeR to call inversion genotypes. Fourth, we create plots and UCSC Genome Browser sessiosn to visualize the inversions.
 
-We assume that you use Bash (a Unix shell), and that you have installed all the software listed on the README of the git repository. We also assume you have 
-cloned the repository, and that you have a set of gzipped, paired-end Strand-seq FASTQ files for a single individual that you would like to analyze.
+We assume that you use Bash (a Unix shell), and that you have installed all the software listed on the README of the git repository. Note that for StrandPhaseR, we originally installed the development branch of the GitHub repository, commit 286d31eab7c27a388f7895faf3009a6d79f8bcfd, because there were installation problems with the master branch. We also assume you have cloned the repository, and that you have a set of gzipped, paired-end Strand-seq FASTQ files for a single individual that you would like to analyze.
 
 	code: 
 		git clone https://github.com/vincent-hanlon/InvertypeR.git
