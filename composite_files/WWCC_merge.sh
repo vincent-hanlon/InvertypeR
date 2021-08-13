@@ -57,7 +57,7 @@ fi
 
 rm merged.*.sam
 
-samtools sort -@$2 -n merged.WW.bam | samtools fixmate -O BAM - - | samtools sort -@$2 - |  samtools view -F4 -F8 -f2 -bh| samtools merge -@$2 merged.WW.CC.bam merged.CC.reversed.bam -
+samtools sort -@$2 -n merged.WW.bam | samtools fixmate -O BAM - - | samtools sort -@$2 - |  samtools view -F4 -F8 -f2 -bh| samtools merge -f -@$2 merged.WW.CC.bam merged.CC.reversed.bam -
 samtools index -@$2 merged.WW.CC.bam
 
 rm merged.CC.bam* merged.WW.bam* merged.CC.reversed.bam* 

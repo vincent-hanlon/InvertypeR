@@ -60,7 +60,7 @@ fi
 
 rm merged.*.sam
 
-samtools sort -@$2 -n merged.WC.bam | samtools fixmate -O BAM - - | samtools sort -@$2 - |  samtools view -F4 -F8 -f2 -bh |  samtools merge -@$2 merged.WC.CW.bam merged.CW.reversed.bam -
+samtools sort -@$2 -n merged.WC.bam | samtools fixmate -O BAM - - | samtools sort -@$2 - |  samtools view -F4 -F8 -f2 -bh |  samtools merge -f -@$2 merged.WC.CW.bam merged.CW.reversed.bam -
 samtools index -@$2 merged.WC.CW.bam
 
 mv merged.WC.CW.bam* ..

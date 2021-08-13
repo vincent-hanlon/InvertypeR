@@ -5,10 +5,16 @@ and select high-quality Strand-seq libraries. Second, we use the aligned BAM fil
 InvertypeR to call inversion genotypes. Fourth, we create plots and UCSC Genome Browser sessiosn to visualize the inversions.
 
 We assume that you use Bash (a Unix shell), and that you have installed all the software listed on the README of the git repository. Note that for StrandPhaseR, we originally
-installed the development branch of the GitHub repository, commit 286d31eab7c27a388f7895faf3009a6d79f8bcfd, because there were installation problems with the master branch. We
-also assume you have cloned the repository, and that you have a set of gzipped, paired-end Strand-seq FASTQ files for a single individual that you would like to analyze.
+installed an old commit (2019) from the development branch of the GitHub repository. However, installing the current newest commit (3c8d905bf0269b93f4da1e1ca7934887a32db024)
+from the master branch produces the same inversion results in recent tests. We also assume you have cloned the InvertypeR repository, and that you have a set of gzipped, 
+paired-end Strand-seq FASTQ files for a single individual that you would like to analyze.
 
-	code: 
+	R code (for installing StrandPhaseR):
+		install.packages(c("devtools","BiocManager"))
+		BiocManager::install(c("GenomicRanges","GenomicAlignments", "BSgenome", "BSgenome.Hsapiens.UCSC.hg38", "zoo", "breakpointR"), force = TRUE)
+		devtools::install_github("daewoooo/StrandPhaseR")		
+
+	Unix code (for cloning InvertypeR): 
 		git clone https://github.com/vincent-hanlon/InvertypeR.git
 
 
