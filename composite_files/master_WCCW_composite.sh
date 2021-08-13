@@ -36,7 +36,7 @@ mkdir ./WC_CW
 Rscript $scripts/printWCCWregions.R
 
 cd ./WC_CW
-sed -i 's/:/ /g' wc_regions.txt | awk '{print $1,$2,$3,$4}' OFS="\t" > tmp
+sed 's/:/ /g' wc_regions.txt | awk '{print $1,$2,$3,$4}' OFS="\t" > tmp
 mv tmp wc_regions.txt
 
 
