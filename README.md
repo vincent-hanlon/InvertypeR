@@ -6,7 +6,7 @@ Source code for all three components of the InvertypeR process:
 
 For a detailed, step-by-step guide to the analysis, from raw FASTQ files to finished InvertypeR ideograms, see the file "instructions.txt" in this repository. For summaries of each component of the InvertypeR process, and for a list of dependencies, see the README, below.
 
-For more information or to cite this tool, please see the InvertypeR paper at https://doi.org/10.1186/s12864-021-07892-9 
+For more information or to cite this tool, please see the InvertypeR paper at https://doi.org/10.1186/s12864-021-07892-9. If you should run into trouble, please feel free to post an Issue or contact me at vhanlon [AT] bccrc.ca.
 
 Composite file creation
 -----------------------
@@ -21,10 +21,10 @@ Dependencies:
   - R (3.5.1)
   - R package GenomicRanges (1.34.0)
   - R package [breakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) (1.5.1)
-  - R package [StrandPhaseR](https://github.com/daewoooo/StrandPhaseR) (0.99)
+  - R package [StrandPhaseR](https://github.com/daewoooo/StrandPhaseR) (1.0.0)
   - R package BSgenome.Hsapiens.UCSC.hg38 (1.4.1)
 
-These scripts create two Strand-seq composite files, given a set of single-cell Strand-seq libraries for an individual (BAM format, indexed). Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run `bash master_WWCC_composite.sh` in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run `bash master_WCCW_composite.sh`. You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). 
+Assuming your Strand-seq FASTQ libraries for an individual are now aligned, indexed BAM files, these scripts create two Strand-seq composite files. Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run `bash master_WWCC_composite.sh` in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run `bash master_WCCW_composite.sh`. You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). See "instructions.txt" for more details. 
 
 InvertypeR genotyping
 -----------------------
@@ -41,7 +41,7 @@ To install invertyper, you should make sure you have [devtools](https://cran.r-p
 
 For instructions on how to run the main invertyper wrapper function, load the package in R and write `?invertyper`.
 
-Results for the submitted manuscript are from the InvertypeR version in commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf. The newest version produces essentially identical results, up to one or two minor shifts to inversion breakpoints per sample. 
+Results for the InvertypeR paper (https://doi.org/10.1186/s12864-021-07892-9) are from commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf. The newest commit produces essentially identical results, up to one or two minor shifts to inversion breakpoints per sample. 
 
 Inversion visualization
 -----------------------
