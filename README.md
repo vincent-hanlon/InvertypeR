@@ -24,7 +24,7 @@ Dependencies:
   - R package [StrandPhaseR](https://github.com/daewoooo/StrandPhaseR) (1.0.0)
   - R package BSgenome.Hsapiens.UCSC.hg38 (1.4.1)
 
-Assuming your Strand-seq FASTQ libraries for an individual are now aligned, indexed BAM files, these scripts create two Strand-seq composite files. Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run `bash master_WWCC_composite.sh` in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run `bash master_WCCW_composite.sh`. You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). See "instructions.txt" for more details. 
+Assuming your Strand-seq FASTQ libraries for an individual are now aligned, indexed BAM files, these scripts create two Strand-seq composite files. Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run `bash master_WWCC_composite.sh` in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run `bash master_WCCW_composite.sh`. You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). Providing a VCF file of high-confidence heterozygous SNPs improves composite file creation, since it can be difficult to call good SNPs from sparse Strand-seq data alone. See "instructions.txt" for more details. 
 
 InvertypeR genotyping
 -----------------------
