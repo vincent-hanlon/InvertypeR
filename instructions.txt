@@ -73,8 +73,10 @@ Now you have a directory containing only high-quality, aligned, sorted BAM files
 The headers of the two composite file scripts (InvertypeR/composite_files/master_WCCW_composite.sh and InvertypeR/composite_files/master_WWCC_composite.sh)
 need to be altered to match your requirements. For each, input the number of threads you wish to use for parallelization, the path to your copy of the GRCh38
 reference genome (FASTA), the sex of the sample ("male" or "female"), and the path to the directory containing the composite bam scripts (e.g., 
-PATH/TO/DIR/InvertypeR/composite_files/). Optionally, you can also input the path to a two-column, space-delimited file with the positions of known het. SNPs
-for your sample (for the WC composite file). Then, simply run the following.
+PATH/TO/DIR/InvertypeR/composite_files/). Optionally, you can also input the path to a VCF file with the positions of known heterozygous SNPs
+for your sample (for the WC composite file). Good-quality SNPs are essential to produce a good WC composite file, and in samples for which there is not enough sequence data, the composite file creation routine might be unable to call good enough SNPs from the Strand-seq data alone.
+
+Then, simply run the following.
 
 	code:
 		bash InvertypeR/composite_files/master_WCCW_composite.sh
@@ -98,6 +100,7 @@ crashed and the files are incomplete.
 		java -jar '/PATH/TO/picard.jar' ValidateSamFile I="WC_CW/merged.WC.CW.bam" MODE=SUMMARY
 		gunzip -t "WC_CW/merged.WC.CW.bam" && printf "VALID\n"
 
+Finally, if you know of a large heterozygous inversion in your sample beforehand, it is often useful to check that it is properly represented in the WC composite file. For example, there is a very common 4-5 Mb inversion on chromosome 8p, which if present is visible in individual (non-composite) Strand-seq libraries. If your sample happens to be heterozygous for this inversion, check whether the WC composite file shows a strand switch at the expected location. If not, it is likely that the input SNPs were too poor quality or there was not enough Strand-seq data. 30-60 libraries with at least 20 million unique reads in total seems to be sufficient for good composite files, but more testing is needed.
 
 
 3. INVERSION CALLING
