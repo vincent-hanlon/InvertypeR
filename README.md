@@ -26,6 +26,8 @@ Dependencies:
 
 Assuming your Strand-seq FASTQ libraries for an individual are now aligned, indexed BAM files, these scripts create two Strand-seq composite files. Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run `bash master_WWCC_composite.sh` in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run `bash master_WCCW_composite.sh`. You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). Providing a VCF file of high-confidence heterozygous SNPs improves composite file creation, since it can be difficult to call good SNPs from sparse Strand-seq data alone. See "instructions.txt" for more details. 
 
+In my experience, 30 or more libraries with at least 20 million unique reads in total is sufficient to make good composite files and call inversions. However, it may be possible to make good composite files with fewer reads, especially with the help of a good VCF file of heterozygous SNPs. On the other hand, having more reads will allow InvertypeR to genotype more & smaller inversions.
+
 InvertypeR genotyping
 -----------------------
 Dependencies:
