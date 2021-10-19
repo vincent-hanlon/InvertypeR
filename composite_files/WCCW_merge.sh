@@ -23,12 +23,12 @@ done
 
 #convert R boolean to bash boolean
 
-if [ "$2" = "FALSE" ]
+if [ "$3" = "FALSE" ]
 then
 
 	paired=false
 
-elif [ "$2" = "TRUE" ]
+elif [ "$3" = "TRUE" ]
 then
 
 	paired=true
@@ -38,6 +38,7 @@ fi
 #Check whether we're dealing with pe reads here
 if $paired
 then
+	echo "paired end reads"
 	#Switching mate one and mate two
 	samtools view -f64 merged.CW.bam | awk '{$2=$2+64; print $0}' OFS="\t"  > merged.m1.sam	
 	samtools view -f128 merged.CW.bam | awk '{$2=$2-64; print $0}' OFS="\t"  > merged.m2.sam
@@ -46,9 +47,8 @@ then
 			samtools view -F4 -F8 -f2 -bh > merged.CW.reversed.bam
 
 else
+	echo "single end reads"
 
-	#I don't actually know if the SE version works...
-	#However, it should just reverse all the reads and alter the fragment length column accordingly
 	samtools view -F4 -F8 -F16 merged.CW.bam | awk '{$2=$2+16; $9=-1*$9;  print $0}' OFS="\t"  > merged.f.sam
 	samtools view -F4 -F8 -f16 merged.CW.bam | awk '{$2=$2-16; $9=-1*$9;  print $0}' OFS="\t"  > merged.r.sam
 

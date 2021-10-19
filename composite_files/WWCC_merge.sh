@@ -12,17 +12,18 @@ do
 	samtools index -@$2 merged.$j.bam 
 	rm tmp.*.$j.bam
 
+
 done
 
 
 #convert R boolean to bash boolean
 
-if [ "$2" = "FALSE" ]
+if [ "$3" = "FALSE" ]
 then
 
 	paired=false
 
-elif [ "$2" = "TRUE" ]
+elif [ "$3" = "TRUE" ]
 then
 
 	paired=true
@@ -32,7 +33,7 @@ fi
 #Check whether we're dealing with pe reads here
 if $paired
 then
-
+echo "paired end reads"
 
 #could be simplified. Why not take reverse reads and subtract 16, and take forward reads and add 16?
 #should also change the mate flags...
@@ -45,8 +46,8 @@ cat <(samtools view -H merged.CC.bam) merged.m1.sam merged.m2.sam |  samtools so
 
 else
 
-#I don't actually know if the SE version works...
 echo "single end reads"
+
 samtools view -F4 -F8 -F16 merged.CC.bam | awk '{$2=$2+16; $9=-1*$9;  print $0}' OFS="\t"  > merged.f.sam
 samtools view -F4 -F8 -f16 merged.CC.bam | awk '{$2=$2-16; $9=-1*$9;  print $0}' OFS="\t"  > merged.r.sam
 

@@ -11,16 +11,16 @@ threads=12
 paired="TRUE" 
 
 #path to the directory containing these scripts
-scripts="/projects/lansdorp/analysis/test/InvertypeR/composite_files/"
+scripts="/home/vhanlon/InvertypeR/composite_files/"
 
-#The path to a SPACE-delimited two-column BED file containing the positions of heterozygous SNPs; if empty, freebayes will be used to call SNPs
+#The path to a VCF file containing good-quality heterozygous SNPs for the sample. If empty, this script will try to call SNPs with bbtools.
 snps="" 
 
 #reference genome
-ref="/home/vhanlon/sspipe/refseq/GRCh38.fasta"
+ref="/projects/lansdorp/sspipe/refseq/GRCh38.fasta"
 
 #sex of the sample
-sex="male"
+sex="female"
 
 
 
@@ -42,10 +42,12 @@ mv tmp wc_regions.txt
 
 if [ "$snps" = "" ]; then
 
-	bash $scripts/call_SNPs_parallel.sh $ref $threads	
-	snps=$(pwd)"/snps.vcf"
+	bash $scripts/call_SNPs.sh $ref	
+	snps=$(pwd)"/called_snps.vcf"
 fi
 
+bcftools view -H -v snps -m2 -M2 -g het $snps > snps.vcf
+snps=$(pwd)"/snps.vcf"
 
 #Calling StrandPhaseR
 Rscript $scripts/strandPhase.R $threads $(pwd) $snps $paired

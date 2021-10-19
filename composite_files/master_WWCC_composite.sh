@@ -9,13 +9,13 @@ threads=12
 paired="TRUE"
 
 #Path to the directory containing these scripts
-scripts="/projects/lansdorp/analysis/test/InvertypeR/composite_files/"
+scripts="/home/vhanlon/InvertypeR/composite_files/"
 
 #reference genome
 ref="/home/vhanlon/sspipe/refseq/GRCh38.fasta"
 
 #sex of the sample
-sex="male"
+sex="female"
 
 
 ##########################################################################################################
