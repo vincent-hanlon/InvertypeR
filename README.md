@@ -16,7 +16,7 @@ Dependencies:
   - bowtie2 (2.3.5.1)
   - Picard MarkDuplicates (2.20.0-SNAPSHOT)
   - samtools (1.10)
-  - freebayes (1.3.2)
+  - BBmap (37.62; we use callvariants.sh only)
   - bcftools (1.10.2)
   - R (3.5.1)
   - R package GenomicRanges (1.34.0)
