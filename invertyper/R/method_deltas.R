@@ -86,7 +86,7 @@ adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c
         colnames(WC_replace) <- colnames(WC_select)
         WC_select <- rbind(WC_select, WC_replace)
         WW_select <- IRanges::mergeByOverlaps(wide_inversions, WW_d)
-	WW_missing <- inversions[!IRanges::overlapsAny(wide_inversions,WW_d)]
+	WW_missing <- wide_inversions[!IRanges::overlapsAny(wide_inversions,WW_d)]
 	WW_replace <- cbind(IRanges::mergeByOverlaps(WW_missing, WW_missing, type="equal"), as.data.frame(matrix(20, ncol=6, nrow=length(WW_missing))))
         colnames(WW_replace) <- colnames(WW_select)
         WW_select <- rbind(WW_select, WW_replace)
