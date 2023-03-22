@@ -1,0 +1,43 @@
+Package: invertyper
+Title: Bayesian Inversion Genotyping with Strand-Seq
+Version: 0.0.0.2
+Authors@R: 
+    person(given = "Vincent",
+           family = "Hanlon",
+           role = c("aut", "cre"),
+           email = "vincent.c.t.hanlon@gmail.com")
+Description: The package implements a Bayesian binomial model to genotype inversions in Strand-seq data. In a sense, 
+	InvertypeR can also be used to discover inversions that were not already known to be present in the data. This can be done when many putative inversions are genotyped, for example, if all 
+	inversions recorded in dbVar are genotyped with an appropriate prior. This package can also adjust the start and end coordinates of inversions in a variety of ways.
+License: MIT 
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+biocViews:
+Imports:
+	GenomicRanges,
+	IRanges,
+	Rsamtools,
+	GenomicAlignments,
+	matrixStats,
+        GenomeInfoDb,
+	cowplot, 
+	methods,
+	utils,
+	grDevices,
+	stats,
+	S4Vectors,
+	GenomeInfoDb (>= 1.12.3),
+	IRanges,
+	Rsamtools,
+	GenomicAlignments,
+	ggplot2,
+	BiocGenerics,
+	gtools,
+	doParallel,
+	foreach,
+	breakpointRdata,
+	breakpointR,
+	StrandPhaseR,
+	parallel,
