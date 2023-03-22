@@ -5,7 +5,8 @@ Authors@R:
     person(given = "Vincent",
            family = "Hanlon",
            role = c("aut", "cre"),
-           email = "vincent.c.t.hanlon@gmail.com")
+           email = "vincent.c.t.hanlon@gmail.com",
+           comment = c(ORCID = "0000-0002-2008-8957"))
 Description: The package implements a Bayesian binomial model to genotype inversions in Strand-seq data. In a sense, 
 	InvertypeR can also be used to discover inversions that were not already known to be present in the data. This can be done when many putative inversions are genotyped, for example, if all 
 	inversions recorded in dbVar are genotyped with an appropriate prior. This package can also adjust the start and end coordinates of inversions in a variety of ways.
@@ -15,6 +16,8 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 biocViews:
+Depends:
+	StrandPhaseR,
 Imports:
 	GenomicRanges,
 	IRanges,
@@ -39,5 +42,5 @@ Imports:
 	foreach,
 	breakpointRdata,
 	breakpointR,
-	StrandPhaseR,
 	parallel,
+	R.utils,

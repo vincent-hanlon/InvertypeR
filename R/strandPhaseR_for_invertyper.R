@@ -6,6 +6,10 @@
 #'
 #' @export
 strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL, chromosomes=NULL, paired_reads=TRUE, num.iterations=3, galignmentslist=galignmentslist) {
+
+R.utils::reassignInPackage("bamregion2GRanges", "StrandPhaseR", bamregion2GRanges_for_invertyper)
+
+message("1")
 	
 	### Helper functions ###
 	#=======================
@@ -29,6 +33,7 @@ strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL
 	## Put options into list and merge with conf
 	params <- list(numCPU=numCPU, positions=positions, WCregions=WCregions, chromosomes=chromosomes, pairedEndReads=paired_reads, num.iterations=num.iterations)
 	conf <- params[setdiff(names(params),names(NULL))]
+message("2")
 
 	#===================
 	### Input checks ###
@@ -41,9 +46,11 @@ strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL
 	if(is.null(conf[['chromosomes']]) && !is.null(conf[['WCregions']])){
 		conf[['chromosomes']] <- sort(as.character.factor(unique(GenomicRanges::seqnames(conf[['WCregions']]))))
 	}
+message("3")
 
 	## Loading in list of SNV positions and locations of WC regions
 	snvs <- suppressWarnings(suppressMessages(StrandPhaseR::vcf2ranges(vcfFile=conf[['positions']], genotypeField=1, chromosome=conf[['chromosomes']])))
+message("4")
 
 	conf[['chromosomes']] <- as.character(conf[['chromosomes']])
 
@@ -52,18 +59,23 @@ strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL
 	
 	# need to awkwardly make this accessible to all sub-functions...
 	galignmentslist_global_for_invertyper <<- galignmentslist
+message("5")
 
 	for(i in conf[['chromosomes']]){
-	temp <- suppressMessages(StrandPhaseR::phaseChromosome(inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i], chromosome=i,
-                                       WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], min.baseq=20, num.iterations=conf[['num.iterations']],
-                                       translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL, galignmentslist_global_for_invertyper=galignmentslist_global_for_invertyper))
 
+message("5.3")
+	temp <- phaseChromosome_for_invertyper(inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i], chromosome=i,
+                                       WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], min.baseq=20, num.iterations=conf[['num.iterations']],
+                                       translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL)
+message("add back in suppress messages for PC!")
+message("5.4")
 	all_phased_WCregions <- append(all_phased_WCregions, temp)
 	}
 
 #	all_phased_WCregions <- suppressMessages(lapply(conf[['chromosomes']], StrandPhaseR::phaseChromosome, inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == conf[['chromosomes']]], 
 #					WCregions=WCregions, pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], min.baseq=20, num.iterations=conf[['num.iterations']], 
-#					translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL,  galignmentslist_global_for_invertyper=galignmentslist_global_for_invertyper))#, mc.cores=numCPU))
+#					translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL))#, mc.cores=numCPU))
+message("6")
 
 	rm('galignmentslist_global_for_invertyper', envir=globalenv())
 	invisible(gc())
@@ -73,6 +85,7 @@ strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL
         all_phased_WCregions <- as.data.frame(do.call(rbind,all_phased_WCregions))
         all_phased_WCregions[all_phased_WCregions[5]=="W",5] <- "wc"
         all_phased_WCregions[all_phased_WCregions[5]=="C",5] <- "cw"
+message("7")
 
         names(all_phased_WCregions) <- c("filename","chr","start","end","states")
 

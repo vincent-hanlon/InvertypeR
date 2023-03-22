@@ -29,6 +29,9 @@
 #' @export
 breakpointr_for_invertyper <- function(grangeslist=NULL, paired_reads=FALSE, plotspath=NULL,numCPU=4, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=NULL, chromosomes=NULL) {
 
+	# so that R stops complaining about not being able to find dopar
+	`%dopar%` <- foreach::`%dopar%`
+
 	 runBreakpointr_for_InvertypeR <- function(granges, paired_reads=FALSE,plotspath=NULL,windowsize=1000000,binMethod="size",minReads=50,background=0.2,maskRegions=NULL, name='unknown', chromosomes=NULL){
 	
 		if(is.null(name)){
@@ -67,7 +70,7 @@ breakpointr_for_invertyper <- function(grangeslist=NULL, paired_reads=FALSE, plo
 		doParallel::registerDoParallel(cl)
 
 		message("Finding breakpoints ...", appendLF=FALSE); ptm <- proc.time()
-		temp <- foreach (index = c(1:length(grangeslist)), .packages='breakpointR', .final = function(x) setNames(x, names(grangeslist))) %dopar% {
+		temp <- foreach::foreach (index = c(1:length(grangeslist)), .packages='breakpointR', .final = function(x) setNames(x, names(grangeslist))) %dopar% {
 			runBreakpointr_for_InvertypeR(granges = grangeslist[[index]], paired_reads=paired_reads, plotspath=plotspath,windowsize=windowsize,binMethod=binMethod,minReads=minReads,background=background,maskRegions=maskRegions, name=names(grangeslist)[index], chromosomes=chromosomes)
 		}
     

@@ -27,17 +27,21 @@
 #'
 #' @export
 
-invertyper_pipeline <- function(regions_to_genotype=NULL, prior = c(0.333,0.333,0.333), prior_male=c(0.5,0.5),  adjust_method=c("raw","merge","deltas","minimal", "low", "all"), inputfolder='./', outputfolder='./', sex='female', vcf=NULL, paired_reads=TRUE, confidence=0.95, blacklist=NULL, chromosomes=NULL, numCPU=24, save_composite_files=FALSE, write_browser_files=FALSE, discover_breakpointr_inversions=TRUE, breakpointr_prior=c(0.9,0.05,0.05), breakpointr_prior_male=c(0.9,0.1), windowsize=c(40,120,260), minReads=c(15,50,50), background=0.2, output_file="inversions.txt") {
+invertyper_pipeline <- function(regions_to_genotype=NULL, prior = c(0.333,0.333,0.333), prior_male=c(0.5,0.5),  adjust_method=c("raw","merge","deltas","minimal", "low", "all"), inputfolder='./', outputfolder='./', sex='female', vcf=NULL, paired_reads=TRUE, confidence=0.95, blacklist=NULL, chromosomes=NULL, numCPU=24, save_composite_files=FALSE, write_browser_files=FALSE, discover_breakpointr_inversions=TRUE, breakpointr_prior=c(0.9,0.05,0.05), breakpointr_prior_male=c(0.9,0.1), windowsize=c(40,120,360), minReads=c(15,50,50), background=0.2, output_file="inversions.txt") {
 
 stopifnot("The provided sex should be 'male' or 'female'. This affects whether we consider the X chromosome diploid, and whether we look for inversions on a haploid Y chromosome" = (sex %in% c('male', 'female') & length(sex) ==1))
 stopifnot("There is nothing to genotype: either provide a list of putative inversions (regions_to_genotype) or set discover_breakpointr_inversions=TRUE" = !is.null(regions_to_genotype) | discover_breakpointr_inversions)
 stopifnot("The confidence threshold for posterior probabilties must be between 0 and 1 (and it should be of type numeric). In general, the arbitrary convention is to choose 0.95." = (as.numeric(confidence) < 1 & as.numeric(confidence) > 0 & is.numeric(confidence)))
 stopifnot('Please choose a value for adjust_method. This controls how InvertypeR will attempt to improve the inversion coordinates you supply. Valid values are "raw","merge","deltas","minimal", "low", or "all".' = all(length(adjust_method)==1 & adjust_method %in% c("raw","merge","deltas","minimal", "low", "all")) | is.null(regions_to_genotype))
 stopifnot("The arguments minReads and windowsize should be parallel (have the same length)" = (length(minReads)==length(windowsize)))
+stopifnot("The regions_to_genotype file cannot be found" = is.null(regions_to_genotype) || file.exists(regions_to_genotype))
+stopifnot("The blacklist file cannot be found" = is.null(blacklist) || file.exists(blacklist))
+stopifnot("The vcf file cannot be found" = is.null(vcf) || file.exists(vcf))
+stopifnot("The inputfolder cannot be found" = file.exists(inputfolder))
 
-if(all(prior == c(0.333,0.333,0.333)) | (sex=='male' & all(prior_male == c(0.5,0.5)))){
 
-message("Using the default priors (prior for females, or both prior and prior_male for males) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes.")
+if(!is.null(regions_to_genotype) && all(prior == c(0.333,0.333,0.333)) | (sex=='male' & all(prior_male == c(0.5,0.5)))){
+
 warning("Using the default priors (prior for females, or both prior and prior_male for males) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes.") 
 
 }

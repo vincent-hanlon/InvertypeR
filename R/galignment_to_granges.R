@@ -34,7 +34,7 @@ galignment_to_granges <- function(galignments=NULL, purpose=NULL, paired_reads=T
 		granges$XA <- NA
 
 		if(length(region)>0){
-			granges <- granges[GenomicRanges::seqnames(granges) %in% GenomeInfoDb::seqlevels(region)]
+			granges <- granges[as.vector(GenomicRanges::seqnames(granges)) %in% as.vector(GenomeInfoDb::seqlevels(region))]
 			GenomeInfoDb::seqlevels(granges) <- GenomeInfoDb::seqlevels(region)
 			granges <- GenomeInfoDb::keepSeqlevels(granges, GenomeInfoDb::seqlevels(region), pruning.mode="coarse")
 		} 

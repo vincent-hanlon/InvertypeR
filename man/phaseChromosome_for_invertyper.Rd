@@ -18,8 +18,7 @@ phaseChromosome_for_invertyper(
   fillMissAllele = NULL,
   splitPhasedReads = FALSE,
   compareSingleCells = FALSE,
-  exportVCF = NULL,
-  galignmentslist_global_for_invertyper = galignmentslist_global_for_invertyper
+  exportVCF = NULL
 )
 }
 \description{

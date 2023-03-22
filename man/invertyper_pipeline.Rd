@@ -23,7 +23,7 @@ invertyper_pipeline(
   discover_breakpointr_inversions = TRUE,
   breakpointr_prior = c(0.9, 0.05, 0.05),
   breakpointr_prior_male = c(0.9, 0.1),
-  windowsize = c(40, 120, 260),
+  windowsize = c(40, 120, 360),
   minReads = c(15, 50, 50),
   background = 0.2,
   output_file = "inversions.txt"

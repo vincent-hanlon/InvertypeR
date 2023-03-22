@@ -4,8 +4,9 @@
 #'
 #' @export
 phaseChromosome_for_invertyper <- function(inputfolder, outputfolder='./StrandPhaseR_analysis', positions=NULL, WCregions=NULL, chromosome=NULL, pairedEndReads=TRUE, min.mapq=10, min.baseq=30, num.iterations=2, translateBases=TRUE, fillMissAllele=NULL, 
-splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL, galignmentslist_global_for_invertyper=galignmentslist_global_for_invertyper) {
+splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL) {
 
+	message("Using Vincents altered PhaseChromosome...")
         GenomeInfoDb::seqlevels(positions, pruning.mode='coarse') <- chromosome
         GenomeInfoDb::seqlevels(WCregions, pruning.mode='coarse') <- chromosome
   #load data into matrix
