@@ -146,9 +146,9 @@ names(to_plot)[2] <- 'WC_composite_file'
 
 
 
-message('start plot composites')
-invisible(suppressMessages(breakpointr_for_invertyper(to_plot, paired_reads=FALSE, plotspath=outputfolder,numCPU=numCPU, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=blacklist,chromosomes=chromosomes)))
+invisible(suppressMessages(breakpointr_for_invertyper(to_plot, paired_reads=FALSE, plotspath=outputfolder,numCPU=numCPU, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=NULL,chromosomes=chromosomes)))
 
+message('start save composites')
 if(save_composite_files){
 
 	if('ww' %in% type){

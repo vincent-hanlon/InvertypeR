@@ -56,8 +56,8 @@ warning("Using the default priors (prior for females, or both prior and prior_ma
 	regions <- regions_to_genotype
 
 	#Takes reads from the BAM files that overlap the regions and stores them as GRanges
-	WW_reads <- read_bam(WW_reads, region=regions+1e06, paired_reads=paired_reads, blacklist=blacklist)
-	WC_reads <- read_bam(WC_reads, region=regions+1e06, paired_reads=paired_reads, blacklist=blacklist)
+	WW_reads <- read_bam(WW_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=GenomeInfoDb::seqlengths(WW_reads), distance=1e06), min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
+	WC_reads <- read_bam(WC_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=GenomeInfoDb::seqlengths(WC_reads), distance=1e06),min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
 
         #Accurate background estimate, plus base strand state for the WW/CC file
         base <- WWCC_background(WW_reads, binsize=1000000, paired_reads=paired_reads)

@@ -24,7 +24,9 @@ if (!file.exists(outputfolder)) {
 
 region <- inversions[inversions[,9]>confidence & inversions[,8]!=0 & inversions[,8]!="0|0",]
 
-region <- GenomicRanges::reduce(GenomicRanges::makeGRangesFromDataFrame(region, ignore.strand=TRUE, seqnames.field=names(region)[1], start.field=names(region)[2],end.field=names(region)[3]) + 5e06, min.gapwidth=1000)
+
+
+region <- GenomicRanges::reduce(widen(granges=GenomicRanges::makeGRangesFromDataFrame(region, ignore.strand=TRUE, seqnames.field=names(region)[1], start.field=names(region)[2],end.field=names(region)[3]), seqlengths=GenomeInfoDb::seqlengths(WW_reads), distance=5e06), min.gapwidth=1000)
 
 WW_reads <- galignment_to_granges(WW_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)
 WC_reads <- galignment_to_granges(WC_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)

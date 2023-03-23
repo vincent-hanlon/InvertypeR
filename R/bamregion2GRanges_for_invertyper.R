@@ -18,18 +18,13 @@ bamregion2GRanges_for_invertyper <- function(bamfile, bamindex, region=NULL, pai
 	message('using Vincents altered bamregion2GRanges...')
 
 	bamfile <- intToUtf8(rev(utf8ToInt(bamfile)))
- message("b2g1")
 	bamfile <- gsub("/.*","", bamfile)
- message("b2g2")
 
 	bamfile <- intToUtf8(rev(utf8ToInt(bamfile)))
- message("b2g3")
 
 	galignment <- all_alignments[[bamfile]]
- message("b2g4")
 
 	reads <- galignment_to_granges(galignment, purpose="StrandPhaseR", paired_reads=pairedEndReads, region=region)
- message("b2g5")
 
 	return(reads)
 

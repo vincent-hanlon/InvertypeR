@@ -4,7 +4,7 @@
 \alias{test}
 \title{test function}
 \usage{
-test()
+test(granges)
 }
 \description{
 test function

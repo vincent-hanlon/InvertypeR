@@ -1,3 +1,5 @@
+#' It is currently unwise to use this function with few chromosomes, because if no reads in a library overlap the blacklist then that library will be skipped will probably cause an error
+#' 
 #' @param composite_files
 #' @param windowsize
 #' @param minReads

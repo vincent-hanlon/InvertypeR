@@ -200,5 +200,26 @@ return(data.frame(seqnames, start, width))
 
 
 
+#' Widens GenomicRanges objects without falling off the start or end of a chromosome
+#'
+#' @param granges A GRanges object to widen  
+#' @param seqlengths A named vector of chromosome lengths, such as is produced by seqlengths(granges)
+#' @param distance A positive integer: each interval will be widened by this distance to the right and to the left
+#'
+#' @return A widened GRanges object
+#' @export
+
+widen <- function(granges,seqlengths,distance) {
+
+stopifnot("The distance must be an integer greater than 0" = distance > 0)
+
+GenomicRanges::start(granges) <- pmax(GenomicRanges::start(granges) - distance, 1)
+chromosome_names <- as.vector(GenomicRanges::seqnames(granges))
+chromosome_lengths <- seqlengths[match(chromosome_names,names(seqlengths))]
+GenomicRanges::end(granges) <- pmin(GenomicRanges::end(granges) + distance, chromosome_lengths)
+
+return(granges)
+}
+
 
 
