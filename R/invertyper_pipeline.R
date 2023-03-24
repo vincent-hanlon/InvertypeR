@@ -71,7 +71,7 @@ test(regions_to_genotype)
 
 message('start inv genotyping (bpr)')
 save(possible_inversions, file="possible.RData")
-breakpointr_inversions <- invertyper(WW_reads=composite_files$WW, WC_reads=composite_files$WC, regions_to_genotype=possible_inversions, blacklist=blacklist, paired_reads=paired_reads, sex=sex, confidence=confidence,prior=breakpointr_prior, prior_male=breakpointr_prior_male, output_file=paste0("breakpointr_",output_file), adjust_method=c("merge"))
+breakpointr_inversions <- invertyper(WW_reads=composite_files$WW, WC_reads=composite_files$WC, regions_to_genotype=possible_inversions, blacklist=blacklist,paired_reads=paired_reads, sex=sex, confidence=confidence,prior=breakpointr_prior, prior_male=breakpointr_prior_male, output_file=paste0("breakpointr_",output_file), adjust_method=c("merge"))
 
 
 
