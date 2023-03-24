@@ -25,6 +25,9 @@ bamregion2GRanges_for_invertyper <- function(bamfile, bamindex, region=NULL, pai
 	galignment <- all_alignments[[bamfile]]
 
 	reads <- galignment_to_granges(galignment, purpose="StrandPhaseR", paired_reads=pairedEndReads, region=region)
+	
+	name <- paste0(as.character(bamfile),".txt")
+	file.create(name)
 
 	return(reads)
 

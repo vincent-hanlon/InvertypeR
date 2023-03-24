@@ -38,25 +38,12 @@ if (!file.exists(outputfolder)) {
 bamlist <- list.files(inputfolder, pattern="\\.bam$")
 stopifnot("No BAM files found in inputfolder for composite file creation." = length(bamlist) > 0)
 
-
-#    cl <- parallel::makeCluster(config[['numCPU']])
-#    doParallel::registerDoParallel(cl)
-  
-#    message("Finding breakpoints ...", appendLF=FALSE); ptm <- proc.time()
-#    temp <- foreach (file = files, .packages=c('breakpointR')) %dopar% {
-#        runBreakpointrANDexport(file = file, datapath = datapath, browserpath = browserpath, config = config)
-#    }
-    
-#    parallel::stopCluster(cl)
-
-
-suppressMessages(cl <- parallel::makeCluster(numCPU))
-doParallel::registerDoParallel(cl)
-
-#(maybe should include something here like this:  doParallel::registerDoParallel(cl))
 # We first must read in the BAM files without removing reads in blacklisted regions or chromosomes that are left out
 message('start read bams')
-galignmentslist <- parallel::parSapply(cl, bamlist, read_bam, blacklist=NULL, chromosomes=NULL, paired_reads=paired_reads)
+
+cl <- suppressMessages(parallel::makeCluster(numCPU))
+galignmentslist <- parallel::parLapply(cl, bamlist, read_bam, blacklist=NULL, chromosomes=NULL, paired_reads=paired_reads)
+
 names(galignmentslist) <- bamlist
 found_chromosomes <- unique(sort(do.call('c',lapply(galignmentslist,function(x)unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
 
@@ -66,7 +53,7 @@ if(!all(chromosomes %in% found_chromosomes)){
 
 message('start granges conversion')
 
-grangeslist <- parallel::parSapply(cl, galignmentslist, galignment_to_granges, purpose='BreakpointR', paired_reads=paired_reads, pair2frgm=FALSE, simplify = FALSE,USE.NAMES = TRUE)
+grangeslist <- parallel::parLapply(cl, galignmentslist, galignment_to_granges, purpose='BreakpointR', paired_reads=paired_reads, pair2frgm=FALSE)
 names(grangeslist) <- names(galignmentslist)
 parallel::stopCluster(cl)
 
@@ -87,10 +74,10 @@ invisible(gc())
 
 message('start chromosome downsample')
 if(!is.null(blacklist) | !is.null(chromosomes)){
-suppressMessages(cl <- parallel::makeCluster(numCPU))
+cl <- suppressMessages(parallel::makeCluster(numCPU))
 
 # now we "re-read" the BAM files, but in reality we're just subsetting Galignments objects according to the chromosomes and blacklist
-galignmentslist <- parallel::parSapply(cl, galignmentslist, read_bam, blacklist=blacklist, chromosomes=chromosomes)
+galignmentslist <- parallel::parLapply(cl, galignmentslist, read_bam, blacklist=blacklist, chromosomes=chromosomes)
 names(galignmentslist) <- bamlist
 
 parallel::stopCluster(cl)
@@ -123,14 +110,7 @@ invisible(gc())
 
 message('start composite assembly')
 
-
-
-
-# maybe this should eventually be parallelized using R parallel and parSapply, but to be honest parallel::mclapply seems faster and less complicated so far.
-#cl <- parallel::makeCluster(numCPU)
-# parallelizing hides error messages in sub-functions though: so these should be in try-catch statements with useful error messages
-# ... and definitely the numCPU=1 case should return useful messages (for example, maybe it needs to be wrapped in an if statement where the alternative is a for loop, like in DP's code.
-
+# If this is parallelized with parLapply instead it might work on Windows, but unfortunately parLapply can't subset GenomicRanges like granges[vector] for some weird reason.
 CC <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=WWCCregions, paired_reads=paired_reads, states='cc', flip_reads=TRUE, mc.cores=numCPU)
 WW <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=WWCCregions, paired_reads=paired_reads, states='ww', flip_reads=FALSE, mc.cores=numCPU)
 
@@ -145,7 +125,6 @@ rm('galignmentslist')
 invisible(gc())
 
 
-#parallel::stopCluster(cl)
 message('make ww file')
 WW_composite_file <- do.call('c',c(CC,WW))
 

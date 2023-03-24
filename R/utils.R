@@ -72,7 +72,7 @@ reads <- GenomicAlignments::GAlignmentPairs(GenomicAlignments::second(reads),Gen
 reads <- BiocGenerics::invertStrand(reads)
 } 
 
-reads <- reads[!is.na(GenomicRanges::seqnames(reads))]
+reads <- reads[!is.na(as.vector(GenomicRanges::seqnames(reads)))]
 
 return(reads)
 

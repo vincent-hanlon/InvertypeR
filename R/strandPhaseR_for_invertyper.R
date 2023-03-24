@@ -8,6 +8,8 @@
 strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL, chromosomes=NULL, paired_reads=TRUE, num.iterations=3, galignmentslist=galignmentslist) {
 
 R.utils::reassignInPackage("bamregion2GRanges", "StrandPhaseR", bamregion2GRanges_for_invertyper)
+bamregion2GRanges <- bamregion2GRanges_for_invertyper
+`%dopar%` <- foreach::`%dopar%`
 	
 	### Helper functions ###
 	#=======================
@@ -55,19 +57,58 @@ R.utils::reassignInPackage("bamregion2GRanges", "StrandPhaseR", bamregion2GRange
 	# need to awkwardly make this accessible to all sub-functions...
 	galignmentslist_global_for_invertyper <<- galignmentslist
 
+
+message("bamregions should write a whole bunch of empty files if the correct one is being used")
+	if(conf[['numCPU']]>1) {
+
+
+    cl <- parallel::makeCluster(conf[['numCPU']])
+    doParallel::registerDoParallel(cl)
+	parallel::clusterExport(cl=cl, c('galignmentslist_global_for_invertyper','bamregion2GRanges'), envir=environment())
+  
+    all_phased_WCregions <- foreach::foreach (i = conf[['chromosomes']], .packages=c('StrandPhaseR', 'invertyper')) %dopar% {
+    
+        tC <- tryCatch({
+
+message("remember to add suppressMessages( back to strandphaser here!") 
+message( "using the right foreach loop")
+invertyper::phaseChromosome_for_invertyper(inputfolder=inputfolder, 
+outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i],
+                                        chromosome=i,
+                                       WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']],
+                                min.baseq=20, num.iterations=conf[['num.iterations']],
+                                       translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL)
+
+
+	 }, error = function(err) {
+          stop(chr,'\n',err)
+        })
+	}		
+    parallel::stopCluster(cl)
+
+
+	} else {
+
+
 	for(i in conf[['chromosomes']]){
 
-message("remember to add suppressMessages( back to strandphaser!")
+	message("remember to add suppressMessages( back to strandphaser!")
 	temp <- phaseChromosome_for_invertyper(inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i], 
 					chromosome=i,
-                                       WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], min.baseq=20, num.iterations=conf[['num.iterations']],
+                                       WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], 
+				min.baseq=20, num.iterations=conf[['num.iterations']],
                                        translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL)
 	all_phased_WCregions <- append(all_phased_WCregions, temp)
 	}
 
+	}
 #	all_phased_WCregions <- suppressMessages(lapply(conf[['chromosomes']], StrandPhaseR::phaseChromosome, inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == conf[['chromosomes']]], 
 #					WCregions=WCregions, pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], min.baseq=20, num.iterations=conf[['num.iterations']], 
 #					translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL))#, mc.cores=numCPU))
+
+
+
+
 
 	rm('galignmentslist_global_for_invertyper', envir=globalenv())
 	invisible(gc())
