@@ -23,6 +23,7 @@
 #'   calls for adjust_method "low". Default 0.95.
 #' @param prior Vector of three prior weights for inversion genotypes. For example, c("REF","HET","HOM") = c(0.9,0.05,0.05). Default c(0.33,0.33,0.33).
 #' @param prior_male Vector of two prior weights for inversions on the male sex chromosomes. For example, c("REF", "INV") = c(0.9,0.1). Default c(0.5,0.5).
+#' @param chromosomes Vector of chromosome names to restrict the search for inversions.
 #' @param output_file Name of the file to write to. Default "inversions.txt".
 #' @param adjust_method One of "raw", "merge", "deltas", "minimal", "low", or "all". Specifies which method to use to adjust the inversion coordinates (start- and end-points). The adjustment routine 
 #'   ensures that adjusted inversions have the same genotype as they did before adjustment (if applicable), and that they overlap at least one of the original unadjusted inversions in every cluster of 
@@ -39,7 +40,7 @@
 #'
 #' @export
 invertyper <- function(WW_reads, WC_reads, regions_to_genotype, blacklist="", paired_reads=TRUE, sex="female", confidence=0.95,prior=c(0.333,0.333,0.333), prior_male=c(0.5,0.5), 
-					output_file="inversions.txt", adjust_method=c("raw","merge","deltas","minimal", "low", "all")){
+					chromosomes=NULL, output_file="inversions.txt", adjust_method=c("raw","merge","deltas","minimal", "low", "all")){
 
 stopifnot('Please choose a value for adjust_method. This controls how InvertypeR will attempt to improve the inversion coordinates you supply. Valid values are "raw","merge","deltas","minimal", "low", or "all".' = all(length(adjust_method)==1 & adjust_method %in% c("raw","merge","deltas","minimal", "low", "all")))
 
@@ -52,8 +53,35 @@ warning("Using the default priors (prior for females, or both prior and prior_ma
 }
 
 
-	#An irrelavent internal name change
-	regions <- regions_to_genotype
+    #An irrelavent internal name change
+        regions <- regions_to_genotype
+
+
+
+        if(length(regions)==0 || length(WW_reads) == 0 || length(WC_reads) == 0){
+
+		warning("Non-empty composite files and a non-empty list of regions_to_genotype are required to genotype inversions")
+
+                inversions <- data.frame(character(),integer(),integer(),integer(),integer(),integer(),integer(),character(),double())
+                colnames(inversions) <- c("chr","start","end",paste0(base_state,"_counts_W"), paste0(base_state,"_counts_C"), "WC_counts_W", "WC_counts_C","genotype","probability")
+
+                return(inversions)
+         } else {
+
+
+
+
+found_chromosomes <- unique(sort(do.call('c',lapply(list(WW_reads,WC_reads),function(x)unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
+
+if(!all(chromosomes %in% found_chromosomes)){
+        warning(paste0("Some chromosomes you provided (", paste(chromosomes[!(chromosomes %in% found_chromosomes)], collapse=" "), ") don't have any reads in the composite files."))
+}
+
+
+	# Removing regions_to_genotype if they aren't on the specified chromosomes
+        if(!is.null(chromosomes)){
+                regions <- regions[as.vector(GenomicRanges::seqnames(regions)) %in% chromosomes]
+        }
 
 	#Takes reads from the BAM files that overlap the regions and stores them as GRanges
 	WW_reads <- read_bam(WW_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=GenomeInfoDb::seqlengths(WW_reads), distance=1e06), min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
@@ -87,5 +115,7 @@ warning("Using the default priors (prior for females, or both prior and prior_ma
 	}
 
 	return(inversions)
+
+	}
 }
 

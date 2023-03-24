@@ -24,7 +24,7 @@ if (!file.exists(outputfolder)) {
 
 region <- inversions[inversions[,9]>confidence & inversions[,8]!=0 & inversions[,8]!="0|0",]
 
-
+if(nrow(region)>0){
 
 region <- GenomicRanges::reduce(widen(granges=GenomicRanges::makeGRangesFromDataFrame(region, ignore.strand=TRUE, seqnames.field=names(region)[1], start.field=names(region)[2],end.field=names(region)[3]), seqlengths=GenomeInfoDb::seqlengths(WW_reads), distance=5e06), min.gapwidth=1000)
 
@@ -52,5 +52,11 @@ savefile.invs.gz <- gzfile(savefile.invs, 'w')
 utils::write.table(paste0("track name=",prefix,"inversions itemRgb=On"), file=savefile.invs.gz, row.names=FALSE, col.names=FALSE, quote=FALSE, append=FALSE, sep='\t')
 utils::write.table(inversions,file=savefile.invs.gz, row.names=FALSE, col.names=FALSE, quote=FALSE, append=TRUE, sep='\t')
 close(savefile.invs.gz)
+} else {
+
+ warning("There are no confident inversions to create a UCSC browser file")
+
+}
+
 
 }

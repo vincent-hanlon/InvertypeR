@@ -72,8 +72,6 @@ adjust_intervals <- function(inversions, reads, confidence=0.95, base,  sex="fem
 
 			#Merging inversions and checking whether they have the same genotype
 			new_regions <- list(GenomicRanges::reduce(het), GenomicRanges::reduce(hom))
-test(new_regions[[1]])
-test(new_regions[[2]])
         	       	new_inversions <- genotype_new_regions(new_regions, het, hom, reads, confidence, base, sex, prior, prior_male)	
 		
 		} else {

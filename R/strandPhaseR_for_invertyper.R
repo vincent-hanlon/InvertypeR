@@ -57,10 +57,11 @@ R.utils::reassignInPackage("bamregion2GRanges", "StrandPhaseR", bamregion2GRange
 
 	for(i in conf[['chromosomes']]){
 
-	temp <- suppressMessages(phaseChromosome_for_invertyper(inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i], 
+message("remember to add suppressMessages( back to strandphaser!")
+	temp <- phaseChromosome_for_invertyper(inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i], 
 					chromosome=i,
                                        WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], min.baseq=20, num.iterations=conf[['num.iterations']],
-                                       translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL))
+                                       translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL)
 	all_phased_WCregions <- append(all_phased_WCregions, temp)
 	}
 

@@ -36,18 +36,42 @@ if (!file.exists(outputfolder)) {
 }
 
 bamlist <- list.files(inputfolder, pattern="\\.bam$")
+stopifnot("No BAM files found in inputfolder for composite file creation." = length(bamlist) > 0)
+
+
+#    cl <- parallel::makeCluster(config[['numCPU']])
+#    doParallel::registerDoParallel(cl)
+  
+#    message("Finding breakpoints ...", appendLF=FALSE); ptm <- proc.time()
+#    temp <- foreach (file = files, .packages=c('breakpointR')) %dopar% {
+#        runBreakpointrANDexport(file = file, datapath = datapath, browserpath = browserpath, config = config)
+#    }
+    
+#    parallel::stopCluster(cl)
 
 
 suppressMessages(cl <- parallel::makeCluster(numCPU))
+doParallel::registerDoParallel(cl)
+
 #(maybe should include something here like this:  doParallel::registerDoParallel(cl))
 # We first must read in the BAM files without removing reads in blacklisted regions or chromosomes that are left out
 message('start read bams')
 galignmentslist <- parallel::parSapply(cl, bamlist, read_bam, blacklist=NULL, chromosomes=NULL, paired_reads=paired_reads)
 names(galignmentslist) <- bamlist
+found_chromosomes <- unique(sort(do.call('c',lapply(galignmentslist,function(x)unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
+
+if(!all(chromosomes %in% found_chromosomes)){
+	warning(paste0("Some chromosomes you provided (", paste(chromosomes[!(chromosomes %in% found_chromosomes)], collapse=" "), ") don't have any reads in the BAM files."))
+}
+
 message('start granges conversion')
+
 grangeslist <- parallel::parSapply(cl, galignmentslist, galignment_to_granges, purpose='BreakpointR', paired_reads=paired_reads, pair2frgm=FALSE, simplify = FALSE,USE.NAMES = TRUE)
 names(grangeslist) <- names(galignmentslist)
 parallel::stopCluster(cl)
+
+
+
 message('start bpr')
 # breakpointR unfortunately can't find the strand state of segments in the genome if reads in blacklisted regions are first removed. 
 # This is probably because there aren't enough Strand-switches
