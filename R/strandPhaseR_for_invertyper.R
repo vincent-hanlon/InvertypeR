@@ -7,8 +7,6 @@
 #' @export
 strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL, chromosomes=NULL, paired_reads=TRUE, num.iterations=3, galignmentslist=galignmentslist) {
 
-R.utils::reassignInPackage("bamregion2GRanges", "StrandPhaseR", bamregion2GRanges_for_invertyper)
-bamregion2GRanges <- bamregion2GRanges_for_invertyper
 `%dopar%` <- foreach::`%dopar%`
 	
 	### Helper functions ###
@@ -64,8 +62,7 @@ message("bamregions should write a whole bunch of empty files if the correct one
 
     cl <- parallel::makeCluster(conf[['numCPU']])
     doParallel::registerDoParallel(cl)
-	parallel::clusterExport(cl=cl, c('galignmentslist_global_for_invertyper','bamregion2GRanges'), envir=environment())
-  
+parallel::clusterExport(cl=cl, 'galignmentslist_global_for_invertyper')  
     all_phased_WCregions <- foreach::foreach (i = conf[['chromosomes']], .packages=c('StrandPhaseR', 'invertyper')) %dopar% {
     
         tC <- tryCatch({
@@ -81,7 +78,7 @@ outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i],
 
 
 	 }, error = function(err) {
-          stop(chr,'\n',err)
+          stop(i,'\n',err)
         })
 	}		
     parallel::stopCluster(cl)
@@ -102,11 +99,6 @@ outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i],
 	}
 
 	}
-#	all_phased_WCregions <- suppressMessages(lapply(conf[['chromosomes']], StrandPhaseR::phaseChromosome, inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == conf[['chromosomes']]], 
-#					WCregions=WCregions, pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], min.baseq=20, num.iterations=conf[['num.iterations']], 
-#					translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL))#, mc.cores=numCPU))
-
-
 
 
 

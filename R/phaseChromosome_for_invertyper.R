@@ -10,7 +10,7 @@ splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL) {
         GenomeInfoDb::seqlevels(positions, pruning.mode='coarse') <- chromosome
         GenomeInfoDb::seqlevels(WCregions, pruning.mode='coarse') <- chromosome
   #load data into matrix
-  matrices <- StrandPhaseR::loadMatrices(inputfolder=inputfolder, positions=positions, WCregions=WCregions, pairedEndReads=pairedEndReads, min.mapq=min.mapq, min.baseq=min.baseq)
+  matrices <- invertyper::loadMatrices(inputfolder=inputfolder, positions=positions, WCregions=WCregions, pairedEndReads=pairedEndReads, min.mapq=min.mapq, min.baseq=min.baseq)
 
   #Check if sufficient data were loaded
   if (length(matrices) > 0) {

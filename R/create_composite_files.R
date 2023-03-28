@@ -101,6 +101,10 @@ GenomeInfoDb::seqlevels(WCregions) <- GenomeInfoDb::seqlevels(galignmentslist[[1
 rm('bpr')
 invisible(gc())
 message('start phasing')
+save(WCregions, galignmentslist, file='sprtest.RData')
+message('remove all these annoying phasing files')
+
+
 all_phased_WCregions <- strandPhaseR_for_invertyper(numCPU=numCPU, positions=vcf, WCregions=WCregions, chromosomes=chromosomes, paired_reads=paired_reads, num.iterations=3, galignmentslist=galignmentslist)
 
 } else{
