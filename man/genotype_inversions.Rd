@@ -10,9 +10,9 @@ genotype_inversions(
   regions,
   background,
   base_state,
-  sex = "female",
+  haploid_chromosomes = NULL,
   prior = c(0.33, 0.33, 0.33),
-  prior_male = c(0.5, 0.5)
+  haploid_prior = c(0.5, 0.5)
 )
 }
 \arguments{
@@ -26,11 +26,11 @@ genotype_inversions(
 
 \item{base_state}{The strand state of the WW composite file: either "WW" (mostly + reads) or "CC" (mostly - reads).}
 
-\item{sex}{Sex of sample to figure out sex chromosomes. Default "female".}
+\item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.}
 
 \item{prior}{Vector of three prior weights for inversion genotypes. For example, c("ref","het","hom") = c(0.9,0.05,0.05). Default c(0.33,0.33,0.33).}
 
-\item{prior_male}{Vector of two prior weights for inversions on the male sex chromosomes. For example, c("ref", "inv") = c(0.9,0.1). Default c(0.5,0.5).}
+\item{haploid_prior}{Vector of two prior weights for inversions on haploid chromosomes (e.g., chrX and chrY in human males). For example, c("ref", "inv") = c(0.9,0.1). Default c(0.5,0.5).}
 }
 \value{
 A dataframe of the regions, where each region is matched with the most probable genotype and the corresponding posterior probability, as well as some read counts.
@@ -40,7 +40,7 @@ Given two Strand-seq composite files (WC and WW) and a list of intervals, this c
 }
 \details{
 Step-by-step: It standardizes the priors so that they sum to 1, and sets prior probabilities for errors that may be present in the data. Then it chooses the binomial probabilities for
-the Bayesian model. The function counts the forward and reverse reads in each inversion, and then genotypes them in the male case (details omitted: it's the same as the female case really).
+the Bayesian model. The function counts the forward and reverse reads in each inversion, and then genotypes them in the haploid case (details omitted: it's the same as the diploid case really).
 The read counts and the probabilites can be combined to calculate binomial (log) likelihoods of the possible strand states of each inversion in the two composite files (e.g. WW or WC).
 Given the strand-states we expect (accounting for the errors that may be present in the data), these likelihoods can be used to compute more (log) likelihoods: this time, for the
 genotypes REF, HET(0|1), HET(1|0), and HOM. We convert these into regular posterior probabilties and choose the highest one, with the associated genotype.

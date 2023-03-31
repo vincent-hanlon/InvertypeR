@@ -11,9 +11,9 @@ genotype_new_regions(
   reads,
   confidence,
   base,
-  sex = "female",
+  haploid_chromosomes = NULL,
   prior,
-  prior_male,
+  haploid_prior,
   paired_reads = TRUE
 )
 }
@@ -30,11 +30,11 @@ genotype_new_regions(
 
 \item{base}{A list output by WWCC_background().}
 
-\item{sex}{Sex of sample to figure out sex chromosomes. Default "female".}
+\item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.}
 
 \item{prior}{Vector of three prior weights for inversion genotypes. For example, c("ref","het","hom") = c(0.9,0.05,0.05).}
 
-\item{prior_male}{Vector of two prior weights for male sex chromosomes. For example, c("ref", "inv") = c(0.9,0.1).}
+\item{haploid_prior}{Vector of two prior weights for haploid chromosomes (e.g., chrX and chrY in human males). For example, c("ref", "inv") = c(0.9,0.1).}
 
 \item{paired_reads}{Boolean: are the reads paired-end? Default TRUE.}
 }

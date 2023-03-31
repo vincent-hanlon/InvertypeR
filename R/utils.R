@@ -8,7 +8,7 @@
 #'
 #'
 #' @export
-import <- function(path) {
+import_bed <- function(path) {
 
 bed <- read.table(path)
 gr <- GenomicRanges::sort(GenomicRanges::GRanges(seqnames=bed[,1], ranges=IRanges::IRanges(start=bed[,2], end=bed[,3])))

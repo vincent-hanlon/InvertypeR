@@ -8,12 +8,12 @@ invertyper(
   WW_reads,
   WC_reads,
   regions_to_genotype,
-  blacklist = "",
+  blacklist = NULL,
   paired_reads = TRUE,
-  sex = "female",
+  haploid_chromosomes = NULL,
   confidence = 0.95,
   prior = c(0.333, 0.333, 0.333),
-  prior_male = c(0.5, 0.5),
+  haploid_prior = c(0.5, 0.5),
   chromosomes = NULL,
   output_file = "inversions.txt",
   adjust_method = c("raw", "merge", "deltas", "minimal", "low", "all")
@@ -30,14 +30,14 @@ invertyper(
 
 \item{paired_reads}{Boolean: are the reads paired-end? Default TRUE.}
 
-\item{sex}{Sex of the sample/individual to figure out expected inversion genotypes on the sex chromosomes. Default "female".}
+\item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.}
 
 \item{confidence}{Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions, as well as to identify low-confidence
 calls for adjust_method "low". Default 0.95.}
 
 \item{prior}{Vector of three prior weights for inversion genotypes. For example, c("REF","HET","HOM") = c(0.9,0.05,0.05). Default c(0.33,0.33,0.33).}
 
-\item{prior_male}{Vector of two prior weights for inversions on the male sex chromosomes. For example, c("REF", "INV") = c(0.9,0.1). Default c(0.5,0.5).}
+\item{haploid_prior}{Vector of two prior weights for inversions on haploid chromosomes, like chrX and chrY in human males. For example, c("REF", "INV") = c(0.9,0.1). Default c(0.5,0.5).}
 
 \item{chromosomes}{Vector of chromosome names to restrict the search for inversions.}
 

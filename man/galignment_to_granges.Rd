@@ -3,7 +3,6 @@
 \name{galignment_to_granges}
 \alias{galignment_to_granges}
 \title{Converting reads for various tools
-The 'region' argument is only for StrandPhaseR
 The purpose argument mus tbe either 'StrandPhaseR' or 'BreakpointR'
 This function should be inserted into InvertypeR whenever these task are done, for example, in the process_reads and pair2frgm functions
 The breakpointR purpose here pairs fragments when we're looking at paired reads}
@@ -24,7 +23,6 @@ galignment_to_granges(
 }
 \description{
 Converting reads for various tools
-The 'region' argument is only for StrandPhaseR
 The purpose argument mus tbe either 'StrandPhaseR' or 'BreakpointR'
 This function should be inserted into InvertypeR whenever these task are done, for example, in the process_reads and pair2frgm functions
 The breakpointR purpose here pairs fragments when we're looking at paired reads

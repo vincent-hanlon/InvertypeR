@@ -9,9 +9,9 @@ adjust_intervals(
   reads,
   confidence = 0.95,
   base,
-  sex = "female",
+  haploid_chromosomes = NULL,
   prior,
-  prior_male = c(0.5, 0.5),
+  haploid_prior = c(0.5, 0.5),
   adjust_method = "deltas",
   paired_reads = TRUE
 )
@@ -26,11 +26,11 @@ for adjust_method "low". Default 0.95.}
 
 \item{base}{A list output by WWCC_background().}
 
-\item{sex}{Sex of sample to figure out sex chromosomes. Default "female".}
+\item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.}
 
 \item{prior}{Vector of three prior weights for inversion genotypes. For example, c("ref","het","hom") = c(0.9,0.05,0.05).}
 
-\item{prior_male}{Vector of two prior weights for male sex chromosomes. For example, c("ref", "inv") = c(0.9,0.1). Default c(0.5,0.5).}
+\item{haploid_prior}{Vector of two prior weights for haploid chromosomes, such as chrX and chrY in human males. For example, c("ref", "inv") = c(0.9,0.1). Default c(0.5,0.5).}
 
 \item{paired_reads}{Boolean: are the reads paired-end? Default TRUE.}
 

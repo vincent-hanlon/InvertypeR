@@ -9,16 +9,16 @@
 #' @param confidence Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions, as well as to identify low-confidence calls 
 #'   for adjust_method "low". Default 0.95.
 #' @param base A list output by WWCC_background().
-#' @param sex Sex of sample to figure out sex chromosomes. Default "female".
+#' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL. 
 #' @param prior Vector of three prior weights for inversion genotypes. For example, c("ref","het","hom") = c(0.9,0.05,0.05).
-#' @param prior_male Vector of two prior weights for male sex chromosomes. For example, c("ref", "inv") = c(0.9,0.1). Default c(0.5,0.5). 
+#' @param haploid_prior Vector of two prior weights for haploid chromosomes, such as chrX and chrY in human males. For example, c("ref", "inv") = c(0.9,0.1). Default c(0.5,0.5). 
 #' @param adjust_method. See invertyper() for more details. Default "deltas". 
 #' @param paired_reads Boolean: are the reads paired-end? Default TRUE.
 #' @return A dataframe with adjusted inversions.
 #'
 #'
 #' @export
-adjust_intervals <- function(inversions, reads, confidence=0.95, base,  sex="female", prior, prior_male=c(0.5,0.5), adjust_method="deltas",paired_reads=TRUE){ 
+adjust_intervals <- function(inversions, reads, confidence=0.95, base,  haploid_chromosomes=NULL, prior, haploid_prior=c(0.5,0.5), adjust_method="deltas",paired_reads=TRUE){ 
 
 		#separating called inversions by genotype and probability and creating GRanges objects; I don't bother with reference homozygotes
 		het <- inversions[inversions$probability>=confidence & (inversions$genotype == "1|0" | inversions$genotype == "0|1"),]
@@ -28,7 +28,7 @@ adjust_intervals <- function(inversions, reads, confidence=0.95, base,  sex="fem
 
 		if (adjust_method == "deltas" | adjust_method == "all" | adjust_method=="low") {
         	
-			new_reads <- process_reads(reads[[1]],reads[[2]], paired_reads=paired_reads, sex=sex)
+			new_reads <- process_reads(reads[[1]],reads[[2]], paired_reads=paired_reads, haploid_chromosomes=haploid_chromosomes)
 		}
 
 		if (adjust_method == "deltas" | adjust_method == "all") {
@@ -37,7 +37,7 @@ adjust_intervals <- function(inversions, reads, confidence=0.95, base,  sex="fem
 		        new_het <- adjust_deltaW(new_reads[[1]], new_reads[[2]], new_reads[[3]], new_reads[[4]], inversions=het, genotype="het")
 			new_hom <- adjust_deltaW(new_reads[[1]], new_reads[[2]], new_reads[[3]], new_reads[[4]], inversions=hom, genotype="hom")
 
-			delta_inversions <- genotype_new_regions(list(new_het,new_hom), het, hom, reads, confidence, base, sex, prior, prior_male)		
+			delta_inversions <- genotype_new_regions(list(new_het,new_hom), het, hom, reads, confidence, base, haploid_chromosomes, prior, haploid_prior)		
 			
 			#Combining inversions whether or not the delta method worked. Either way it's worth trying to merge those that overlap.
 			het <- delta_inversions[[1]]
@@ -55,7 +55,7 @@ adjust_intervals <- function(inversions, reads, confidence=0.95, base,  sex="fem
                         low <- inversions[inversions$probability<confidence,]
                         low <- GenomicRanges::GRanges(seqnames=low[,1], ranges=IRanges::IRanges(start=low[,2], end=low[,3]), mcols= low[,-c(1:3)])
                         new_low <- adjust_deltaW(new_reads[[1]], new_reads[[2]], new_reads[[3]], new_reads[[4]], inversions=low, genotype="low")
-                        new_low <- genotype_inversions(WW_reads=reads[[1]], WC_reads=reads[[2]], regions=new_low, background=base[[1]], base_state=base[[2]],  sex=sex, prior=prior, prior_male=prior_male)
+                        new_low <- genotype_inversions(WW_reads=reads[[1]], WC_reads=reads[[2]], regions=new_low, background=base[[1]], base_state=base[[2]],  haploid_chromosomes=haploid_chromosomes, prior=prior, haploid_prior=haploid_prior)
                         new_low_het <- new_low[new_low$probability>=confidence & (new_low$genotype=="0|1" | new_low$genotype=="1|0"),]
                         new_low_hom <- new_low[new_low$probability>=confidence & (new_low$genotype=="1|1" | new_low$genotype=="1"),]
                         new_low_ref <- new_low[new_low$probability>=confidence & (new_low$genotype=="0|0" | new_low$genotype=="0"),]
@@ -72,13 +72,13 @@ adjust_intervals <- function(inversions, reads, confidence=0.95, base,  sex="fem
 
 			#Merging inversions and checking whether they have the same genotype
 			new_regions <- list(GenomicRanges::reduce(het), GenomicRanges::reduce(hom))
-        	       	new_inversions <- genotype_new_regions(new_regions, het, hom, reads, confidence, base, sex, prior, prior_male)	
+        	       	new_inversions <- genotype_new_regions(new_regions, het, hom, reads, confidence, base, haploid_chromosomes, prior, haploid_prior)	
 		
 		} else {
 	
 			#Trying to find and genotype the intersection of all inversions in a cluster of overlaps
 			new_regions <- list(minimal(het), minimal(hom))
-                        new_inversions <- genotype_new_regions(new_regions, het, hom, reads, confidence, base, sex, prior, prior_male)
+                        new_inversions <- genotype_new_regions(new_regions, het, hom, reads, confidence, base, haploid_chromosomes, prior, haploid_prior)
 			
 		}
 

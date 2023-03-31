@@ -4,12 +4,14 @@
 \alias{process_reads}
 \title{Read processing for inversion adjustment}
 \usage{
-process_reads(WW_reads, WC_reads, sex, paired_reads = TRUE)
+process_reads(WW_reads, WC_reads, haploid_chromosomes, paired_reads = TRUE)
 }
 \arguments{
 \item{WW_reads}{A GRanges object from the WW composite file.}
 
 \item{WC_reads}{A GRanges object from the WC composite file.}
+
+\item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males).}
 
 \item{paired_reads}{Boolean: are the reads paired-end? Default TRUE.}
 }

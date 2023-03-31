@@ -15,10 +15,12 @@
 #'
 #'
 #' @export
-WWCC_background <- function(WW_reads, binsize=1000000, paired_reads=TRUE){
+WWCC_background <- function(WW_reads, binsize=1000000, paired_reads=TRUE, chromosomes=chromosomes){
 
-	#chromosome lengths for the first 22 chromosomes 
-	chr_lengths <- GenomeInfoDb::seqlengths(WW_reads)[1:22]
+	#chromosome lengths
+	lengths <- GenomeInfoDb::seqlengths(WW_reads)
+	chr_lengths <- lengths[names(lengths) %in% chromosomes]
+
 	#Creating genomic bins, default size 1 Mb
 	bins <-	GenomicRanges::tileGenome(chr_lengths, tilewidth=binsize, cut.last.tile.in.chrom=TRUE)
 

@@ -9,21 +9,21 @@
 #' @param reads reads A list of two Granges objects: reads from a WW composite file and a WC composite file.
 #' @param confidence Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions. Default 0.95.
 #' @param base A list output by WWCC_background().
-#' @param sex Sex of sample to figure out sex chromosomes. Default "female".
+#' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.
 #' @param prior Vector of three prior weights for inversion genotypes. For example, c("ref","het","hom") = c(0.9,0.05,0.05).
-#' @param prior_male Vector of two prior weights for male sex chromosomes. For example, c("ref", "inv") = c(0.9,0.1). 
+#' @param haploid_prior Vector of two prior weights for haploid chromosomes (e.g., chrX and chrY in human males). For example, c("ref", "inv") = c(0.9,0.1). 
 #' @param paired_reads Boolean: are the reads paired-end? Default TRUE.
 #' @return A list containing two GRanges objects: the adjusted heterozygous inversions and the adjusted homozygous inversions.
 #'
 #'
 #' @export
-genotype_new_regions <- function(new_regions, het, hom, reads, confidence, base,  sex="female", prior, prior_male, paired_reads=TRUE){
+genotype_new_regions <- function(new_regions, het, hom, reads, confidence, base,  haploid_chromosomes=NULL, prior, haploid_prior, paired_reads=TRUE){
 
 		#Re-genotyping the adjusted inversions
-               	new_het <- genotype_inversions(WW_reads=reads[[1]], WC_reads=reads[[2]], regions=new_regions[[1]], background=base[[1]], base_state=base[[2]],  sex=sex,
-                        prior=prior, prior_male=prior_male)
-               	new_hom <- genotype_inversions(WW_reads=reads[[1]], WC_reads=reads[[2]], regions=new_regions[[2]], background=base[[1]], base_state=base[[2]],  sex=sex,
-                        prior=prior, prior_male=prior_male)
+               	new_het <- genotype_inversions(WW_reads=reads[[1]], WC_reads=reads[[2]], regions=new_regions[[1]], background=base[[1]], base_state=base[[2]],  haploid_chromosomes=haploid_chromosomes,
+                        prior=prior, haploid_prior=haploid_prior)
+               	new_hom <- genotype_inversions(WW_reads=reads[[1]], WC_reads=reads[[2]], regions=new_regions[[2]], background=base[[1]], base_state=base[[2]],  haploid_chromosomes=haploid_chromosomes,
+                        prior=prior, haploid_prior=haploid_prior)
 
 
 		#Discarding the ones that don't match genotypes and constructing a dataframe

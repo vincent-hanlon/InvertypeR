@@ -4,7 +4,12 @@
 \alias{WWCC_background}
 \title{Estimates the background}
 \usage{
-WWCC_background(WW_reads, binsize = 1e+06, paired_reads = TRUE)
+WWCC_background(
+  WW_reads,
+  binsize = 1e+06,
+  paired_reads = TRUE,
+  chromosomes = chromosomes
+)
 }
 \arguments{
 \item{WW_reads}{A GenomicAlignments object, the WW or CC composite file}

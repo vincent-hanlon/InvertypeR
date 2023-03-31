@@ -19,6 +19,8 @@
 #' @export
 adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c("het","hom","low")){
 
+message("remove unnecessary adjust save")
+save(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype, file="adjust.RData")
 
         #Next I want to merge and expand the inversions. The wider, expanded inversion intervals will be used to look for alternative breakpoints
         inversions <- GenomicRanges::sort(GenomicRanges::reduce(inversions))

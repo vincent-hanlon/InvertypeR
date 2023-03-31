@@ -1,4 +1,4 @@
-
+#' When David releases the next Bioconductor version of BreakpointR with a fixed maskRegions thingy, try subsetting reads to chromosomes right away! Should simplify things a bit
 #' Creates composite files for inversion genotyping
 #'
 #' 
@@ -136,6 +136,9 @@ message('make ww file to plot')
 to_plot <- list(galignment_to_granges(WW_composite_file[sort(sample(length(WW_composite_file),min(length(WW_composite_file),500000)))], purpose='BreakpointR', paired_reads=paired_reads,  pair2frgm=FALSE))
 names(to_plot)[1] <- 'WW_composite_file'
 
+composite <- list(WW_composite_file)
+names(composite) <- c("WW")
+
 if('wc' %in% type){
 message('assemble wc file')
 
@@ -144,6 +147,10 @@ message('make wc toplot')
 to_plot <- append(to_plot,galignment_to_granges(WC_composite_file[sort(sample(length(WC_composite_file),min(length(WC_composite_file),500000)))], purpose='BreakpointR', pair2frgm=FALSE, paired_reads=paired_reads))
 
 names(to_plot)[2] <- 'WC_composite_file'
+
+composite <- append(composite, WC_composite_file)
+
+names(composite) <- c("WW", "WC")
 
 }
 
@@ -167,10 +174,6 @@ if(save_composite_files){
 	}
 }
 
-
-
-composite <- list(WW_composite_file, WC_composite_file)
-names(composite) <- c("WW", "WC") 
 
 
 return(composite)

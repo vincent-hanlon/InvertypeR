@@ -1,6 +1,5 @@
 
 #' Converting reads for various tools
-#' The 'region' argument is only for StrandPhaseR
 #' The purpose argument mus tbe either 'StrandPhaseR' or 'BreakpointR'
 #' This function should be inserted into InvertypeR whenever these task are done, for example, in the process_reads and pair2frgm functions
 #' The breakpointR purpose here pairs fragments when we're looking at paired reads
@@ -33,16 +32,11 @@ galignment_to_granges <- function(galignments=NULL, purpose=NULL, paired_reads=T
 		granges <- GenomicRanges::sort(c(granges.first, granges.last), ignore.strand=TRUE)
 		granges$XA <- NA
 
-		if(length(region)>0){
-			granges <- granges[as.vector(GenomicRanges::seqnames(granges)) %in% as.vector(GenomeInfoDb::seqlevels(region))]
-			GenomeInfoDb::seqlevels(granges) <- GenomeInfoDb::seqlevels(region)
-			granges <- GenomeInfoDb::keepSeqlevels(granges, GenomeInfoDb::seqlevels(region), pruning.mode="coarse")
-		} 
 
 	} else if(purpose=="StrandPhaseR" && !paired_reads && !pair2frgm){
 
 		granges <- as(galignments, 'GRanges')
-	
+
 	} else if(purpose=="BreakpointR" && paired_reads && pair2frgm){
 
 		galignments.prop.pairs <- galignments[GenomicAlignments::isProperPair(galignments)]
@@ -67,15 +61,20 @@ galignment_to_granges <- function(galignments=NULL, purpose=NULL, paired_reads=T
 	} else if(purpose=="BreakpointR" && paired_reads && !pair2frgm) {	
 		
 		granges <- as(GenomicAlignments::first(galignments), 'GRanges')
-		GenomicRanges::mcols(granges)$seq <- NULL
-                GenomicRanges::mcols(granges)$qual <- NULL
+		GenomicRanges::mcols(granges)[!names(GenomicRanges::mcols(granges)) %in% 'mapq'] <- NULL
 
 	} else if(purpose=="BreakpointR" && !paired_reads && !pair2frgm){
 
 		granges <- as(galignments, 'GRanges')
-                GenomicRanges::mcols(granges)$seq <- NULL
-                GenomicRanges::mcols(granges)$qual <- NULL
+		GenomicRanges::mcols(granges)[!names(GenomicRanges::mcols(granges)) %in% 'mapq'] <- NULL
 	}
+
+if(length(region)>0 && purpose=="StrandPhaseR"){
+
+                granges <- granges[as.vector(GenomicRanges::seqnames(granges)) %in% as.vector(GenomeInfoDb::seqlevels(region))]
+                GenomeInfoDb::seqlevels(granges) <- GenomeInfoDb::seqlevels(region)
+                granges <- GenomeInfoDb::keepSeqlevels(granges, GenomeInfoDb::seqlevels(region), pruning.mode="coarse")
+}
 
 
 if(length(region)>0 && purpose=="BreakpointR") {

@@ -18,12 +18,12 @@
 #' @param regions_to_genotype A GRanges object containing genomic intervals to be genotyped (putative inversions).
 #' @param blacklist A GRanges containing regions genomic intervals with poor-quality Strand-seq data. Reads that overlap these intervals will not be used. Highly recommended. Default "".
 #' @param paired_reads Boolean: are the reads paired-end? Default TRUE. 
-#' @param sex Sex of the sample/individual to figure out expected inversion genotypes on the sex chromosomes. Default "female".
 #' @param confidence Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions, as well as to identify low-confidence 
 #'   calls for adjust_method "low". Default 0.95.
 #' @param prior Vector of three prior weights for inversion genotypes. For example, c("REF","HET","HOM") = c(0.9,0.05,0.05). Default c(0.33,0.33,0.33).
-#' @param prior_male Vector of two prior weights for inversions on the male sex chromosomes. For example, c("REF", "INV") = c(0.9,0.1). Default c(0.5,0.5).
+#' @param haploid_prior Vector of two prior weights for inversions on haploid chromosomes, like chrX and chrY in human males. For example, c("REF", "INV") = c(0.9,0.1). Default c(0.5,0.5).
 #' @param chromosomes Vector of chromosome names to restrict the search for inversions.
+#' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.
 #' @param output_file Name of the file to write to. Default "inversions.txt".
 #' @param adjust_method One of "raw", "merge", "deltas", "minimal", "low", or "all". Specifies which method to use to adjust the inversion coordinates (start- and end-points). The adjustment routine 
 #'   ensures that adjusted inversions have the same genotype as they did before adjustment (if applicable), and that they overlap at least one of the original unadjusted inversions in every cluster of 
@@ -39,16 +39,16 @@
 #'   associated with that genotype. Col 10 labels inversions with low read density. The start and end coordinates of such inversions should be checked by viewing Strand-seq data in a genome browser.
 #'
 #' @export
-invertyper <- function(WW_reads, WC_reads, regions_to_genotype, blacklist="", paired_reads=TRUE, sex="female", confidence=0.95,prior=c(0.333,0.333,0.333), prior_male=c(0.5,0.5), 
+invertyper <- function(WW_reads, WC_reads, regions_to_genotype, blacklist=NULL, paired_reads=TRUE, haploid_chromosomes=NULL, confidence=0.95,prior=c(0.333,0.333,0.333), haploid_prior=c(0.5,0.5), 
 					chromosomes=NULL, output_file="inversions.txt", adjust_method=c("raw","merge","deltas","minimal", "low", "all")){
 
 stopifnot('Please choose a value for adjust_method. This controls how InvertypeR will attempt to improve the inversion coordinates you supply. Valid values are "raw","merge","deltas","minimal", "low", or "all".' = all(length(adjust_method)==1 & adjust_method %in% c("raw","merge","deltas","minimal", "low", "all")))
+stopifnot("Any haploid chromosomes you specify should be include as chromosomes too. This means including chrX and chrY as chromosomes AND as haploid_chromosomes for human males" = all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes))
 
 
+if(all(prior == c(0.333,0.333,0.333)) | (!is.null(haploid_chromosomes) & all(haploid_prior == c(0.5,0.5)))){
 
-if(all(prior == c(0.333,0.333,0.333)) | (sex=='male' & all(prior_male == c(0.5,0.5)))){
-
-warning("Using the default priors (prior for females, or both prior and prior_male for males) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes.")
+warning("Using the default priors (prior for homogametic diploids (e.g., human females), haploid_prior for haploids, or both for heterogametic dipoids (e.g., human males)) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes.")
 
 }
 
@@ -69,35 +69,52 @@ warning("Using the default priors (prior for females, or both prior and prior_ma
          } else {
 
 
+if(!is.character(WW_reads)){
 
+WW_chromosomes <- unique(sort(as.vector(seqnames(WW_reads))))
+WC_chromosomes <- unique(sort(as.vector(seqnames(WC_reads))))
 
-found_chromosomes <- unique(sort(do.call('c',lapply(list(WW_reads,WC_reads),function(x)unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
+if(any(!WW_chromosomes[!WW_chromosomes %in% WC_chromosomes] %in% haploid_chromosomes)){
 
-if(!all(chromosomes %in% found_chromosomes)){
-        warning(paste0("Some chromosomes you provided (", paste(chromosomes[!(chromosomes %in% found_chromosomes)], collapse=" "), ") don't have any reads in the composite files."))
+	warning("Make sure that haploid chromosomes appear in the argument haploid_chromosomes if they appear in the argument chromosomes. For example, chrX and chrY for human males")
+}
 }
 
 
-	# Removing regions_to_genotype if they aren't on the specified chromosomes
-        if(!is.null(chromosomes)){
-                regions <- regions[as.vector(GenomicRanges::seqnames(regions)) %in% chromosomes]
-        }
+if(!is.null(chromosomes)){
+	found_chromosomes <- unique(sort(do.call('c',lapply(list(WW_reads,WC_reads),function(x)unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
+
+	if(!all(chromosomes %in% found_chromosomes)){
+	        warning(paste0("Some chromosomes you provided (", paste(chromosomes[!(chromosomes %in% found_chromosomes)], collapse=" "), ") don't have any reads in the composite files."))
+	}
+
+	regions <- regions[as.vector(GenomicRanges::seqnames(regions)) %in% chromosomes]
+
+} else {
+
+	chromosomes <- unique(sort(as.vector(seqnames(regions_to_genotype))))
+
+}
+
+
+
+
 
 	#Takes reads from the BAM files that overlap the regions and stores them as GRanges
 	WW_reads <- read_bam(WW_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=GenomeInfoDb::seqlengths(WW_reads), distance=1e06), min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
 	WC_reads <- read_bam(WC_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=GenomeInfoDb::seqlengths(WC_reads), distance=1e06),min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
 
         #Accurate background estimate, plus base strand state for the WW/CC file
-        base <- WWCC_background(WW_reads, binsize=1000000, paired_reads=paired_reads)
+        base <- WWCC_background(WW_reads, binsize=1000000, paired_reads=paired_reads, chromosomes=chromosomes)
 
 	#Genotyping the inversions
-	inversions <- genotype_inversions(WW_reads=WW_reads, WC_reads=WC_reads, regions=regions, background=base[[1]], base_state=base[[2]],  sex=sex, 
-		prior=prior, prior_male=prior_male)
+	inversions <- genotype_inversions(WW_reads=WW_reads, WC_reads=WC_reads, regions=regions, background=base[[1]], base_state=base[[2]],  haploid_chromosomes=haploid_chromosomes, 
+		prior=prior, haploid_prior=haploid_prior)
 
 	#two methods under development for dealing with overlapping intervals
 	if( adjust_method != "raw" ){
 		reads <- list(WW_reads, WC_reads)
-		inversions <- adjust_intervals(inversions=inversions, reads=reads, confidence=confidence, base=base,  sex=sex, prior=prior, prior_male=prior_male, 
+		inversions <- adjust_intervals(inversions=inversions, reads=reads, confidence=confidence, base=base,  haploid_chromosomes=haploid_chromosomes, prior=prior, haploid_prior=haploid_prior, 
 			adjust_method=adjust_method, paired_reads=paired_reads)
 		inversions <- inversions[order(-inversions$probability),]
 	}

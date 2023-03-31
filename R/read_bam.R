@@ -29,7 +29,7 @@ read_bam <- function(bam=NULL, region=NULL, paired_reads=TRUE, blacklist=NULL, c
 	} else if(length(region)==0 & !is.character(bam) & (!is.null(chromosomes) | !is.null(blacklist))){	
 
 		lengths <- GenomeInfoDb::seqlengths(bam)
-		region <- GRanges(seqnames=names(lengths), ranges=IRanges::IRanges(start=c(1:length(lengths)), end=lengths))			
+		region <- GenomicRanges::GRanges(seqnames=names(lengths), ranges=IRanges::IRanges(start=c(1:length(lengths)), end=lengths))			
 
 	} else {	
 	
