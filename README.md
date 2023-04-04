@@ -1,28 +1,26 @@
 # InvertypeR
-Source code for all three components of the InvertypeR process:
-1. Composite file creation
-2. InvertypeR genotyping 
-3. Inversion visualization
 
-For a detailed, step-by-step guide to the analysis, from raw FASTQ files to finished InvertypeR ideograms, see the file "instructions.txt" in this repository. For summaries of each component of the InvertypeR process, and for a list of dependencies, see the README, below.
+An R package for inversion genotyping (and discovery) using Strand-seq data. This is supplemented by an "Inversion visualization" section, at bottom, which uses PERL scripts to make ideograms linked to the UCSC Genome Browser.
 
-For more information or to cite this tool, please see the InvertypeR paper at https://doi.org/10.1186/s12864-021-07892-9. If you should run into trouble, please feel free to post an Issue or contact me at vhanlon [AT] bccrc.ca.
+For more information not provided below, or to cite this tool, please see the InvertypeR paper at https://doi.org/10.1186/s12864-021-07892-9. If you should run into trouble, please feel free to post an Issue or contact me at vhanlon [at] bccrc.ca
 
-Composite file creation
------------------------
-Dependencies:
-  - *tool (version we use)*
-  - cutadapt (1.8.1)
-  - bowtie2 (2.3.5.1)
-  - Picard MarkDuplicates (2.20.0-SNAPSHOT)
-  - samtools (1.10)
-  - BBmap (37.62; we use callvariants.sh only)
-  - bcftools (1.10.2)
-  - R (3.5.1)
-  - R package GenomicRanges (1.34.0)
-  - R package [breakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) (1.5.1)
-  - R package [StrandPhaseR](https://github.com/daewoooo/StrandPhaseR) (1.0.0)
-  - R package BSgenome.Hsapiens.UCSC.hg38 (1.4.1)
+## Pre-processing
+
+The main inputs to InvertypeR are:
+
+1. Strand-seq BAM files for the individual of interest, placed together in a directory. The BAM files should have good Strand-seq quality.
+2. A VCF file containing heterozygous SNVs for the individual of interest (not needed for haploids). If you don't have this, it's always best to use high-coverage NGS data of some kind to call SNVs before using InvertypeR. However, it's also possible to call SNVs directly from the Strand-seq libraries despite their shallow coverage. 
+3. A BED file containing genomic intervals that you suspect may be inverted. This could be a handful of well-characterized inversions you want to genotype in a new individual, or it could be thousands of dubious inversions from the literature.
+4. Appropriate priors. These aren't as hard to choose as you might think. 
+5. A BED file containing regions that you expect to have poor-quality Strand-seq data. For humans, you can generally just use the one on this repo. For other species, you may want to make one.
+
+### Strand-seq BAM files
+
+
+
+
+
+
 
 Assuming your Strand-seq FASTQ libraries for an individual are now aligned, indexed BAM files, these scripts create two Strand-seq composite files. Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run `bash master_WWCC_composite.sh` in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run `bash master_WCCW_composite.sh`. You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). Providing a VCF file of high-confidence heterozygous SNPs improves composite file creation, since it can be difficult to call good SNPs from sparse Strand-seq data alone. See "instructions.txt" for more details. 
 
