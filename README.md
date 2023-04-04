@@ -2,7 +2,7 @@
 
 An R package for genotyping (and discovering) inversions using Strand-seq data. This is supplemented by an "Inversion visualization" section, at bottom, which uses R/PERL scripts to make ideograms linked to the UCSC Genome Browser.
 
-For more information not provided below, or to cite this tool, please see the InvertypeR paper at https://doi.org/10.1186/s12864-021-07892-9. If you should run into trouble, please feel free to post an Issue or contact me at vhanlon [at] bccrc.ca
+For more information not provided below, or to cite this tool, please see the InvertypeR paper at doi.org/10.1186/s12864-021-07892-9. If you should run into trouble, please feel free to post an Issue or contact me at vhanlon [at] bccrc.ca
 
 ## Pre-processing
 
@@ -16,6 +16,10 @@ The main inputs to InvertypeR are:
 
 ### Strand-seq BAM files
 
+Strand-seq is a single-cell library preparation for DNA sequencing that is quite good at finding inversions. Here are some relevant papers:
+
+doi.org/10.1038/nmeth.2206
+doi.org/10.1038/s41587-020-0719-5
 
 
 
