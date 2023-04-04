@@ -1,6 +1,6 @@
 # InvertypeR
 
-An R package for inversion genotyping (and discovery) using Strand-seq data. This is supplemented by an "Inversion visualization" section, at bottom, which uses PERL scripts to make ideograms linked to the UCSC Genome Browser.
+An R package for genotyping (and discovering) inversions using Strand-seq data. This is supplemented by an "Inversion visualization" section, at bottom, which uses R/PERL scripts to make ideograms linked to the UCSC Genome Browser.
 
 For more information not provided below, or to cite this tool, please see the InvertypeR paper at https://doi.org/10.1186/s12864-021-07892-9. If you should run into trouble, please feel free to post an Issue or contact me at vhanlon [at] bccrc.ca
 
@@ -43,8 +43,8 @@ For instructions on how to run the main invertyper wrapper function, load the pa
 
 Results for the InvertypeR paper (https://doi.org/10.1186/s12864-021-07892-9) are from commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf. The newest commit produces essentially identical results, up to one or two minor shifts to inversion breakpoints per sample. 
 
-Inversion visualization
------------------------
+## Inversion visualization
+
 Dependencies:
   - *tool (version we use)*
   - R (3.5.1)
