@@ -17,6 +17,8 @@ WWCC_background(
 \item{binsize}{How big should the bins be? Default 1000000.}
 
 \item{paired_reads}{A Boolean: are the reads paired-end? Default TRUE.}
+
+\item{chromosomes}{A character vector of chromosome names to use}
 }
 \value{
 A list: The background, the strand state of the composite file, and the number of reads in the composite file.

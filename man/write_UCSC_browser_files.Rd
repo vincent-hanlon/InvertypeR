@@ -11,16 +11,31 @@ write_UCSC_browser_files(
   confidence = 0.95,
   paired_reads = TRUE,
   outputfolder = "./",
-  prefix = ""
+  prefix = "",
+  type = c("ww", "wc")
 )
 }
 \arguments{
-\item{prefix}{}
+\item{inversions}{A dataframe output by invertyper() that contains inversion calls}
+
+\item{WW_reads}{A GenomicAlignments object for the WW composite file}
+
+\item{WC_reads}{A GenomicAlignments object for the WC composite file}
+
+\item{confidence}{Cutoff for posterior probabilities of inversions. Inversions more confident than this will be displayed in the files. Default 0.95}
+
+\item{paired_reads}{Boolean. Are the reads paired?}
+
+\item{outputfolder}{Path where files should be written}
+
+\item{prefix}{Start of the output filenames}
+
+\item{type}{What type of composite files are we dealing with? 'wc' for Watson-Crick, 'ww' for Watson-Watson, or both (for both).}
 }
 \value{
-\link{...}
+Nothing. This just writes files
 }
 \description{
-Given a list of inversions from invertyper() and two composite files, it makes nicely-formatted BED files compatible with the UCSC Genome Browser
+Given a list of inversions from invertyper() and one or two composite files, it makes nicely-formatted BED files compatible with the UCSC Genome Browser
 The inversions are coloured by genotype (black is 1/1, grey is 0/1, light grey is 0/0), and the Strand-seq reads are coloured by strand as in BreakpointR etc.
 }

@@ -1,21 +1,17 @@
-
-#' For composite BAM writing, maybe something related to fwrite could be created? Fastest way to write... write to SAM format and then compress? Or use rtracklayer's function
-#' Going to expect sorted, indexed BAM files.
-#' Maybe for SNV calling, https://bioconductor.org/packages/release/bioc/manuals/VariantTools/man/VariantTools.pdf should be used? 
-#' However, that looks clumsy: it won't take GAlingments format. So it's best to ask for an external VCF, and just suggest in the documentation that this can easily be done with bbtools (give command)
-#' If a GenomicAlignments or GRanges object is passed instead of the path to a BAM file, this will just try excluding reads that aren't part of the provided regions. This is helpful because
-#' That way InvertypeR can be given either a GAlignments composite file (to throw away useless reads) or a BAM composite file (old-school InvertypeR)
-
-#' @param bam
-#' @param region
-#' @param paired_reads
-#' @param blacklist
-#' @param chromosomes
+#' Reads a BAM file into a GAlignments object, subsetting to regions/chromosomes of interest
+#' 
+#' It can also take a GAlignments or GRanges object, in which case it will just apply the necessary region subsetting instead of trying to load it fresh somehow.
 #'
-#' @return  [...]
-#'
+#' @param bam Path to a BAM file. Alternatively, a GRanges or GAlignments object
+#' @param region A GRanges object of regions from which reads should be taken. Default NULL.
+#' @param paired_reads Boolean. Are the reads paired?
+#' @param blacklist A GRanges object of regions from which reads should NOT be taken. Default NULL
+#' @param chromosomes A character vector of chromosome names. Reads from other chromosomes will not be loaded. Default NULL (all chromosomes).
+#' 
+#' @return A GAlignments object of reads
+#' 
 #' @export
-read_bam <- function(bam=NULL, region=NULL, paired_reads=TRUE, blacklist=NULL, chromosomes=NULL) {
+import_bam <- function(bam=NULL, region=NULL, paired_reads=TRUE, blacklist=NULL, chromosomes=NULL) {
 
         if(length(region)==0 & is.character(bam)){
         
@@ -32,8 +28,7 @@ read_bam <- function(bam=NULL, region=NULL, paired_reads=TRUE, blacklist=NULL, c
 		region <- GenomicRanges::GRanges(seqnames=names(lengths), ranges=IRanges::IRanges(start=c(1:length(lengths)), end=lengths))			
 
 	} else {	
-	
-		warning("read_bam is returning the input reads unaltered because neither a subsetting region nor the path to a BAM file were supplied.")
+		warning("import_bam is returning the input reads unaltered because neither a subsetting region nor the path to a BAM file were supplied. This may also be a consequence of not providing a blacklist")
 		return(bam)	
         }
 
@@ -73,7 +68,7 @@ read_bam <- function(bam=NULL, region=NULL, paired_reads=TRUE, blacklist=NULL, c
 		reads <- bam[S4Vectors::queryHits(GenomicAlignments::findOverlaps(bam, region))]
 	} else {
 	
-		stop("The read_bam function requires either the path to a BAM file, or a GenomicAlignments object full of reads AND a GRanges object containing genomic regions for which the corresponding reads will be selected.")
+		stop("The import_bam function requires either the path to a BAM file, or a GenomicAlignments object full of reads AND a GRanges object containing genomic regions for which the corresponding reads will be selected.")
 
 	}
 

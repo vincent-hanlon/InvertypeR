@@ -1,25 +1,29 @@
-#' When David releases the next Bioconductor version of BreakpointR with a fixed maskRegions thingy, try subsetting reads to chromosomes right away! Should simplify things a bit
-#' Creates composite files for inversion genotyping
+#' Creates Strand-seq composite files for inversion genotyping
 #'
-#' 
+#' This replaces BASH scripts in a previous InvertypeR version.
 #'
-#' @param inputfolder
-#' @param type
-#' @param numCPU
-#' @param vcf
-#' @param paired_reads
-#' @param blacklist
-#' @param outputfolder
-#' @param save_composite_files
-#' @param chromosomes
+#' In brief, this function merges Strand-seq libraries into two composite files. The Watson-Watson (WW, or CC) composite file contains reads from Watson-Watson regions, 
+#' plus reads from Crick-Crick regions that have been reversed before merging. The Watson-Crick composite file combines reads from Watson-Crick regions and 'Crick-Watson' 
+#' regions. Basically, this last bit is a haplotype aware merging step that accounts for the fact that half of the time, a Watson-Crick/Crick-Watson region has reads from 
+#' homolog 1 align in the reverse orientation and reads from homolog 2 align in the forward orientation, while half of the time the orientations are switched.
 #'
-#' @return  [...]
+#' The composite files can be saved to an RData object for later use. However, since the composite files are GenomicAlignments or GenomicAlignmentPairs objects, it should
+#' also be possible to save them as samtools-compatible BAM files using rtracklayer::export().
+#'
+#' @param inputfolder The path to a directory containing good-quality Strand-seq BAM files 
+#' @param type Either 'ww', or 'wc', or both. The 'wc' file is only available for diploids for which heterozygous SNPs are available, but it greatly improves inversion calls
+#' @param numCPU An integer; the number of threads to use
+#' @param vcf The path to a VCF file containing heterozygous SNPs for an individual. External SNPs (e.g. from WGS data) are best, but they can also usually be called
+#' directly from the Strand-seq data using BBTOOLS callvariants.sh (see README on GitHub).
+#' @param paired_reads Boolean. Are the reads paired-end?
+#' @param blacklist A GRanges object containing regions that are thought to contain unreliable Strand-seq data. Highly recommended.
+#' @param outputfolder The name of a folder to which output files should be written. 
+#' @param save_composite_files Boolean. Should composite files be saved as RData objects, or not at all?
+#' @param chromosomes A character vector of chromosome names for which composite files should be created.
+#'
+#' @return  A list containing 1 or 2 composite files in GenomicAlignments format.
 #'
 #' @export
-
-
-#' This sometimes has issues with memory usage: if the memory usage on the first BPR step gets too high, R will crash.
-#' be sure to include in the documentation that the export function from the rtracklayer package can be used to write a GenomicAlignment or GenomicAlignmentPairs composite file to a BAM file, which may be useful for bioinformatic command line tools.
 create_composite_files <- function(inputfolder='./', type=c("wc","ww"), numCPU=24, vcf=NULL, paired_reads=TRUE, blacklist=NULL, outputfolder='./', save_composite_files=FALSE, chromosomes=NULL){
 
 message('start composite')
@@ -42,7 +46,7 @@ stopifnot("No BAM files found in inputfolder for composite file creation." = len
 message('start read bams')
 
 cl <- suppressMessages(parallel::makeCluster(numCPU))
-galignmentslist <- parallel::parLapply(cl, bamlist, read_bam, blacklist=NULL, chromosomes=NULL, paired_reads=paired_reads)
+galignmentslist <- parallel::parLapply(cl, bamlist, import_bam, blacklist=NULL, chromosomes=NULL, paired_reads=paired_reads)
 
 names(galignmentslist) <- bamlist
 found_chromosomes <- unique(sort(do.call('c',lapply(galignmentslist,function(x)unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
@@ -65,7 +69,7 @@ message('start bpr')
 # Could be a github issue: subtract blacklisted regions from BAM file directly?
 # This means it's best to read in the offending reads, and then only remove them later on.
 # ALSO: the galignments_to_granges should really just take the first read for PE reads, unless pair2frgm is specified
-bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist, paired_reads=FALSE, numCPU=8, windowsize=20000000, binMethod="size", minReads=50, background=0.2, maskRegions=blacklist, chromosomes=NULL))
+bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist, numCPU=8, windowsize=20000000, binMethod="size", minReads=50, background=0.2, maskRegions=blacklist, chromosomes=NULL))
 
 message('done bpr')
 
@@ -77,7 +81,7 @@ if(!is.null(blacklist) | !is.null(chromosomes)){
 cl <- suppressMessages(parallel::makeCluster(numCPU))
 
 # now we "re-read" the BAM files, but in reality we're just subsetting Galignments objects according to the chromosomes and blacklist
-galignmentslist <- parallel::parLapply(cl, galignmentslist, read_bam, blacklist=blacklist, chromosomes=chromosomes)
+galignmentslist <- parallel::parLapply(cl, galignmentslist, import_bam, blacklist=blacklist, chromosomes=chromosomes)
 names(galignmentslist) <- bamlist
 
 parallel::stopCluster(cl)
@@ -160,7 +164,7 @@ names(composite) <- c("WW", "WC")
 
 
 
-invisible(suppressMessages(breakpointr_for_invertyper(to_plot, paired_reads=FALSE, plotspath=outputfolder,numCPU=numCPU, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=NULL,chromosomes=chromosomes)))
+invisible(suppressMessages(breakpointr_for_invertyper(to_plot, plotspath=outputfolder,numCPU=numCPU, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=NULL,chromosomes=chromosomes)))
 
 message('start save composites')
 if(save_composite_files){

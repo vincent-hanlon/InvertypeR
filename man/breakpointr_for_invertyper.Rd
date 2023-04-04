@@ -2,20 +2,10 @@
 % Please edit documentation in R/breakpointr_for_invertyper.R
 \name{breakpointr_for_invertyper}
 \alias{breakpointr_for_invertyper}
-\title{A stripped down parallel implementation of the core BreakpointR function, "runBreakpointr".
-Lots of this code is borrowed/altered from the BreakpointR package by David Porubsky, Ashley Sanders, and Aaron Taudt.
-It also doesn't do such nice validation of arguments
-Needs import foreach, doParallel, and maybe utils from read.table
-Probably need to ad BreakpointR:: to all the BPR functions
-We get a separate PDF for each file... maybe that could be improved?
-qPDF could be used for that
-plotspath should be a directory, not a filename
-it uses single end GRanges with 2 frags paired.
-For plotting, should also downsample beforehand to reduce processing time. Plus----sort the GRANGES! otherwise the chromosomes are all mixed up.}
+\title{A stripped down parallel implementation of the core BreakpointR function, "runBreakpointr".}
 \usage{
 breakpointr_for_invertyper(
   grangeslist = NULL,
-  paired_reads = FALSE,
   plotspath = NULL,
   numCPU = 4,
   windowsize = 1e+06,
@@ -27,20 +17,28 @@ breakpointr_for_invertyper(
 )
 }
 \arguments{
-\item{chromosomes}{}
+\item{grangeslist}{List of GRanges objects containing single-end reads (or the first read from paired reads)}
+
+\item{plotspath}{File path where PDFs should be generated. Default NULL}
+
+\item{numCPU}{See BreakpointR}
+
+\item{windowsize}{See BreakpointR}
+
+\item{binMethod}{See BreakpointR}
+
+\item{minReads}{See BreakpointR}
+
+\item{background}{See BreakpointR}
+
+\item{maskRegions}{See BreakpointR}
+
+\item{chromosomes}{See BreakpointR}
 }
 \value{
-\link{...}
+A Breakpoints object from BreakpointR
 }
 \description{
-A stripped down parallel implementation of the core BreakpointR function, "runBreakpointr".
 Lots of this code is borrowed/altered from the BreakpointR package by David Porubsky, Ashley Sanders, and Aaron Taudt.
-It also doesn't do such nice validation of arguments
-Needs import foreach, doParallel, and maybe utils from read.table
-Probably need to ad BreakpointR:: to all the BPR functions
-We get a separate PDF for each file... maybe that could be improved?
-qPDF could be used for that
-plotspath should be a directory, not a filename
-it uses single end GRanges with 2 frags paired.
-For plotting, should also downsample beforehand to reduce processing time. Plus----sort the GRANGES! otherwise the chromosomes are all mixed up.
+It doesn't do such nice validation of arguments etc., but it is sufficient for InvertypeR's purposes
 }

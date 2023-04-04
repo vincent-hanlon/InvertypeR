@@ -1,19 +1,14 @@
-
-#' Converting reads for various tools
-#' The purpose argument mus tbe either 'StrandPhaseR' or 'BreakpointR'
-#' This function should be inserted into InvertypeR whenever these task are done, for example, in the process_reads and pair2frgm functions
-#' The breakpointR purpose here pairs fragments when we're looking at paired reads
-
-
-
-
-#' @param galignments
-#' @param purpose
-#' @param paired_reads
-#' @param region
-#' @param pair2frgm
+#' Converting reads from GAlignments to GRanges formats
 #'
-#' @return  [...]
+#' The resulting GRanges objects are suitable for processing with other Strand-seq R packages like StrandPhaseR or BreakpointR
+#'
+#' @param galignments A GenomicAlignments object
+#' @param purpose Either 'StrandPhaseR' or 'BreakpointR'. Different purposes result in different formats.
+#' @param paired_reads Boolean. Are the reads paired?
+#' @param region A GRanges object, to which the GAlignments object can be subset.
+#' @param pair2frgm Boolean. Should paired reads be merged into a single fragment, for BreakpointR?
+#'
+#' @return A GRanges object
 #'
 #' @export
 

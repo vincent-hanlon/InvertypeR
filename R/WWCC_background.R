@@ -11,6 +11,7 @@
 #' @param WW_reads A GenomicAlignments object, the WW or CC composite file
 #' @param binsize How big should the bins be? Default 1000000.
 #' @param paired_reads A Boolean: are the reads paired-end? Default TRUE.
+#' @param chromosomes A character vector of chromosome names to use
 #' @return A list: The background, the strand state of the composite file, and the number of reads in the composite file.
 #'
 #'
@@ -51,7 +52,7 @@ WWCC_background <- function(WW_reads, binsize=1000000, paired_reads=TRUE, chromo
 
         } else if( ( background > 0.3) & (background < 0.7) ) {
 
-                stop("the input file seems to be WC/CW, not WW/CC!")
+               stop("the input file seems to be WC/CW, not WW/CC! Either the WW (or CC) composite file is malformed, or (possibly) the regions you provided for genotyping all have strand-state WC. In that case, try genotyping additional regions")
 
         } else {
 

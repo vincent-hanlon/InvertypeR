@@ -4,7 +4,7 @@
 #' This funcion will read in partial single cell haplotypes into
 #' two parallel matrices separately for Watson and Crick reads
 #' 
-#' @inheritParams phaseChromosome_for_invertyper.R  
+#' @inheritParams phaseChromosome_for_invertyper
 #' @importFrom GenomicAlignments pileLettersAt
 #' @importFrom Biostrings alphabetFrequency DNAStringSet
 #' 

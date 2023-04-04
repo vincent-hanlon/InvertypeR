@@ -14,6 +14,19 @@ loadMatrices(
   min.baseq = 30
 )
 }
+\arguments{
+\item{inputfolder}{Path to the bam files to process}
+
+\item{positions}{Filename with listed position of SNVs for given chromosome (format: chrName SNVpos).}
+
+\item{WCregions}{Filename of all WC region for a given chromosome (format: chrName:Start:End:FileName).}
+
+\item{pairedEndReads}{Set to \code{TRUE} if you have paired-end reads in your file.}
+
+\item{min.mapq}{Minimum mapping quality when importing from BAM files.}
+
+\item{min.baseq}{Minimum base quality to consider a base for phasing.}
+}
 \description{
 This funcion will read in partial single cell haplotypes into
 two parallel matrices separately for Watson and Crick reads

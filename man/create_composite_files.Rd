@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_composite_files.R
 \name{create_composite_files}
 \alias{create_composite_files}
-\title{Creates composite files for inversion genotyping}
+\title{Creates Strand-seq composite files for inversion genotyping}
 \usage{
 create_composite_files(
   inputfolder = "./",
@@ -17,11 +17,37 @@ create_composite_files(
 )
 }
 \arguments{
-\item{chromosomes}{}
+\item{inputfolder}{The path to a directory containing good-quality Strand-seq BAM files}
+
+\item{type}{Either 'ww', or 'wc', or both. The 'wc' file is only available for diploids for which heterozygous SNPs are available, but it greatly improves inversion calls}
+
+\item{numCPU}{An integer; the number of threads to use}
+
+\item{vcf}{The path to a VCF file containing heterozygous SNPs for an individual. External SNPs (e.g. from WGS data) are best, but they can also usually be called
+directly from the Strand-seq data using BBTOOLS callvariants.sh (see README on GitHub).}
+
+\item{paired_reads}{Boolean. Are the reads paired-end?}
+
+\item{blacklist}{A GRanges object containing regions that are thought to contain unreliable Strand-seq data. Highly recommended.}
+
+\item{outputfolder}{The name of a folder to which output files should be written.}
+
+\item{save_composite_files}{Boolean. Should composite files be saved as RData objects, or not at all?}
+
+\item{chromosomes}{A character vector of chromosome names for which composite files should be created.}
 }
 \value{
-\link{...}
+A list containing 1 or 2 composite files in GenomicAlignments format.
 }
 \description{
-Creates composite files for inversion genotyping
+This replaces BASH scripts in a previous InvertypeR version.
+}
+\details{
+In brief, this function merges Strand-seq libraries into two composite files. The Watson-Watson (WW, or CC) composite file contains reads from Watson-Watson regions,
+plus reads from Crick-Crick regions that have been reversed before merging. The Watson-Crick composite file combines reads from Watson-Crick regions and 'Crick-Watson'
+regions. Basically, this last bit is a haplotype aware merging step that accounts for the fact that half of the time, a Watson-Crick/Crick-Watson region has reads from
+homolog 1 align in the reverse orientation and reads from homolog 2 align in the forward orientation, while half of the time the orientations are switched.
+
+The composite files can be saved to an RData object for later use. However, since the composite files are GenomicAlignments or GenomicAlignmentPairs objects, it should
+also be possible to save them as samtools-compatible BAM files using rtracklayer::export().
 }

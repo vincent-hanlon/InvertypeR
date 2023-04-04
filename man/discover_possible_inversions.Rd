@@ -2,7 +2,8 @@
 % Please edit documentation in R/discover_possible_inversions.R
 \name{discover_possible_inversions}
 \alias{discover_possible_inversions}
-\title{It is currently unwise to use this function with few chromosomes, because if no reads in a library overlap the blacklist then that library will be skipped will probably cause an error}
+\title{For BreakpointR version 1.16.0, it is currently unwise to use this with a blacklist and few reads/chromosomes, because when no reads intersect the blacklist it removes
+all reads. This bug will hopefully be fixed in the next version}
 \usage{
 discover_possible_inversions(
   composite_files = list(),
@@ -12,15 +13,33 @@ discover_possible_inversions(
   numCPU = 24,
   chromosomes = NULL,
   blacklist = NULL,
-  background = 0.2
+  background = 0.2,
+  type = c("wc", "ww")
 )
 }
 \arguments{
-\item{background}{}
+\item{composite_files}{A list of 1 or 2 composite files, named WC and WW (or just WW for haploids)}
+
+\item{windowsize}{A vector of integers. Each integer will be used the set the number of reads in a bin for a BreakpointR run.}
+
+\item{minReads}{A vector of integers parallel to windowsize, giving the minimum number of reads in a bin for it to be considered/genotyped}
+
+\item{paired_reads}{Boolean. Paired-end reads?}
+
+\item{numCPU}{Integer. How many threads to use?}
+
+\item{chromosomes}{A character vector of chromosome names to examine}
+
+\item{blacklist}{A GRanges object containing intervals with suspected poor-quality Strand-seq data.}
+
+\item{background}{A parameter to be passed on to BreakpointR, setting the maximum amount of background allowable for ww or cc calls.}
+
+\item{type}{'wc', 'ww', or both. Describes the input composite files (which are either Watson-Watson or Watson-Crick, or both).}
 }
 \value{
-\link{...}
+A GRanges object of potential inversions for genoptyping with invertyper()
 }
 \description{
-It is currently unwise to use this function with few chromosomes, because if no reads in a library overlap the blacklist then that library will be skipped will probably cause an error
+For BreakpointR version 1.16.0, it is currently unwise to use this with a blacklist and few reads/chromosomes, because when no reads intersect the blacklist it removes
+all reads. This bug will hopefully be fixed in the next version
 }

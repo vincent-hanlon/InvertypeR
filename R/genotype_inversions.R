@@ -12,8 +12,8 @@
 #' on chr1 in the sample, and that all chr1 1|0 inversions are on the other homolog. However, we don't know whether a 0|1 inversion on chr1 and a 0|1 inversion chr2 came from the same parent. 
 #' 0|1 inversions are distinguished from 1|0 inversions based on the strand switch in the WC composite file ( WC -> WW or WC -> CC). 
 #'
-#' @param WW_reads A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WW composite file. See create_composite_files() or read_bam().
-#' @param WC_reads A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WC composite file. See create_composite_files() or read_bam().
+#' @param WW_reads A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WW composite file. See create_composite_files() or import_bam().
+#' @param WC_reads A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WC composite file. See create_composite_files() or import_bam().
 #' @param regions A Granges object containing genomic intervals that are thought to be inversions.
 #' @param background The fraction of background reads for the WW composite file. See WWCC_background().
 #' @param base_state The strand state of the WW composite file: either "WW" (mostly + reads) or "CC" (mostly - reads). 

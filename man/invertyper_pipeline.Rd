@@ -2,7 +2,7 @@
 % Please edit documentation in R/invertyper_pipeline.R
 \name{invertyper_pipeline}
 \alias{invertyper_pipeline}
-\title{The BED files assume 1-based coordinates.}
+\title{A pipeline-style implementation of all invertyper() functionality}
 \usage{
 invertyper_pipeline(
   regions_to_genotype = NULL,
@@ -30,11 +30,75 @@ invertyper_pipeline(
 )
 }
 \arguments{
-\item{output_file}{}
+\item{regions_to_genotype}{A BED file containing genomic intervals to be genotyped (putative inversions). Default NULL.}
+
+\item{prior}{Vector of three prior weights for inversion genotypes. For example, c("REF","HET","HOM") = c(0.9,0.05,0.05). Default c(0.33,0.33,0.33).}
+
+\item{haploid_prior}{Vector of two prior weights for inversions on haploid chromosomes, like chrX and chrY in human males. For example, c("REF", "INV") = c(0.9,0.1). Default c(0.5,0.5).}
+
+\item{adjust_method}{One of "raw", "merge", "deltas", "minimal", "low", or "all". (usually 'all' !). Specifies which method to use to adjust the inversion coordinates (start- and end-points). The adjustment routine
+ensures that adjusted inversions have the same genotype as they did before adjustment (if applicable), and that they overlap at least one of the original unadjusted inversions in every cluster of
+overlapping events. If after adjustment (except with "raw") overlapping inversions still remain, we merge the ones of the same genotype. If there are still overlapping inversions, we take the largest.
+"raw": No adjustment. "merge": Merge overlapping confident (i.e., posterior probability >= confidence for a genotype) inversions of the same genotype. "Deltas": adjust the endpoints of confident
+inversions based on the Strand-seq data. We calculate deltaW values for each read, which measure the change in read direction for nearby reads, and take the coordinates that correspond to the two
+highest values (i.e. the two spots with the greates change in read direction, which we hope will correspond to inversion breakpoints). This is done once for every set of overlapping inversions of the
+same genotype. "minimal": An experimental method. For confident overlapping inversions of the same genotype, take the interval common to all of them if one exists. "low": Much like "deltas", except
+that we only adjust inversions for which no confident genotype could be found (i.e., all prior probabilities < confidence). Sometimes this will "find" a confident inversion if the original coordinates
+were slightly off. "all": Does both "deltas" and "low".}
+
+\item{inputfolder}{Path to a directory containing Strand-seq BAM files}
+
+\item{outputfolder}{Path to a directory for output files}
+
+\item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.}
+
+\item{vcf}{A VCF file containing heterozygous SNVs for the sample. If there is no external source of SNVs, they can be called directly from the Strand-seq BAMs at a pinch}
+
+\item{paired_reads}{Boolean: are the reads paired-end? Default TRUE.}
+
+\item{confidence}{Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions, as well as to identify low-confidence
+calls for adjust_method "low". Default 0.95.}
+
+\item{blacklist}{A BED file containing regions genomic intervals with poor-quality Strand-seq data. Reads that overlap these intervals will not be used. Highly recommended. Default NULL.}
+
+\item{chromosomes}{Vector of chromosome names to restrict the search for inversions.}
+
+\item{numCPU}{Integer. How many parallel threads to use, where possible?}
+
+\item{save_composite_files}{Should composite files be saved as RData objects?}
+
+\item{write_browser_files}{Should inversions and associated reads be saved to UCSC Genome Browser files?}
+
+\item{discover_breakpointr_inversions}{Boolean. Should BreakpointR be used to find additional putative inversions not provided in regions_to_genotype? Default TRUE.}
+
+\item{breakpointr_prior}{Vector of three prior weights for genotyping putative inversions found using BreakpointR. The default is ok for humans.}
+
+\item{breakpointr_haploid_prior}{Vector of two prior weights. See breakpointr_prior}
+
+\item{windowsize}{An integer vector, describing the binsizes for running BreakpointR, measured in # reads per bin. The default is ok for humans.}
+
+\item{minReads}{An integer vector parallel to windowsize that gives the minimum number of reads allowed in a BreakpointR bin for deciding its strand state}
+
+\item{background}{A BreakpointR parameter: how much background would you expect, at most, in a Watson-Watson region?}
+
+\item{output_file}{Name of the inversion genotype file(s) to write to. Default "inversions.txt".}
 }
 \value{
-\link{...}
+A dataframe or list of dataframe containing inversion coordinates, genotypes, posterior probabilities, and more.
 }
 \description{
-The BED files assume 1-based coordinates.
+Requires Strand-seq BAM files, and preferably a VCF of heterozygous SNVs (can be called directly from the Strand-seq BAM files) and a BED file of regions to genotype
+}
+\details{
+In brief, this function:
+(i) Creates phased Strand-seq composite files, which have higher coverage than any individual library.
+(ii) Looks for strand-switches in the composite files that might be inversions, using BreakpointR
+(iii) Genotypes the putative inversions that BreakpointR finds
+(iv) Writes the inversions and relevant Strand-seq reads to UCSC Genome Browser files, if desired
+(v) Genotypes any user-provided putative inversions. This typically helps find smaller inversions than those BreakpointR can detect
+(vi) Writes those to UCSC Genome Browser files too
+(vii) Returns dataframe(s) with inversion coordinates, genotypes, and posterior probabilities
+
+One tricky thing for human males is that it is necessary to set haploid_chromosomes=c('chrX','chrY')
+This was primarily set up for diploids, but haploids can be accomodated if haploid_chromosomes == chromosomes
 }

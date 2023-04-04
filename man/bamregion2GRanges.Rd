@@ -14,6 +14,21 @@ bamregion2GRanges(
   all_alignments = galignmentslist_global_for_invertyper
 )
 }
+\arguments{
+\item{bamindex}{Bam-index file with or without the .bai ending. If this file does not exist it will be created and a warning is issued. (Not needed for InvertypeR)}
+
+\item{region}{If only a subset of the genomic regions should be loaded.}
+
+\item{pairedEndReads}{Set to \code{TRUE} if you have paired-end reads in your file.}
+
+\item{min.mapq}{Minimum mapping quality when importing from BAM files. (not actually used by InvertypeR, same as filterAltAlign)}
+
+\item{filterAltAlign}{(A parameter used by StrandPhaseR but accepted and then ignored by InvertypeR).}
+
+\item{all_alignments}{A list of GAlignments objects for the Strand-seq libraries. Global so that there are no problems accessing it in parallel}
+
+\item{file}{Bamfile with aligned reads. (Or in InvertypeR, the filename of a bamfile)}
+}
 \value{
 a GRanges object
 }

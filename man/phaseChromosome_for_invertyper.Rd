@@ -2,7 +2,7 @@
 % Please edit documentation in R/phaseChromosome_for_invertyper.R
 \name{phaseChromosome_for_invertyper}
 \alias{phaseChromosome_for_invertyper}
-\title{A stripped-down version of the StrandPhaseR function phaseChromosome}
+\title{A stripped-down version of the StrandPhaseR function phaseChromosome by David Porubsky}
 \usage{
 phaseChromosome_for_invertyper(
   inputfolder,
@@ -21,6 +21,42 @@ phaseChromosome_for_invertyper(
   exportVCF = NULL
 )
 }
+\arguments{
+\item{inputfolder}{Path to the bam files to process}
+
+\item{outputfolder}{Output directory.}
+
+\item{positions}{Filename with listed position of SNVs for given chromosome (format: chrName SNVpos).}
+
+\item{WCregions}{Filename of all WC region for a given chromosome (format: chrName:Start:End:FileName).}
+
+\item{chromosome}{If only a subset of the chromosomes should be processed, specify them here.}
+
+\item{pairedEndReads}{Set to \code{TRUE} if you have paired-end reads in your file.}
+
+\item{min.mapq}{Minimum mapping quality when importing from BAM files.}
+
+\item{min.baseq}{Minimum base quality to consider a base for phasing.}
+
+\item{num.iterations}{Number of iteration to sort watson and crick matrices.}
+
+\item{translateBases}{...}
+
+\item{splitPhasedReads}{Set to \code{TRUE} if you want to split reads per haplotype.}
+
+\item{compareSingleCells}{Set to \code{TRUE} if you want to compare haplotypes at the single-cell level.}
+
+\item{exportVCF}{...}
+
+\item{fillGaps}{...}
+}
+\value{
+A subset of the StrandPhaseR output that phases the strand state of wc regions
+}
 \description{
-This is a simplified function that removes some of the functionality (and runtime) of David Porubsky's original StrandPhaseR function
+This is a simplified function that removes some of the functionality (and runtime) of David's original StrandPhaseR function
+The arguments are the same (or effectively the same) as David's corresponding function.
+}
+\details{
+The descriptions of arguments here are just copied from StrandPhaseR
 }

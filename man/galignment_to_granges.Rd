@@ -2,10 +2,7 @@
 % Please edit documentation in R/galignment_to_granges.R
 \name{galignment_to_granges}
 \alias{galignment_to_granges}
-\title{Converting reads for various tools
-The purpose argument mus tbe either 'StrandPhaseR' or 'BreakpointR'
-This function should be inserted into InvertypeR whenever these task are done, for example, in the process_reads and pair2frgm functions
-The breakpointR purpose here pairs fragments when we're looking at paired reads}
+\title{Converting reads from GAlignments to GRanges formats}
 \usage{
 galignment_to_granges(
   galignments = NULL,
@@ -16,14 +13,19 @@ galignment_to_granges(
 )
 }
 \arguments{
-\item{pair2frgm}{}
+\item{galignments}{A GenomicAlignments object}
+
+\item{purpose}{Either 'StrandPhaseR' or 'BreakpointR'. Different purposes result in different formats.}
+
+\item{paired_reads}{Boolean. Are the reads paired?}
+
+\item{region}{A GRanges object, to which the GAlignments object can be subset.}
+
+\item{pair2frgm}{Boolean. Should paired reads be merged into a single fragment, for BreakpointR?}
 }
 \value{
-\link{...}
+A GRanges object
 }
 \description{
-Converting reads for various tools
-The purpose argument mus tbe either 'StrandPhaseR' or 'BreakpointR'
-This function should be inserted into InvertypeR whenever these task are done, for example, in the process_reads and pair2frgm functions
-The breakpointR purpose here pairs fragments when we're looking at paired reads
+The resulting GRanges objects are suitable for processing with other Strand-seq R packages like StrandPhaseR or BreakpointR
 }

@@ -7,10 +7,12 @@
 drop_seq_qual(galignments, paired_reads = TRUE)
 }
 \arguments{
-\item{paired_reads}{}
+\item{galignments}{A GAlignments object}
+
+\item{paired_reads}{Boolean}
 }
 \value{
-\link{...}
+A GAlignments object without the offending mcols
 }
 \description{
 I'm concerned that these fields are burdensome to store, so I want to get rid of them in the standard implementation

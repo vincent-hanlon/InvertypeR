@@ -16,9 +16,9 @@ genotype_inversions(
 )
 }
 \arguments{
-\item{WW_reads}{A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WW composite file. See create_composite_files() or read_bam().}
+\item{WW_reads}{A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WW composite file. See create_composite_files() or import_bam().}
 
-\item{WC_reads}{A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WC composite file. See create_composite_files() or read_bam().}
+\item{WC_reads}{A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WC composite file. See create_composite_files() or import_bam().}
 
 \item{regions}{A Granges object containing genomic intervals that are thought to be inversions.}
 

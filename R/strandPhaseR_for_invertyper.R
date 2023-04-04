@@ -1,8 +1,17 @@
-
 #' A modified implementation of the core StrandPhaseR function, "strandPhaseR"
 #' 
 #' This function is effectively a stripped-down version of David Porubsky's strandPhaseR, but with some additional post-processing of my own to return a nice GRanges of phased WC regions. 
 #' It sneakily uses the galignmentlist (BAM files loaded into R) rather then reading them from the files all over again. This is accomplished by overwriting some StrandPhaseR functions.
+#'
+#' @param numCPU An integer, the number of threads to use
+#' @param positions The path to a VCF file containing heterozygous SNPs 
+#' @param WCregions A pre-processed GRanges object that contains intervals in which specified libraries have strand-state WC (Watson-Crick)
+#' @param chromosomes A character vector of chromosome names to be used
+#' @param paired_reads Boolean. Are the reads paired-end?
+#' @param num.iterations An integer. See StrandPhaseR for details. The default here is usually fine.
+#' @param galignmentslist A list of GenomicAlignments objects containing the input Strand-seq libraries
+#'
+#' @return A GRanges object such that the input WCregions are annotated with 'wc' or 'cw' according to their phase
 #'
 #' @export
 strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL, chromosomes=NULL, paired_reads=TRUE, num.iterations=3, galignmentslist=galignmentslist) {
@@ -90,7 +99,7 @@ outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i],
 	for(i in conf[['chromosomes']]){
 
 	message("remember to add suppressMessages( back to strandphaser!")
-	temp <- phaseChromosome_for_invertyper(inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i], 
+	temp <- invertyper::phaseChromosome_for_invertyper(inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i], 
 					chromosome=i,
                                        WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], 
 				min.baseq=20, num.iterations=conf[['num.iterations']],

@@ -1,4 +1,3 @@
-
 #' Checks if adjusted inversions have the same genotype
 #'
 #' Runs genotype_inversions(), discards inversions that don't have the same genotype as before adjustment, and then adds back in the originals for the ones that weren't adjusted.

@@ -44,21 +44,22 @@ invertyper <- function(WW_reads, WC_reads, regions_to_genotype, blacklist=NULL, 
 
 stopifnot('Please choose a value for adjust_method. This controls how InvertypeR will attempt to improve the inversion coordinates you supply. Valid values are "raw","merge","deltas","minimal", "low", or "all".' = all(length(adjust_method)==1 & adjust_method %in% c("raw","merge","deltas","minimal", "low", "all")))
 stopifnot("Any haploid chromosomes you specify should be include as chromosomes too. This means including chrX and chrY as chromosomes AND as haploid_chromosomes for human males" = all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes))
+stopifnot('The blacklist and regions_to_genotype arguments must be GRanges objects. Use import_bed()' = !is.character(regions_to_genotype) & !is.character(blacklist))
 
 
-if(all(prior == c(0.333,0.333,0.333)) | (!is.null(haploid_chromosomes) & all(haploid_prior == c(0.5,0.5)))){
+haploid <- all(sort(haploid_chromosomes) == sort(chromosomes)) & !(is.null(chromosomes) & is.null(haploid_chromosomes))
+
+if(all(prior == c(0.333,0.333,0.333)) & !haploid | (haploid & all(haploid_prior == c(0.5,0.5)))){
 
 warning("Using the default priors (prior for homogametic diploids (e.g., human females), haploid_prior for haploids, or both for heterogametic dipoids (e.g., human males)) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes.")
 
 }
 
 
-    #An irrelavent internal name change
+    #An irrelevant internal name change
         regions <- regions_to_genotype
 
-
-
-        if(length(regions)==0 || length(WW_reads) == 0 || length(WC_reads) == 0){
+        if(length(regions)==0 || length(WW_reads) == 0 || (length(WC_reads) == 0 & !haploid)){
 
 		warning("Non-empty composite files and a non-empty list of regions_to_genotype are required to genotype inversions")
 
@@ -69,20 +70,21 @@ warning("Using the default priors (prior for homogametic diploids (e.g., human f
          } else {
 
 
-if(!is.character(WW_reads)){
 
-WW_chromosomes <- unique(sort(as.vector(seqnames(WW_reads))))
-WC_chromosomes <- unique(sort(as.vector(seqnames(WC_reads))))
 
-if(any(!WW_chromosomes[!WW_chromosomes %in% WC_chromosomes] %in% haploid_chromosomes)){
+if(!is.character(WW_reads) & !haploid){
+
+	WW_chromosomes <- unique(sort(as.vector(seqnames(WW_reads))))
+
+	if(any(!WW_chromosomes[!WW_chromosomes %in% WC_chromosomes] %in% haploid_chromosomes)){
 
 	warning("Make sure that haploid chromosomes appear in the argument haploid_chromosomes if they appear in the argument chromosomes. For example, chrX and chrY for human males")
-}
+	}
 }
 
 
 if(!is.null(chromosomes)){
-	found_chromosomes <- unique(sort(do.call('c',lapply(list(WW_reads,WC_reads),function(x)unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
+	found_chromosomes <- unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(WW_reads)))))
 
 	if(!all(chromosomes %in% found_chromosomes)){
 	        warning(paste0("Some chromosomes you provided (", paste(chromosomes[!(chromosomes %in% found_chromosomes)], collapse=" "), ") don't have any reads in the composite files."))
@@ -96,16 +98,36 @@ if(!is.null(chromosomes)){
 
 }
 
+if(is.character(WW_reads)){
 
+	file <- Rsamtools::BamFile(WW_reads)
+	seqlengths_WW <- Rsamtools::scanBamHeader(file)$targets
+	seqlengths_WC <- seqlengths_WW
+} else {
+
+	seqlengths_WW <- GenomeInfoDb::seqlengths(WW_reads)
+}
 
 
 
 	#Takes reads from the BAM files that overlap the regions and stores them as GRanges
-	WW_reads <- read_bam(WW_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=GenomeInfoDb::seqlengths(WW_reads), distance=1e06), min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
-	WC_reads <- read_bam(WC_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=GenomeInfoDb::seqlengths(WC_reads), distance=1e06),min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
+	WW_reads <- import_bam(WW_reads, chromosomes=chromosomes, paired_reads=paired_reads, blacklist=blacklist)
+	if(!is.null(WC_reads)){
 
+	if(!is.character(WC_reads)){
+	seqlengths_WC <- GenomeInfoDb::seqlengths(WC_reads)
+	}
+	WC_reads <- import_bam(WC_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=seqlengths_WC, distance=1e06),min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
+	} else {
+	WC_reads <- WW_reads[0]
+	}
+print(WW_reads)
+save(WW_reads, file='ww-b4.RData')
         #Accurate background estimate, plus base strand state for the WW/CC file
         base <- WWCC_background(WW_reads, binsize=1000000, paired_reads=paired_reads, chromosomes=chromosomes)
+
+	WW_reads <- WW_reads <- import_bam(WW_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=seqlengths_WW, distance=1e06), min.gapwidth=1000), 
+paired_reads=paired_reads, blacklist=blacklist)
 
 	#Genotyping the inversions
 	inversions <- genotype_inversions(WW_reads=WW_reads, WC_reads=WC_reads, regions=regions, background=base[[1]], base_state=base[[2]],  haploid_chromosomes=haploid_chromosomes, 

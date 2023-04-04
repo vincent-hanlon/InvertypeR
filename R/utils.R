@@ -17,13 +17,14 @@ return(gr)
 }
 
 
-
-
-#' @param list_of_breakpoint_objects
-#' @param states
-#' @param region_size
+#' Using BreakpointR output, this identifies regions of a particular strand state
+#' For example, Watson-Crick regions for phasing
 #'
-#' @return  [...]
+#' @param list_of_breakpoint_objects A list of Breakpoint objects from BreakpointR
+#' @param states The desired Strand-state ('ww', 'wc', or 'cc')
+#' @param region_size The minimum size of regions to select
+#'
+#' @return  A GRanges object containing genomic intervals of the desired strand state(s) 
 #'
 #' @export
 find_regions_with_strand_state <- function(list_of_breakpoint_objects=list(), states=c('wc'), region_size=100000){
@@ -47,17 +48,16 @@ return(regions)
 }
 
 
-
-
-
-#' @param galignmentslist
-#' @param regions
-#' @param paired_reads
-#' @param states
-#' @param filename
-#' @param flip_reads
+#' Extracts reads from a GAlignments object that match a certain strand state within a given region
 #'
-#' @return  [...]
+#' @param galignmentslist A list of GAlignments objects 
+#' @param regions A GRanges object with a 'states' mcol and a 'filename' mcol matching the GAlignments objects 
+#' @param paired_reads Boolean 
+#' @param states The desired strand state(s) 
+#' @param filename The filename for the GAlignments object in the list from which reads should be extracted 
+#' @param flip_reads Whether to reorient reads for composite file creation (e.g., reorient cc regions for a ww composite file) 
+#' @return A GAlignments object
+
 extract_reads_by_region_and_state <- function(galignmentslist=NULL, regions=NULL, paired_reads=TRUE, states='wc', filename=NULL, flip_reads=FALSE) {
 
 stopifnot("Allowable states are 'ww', 'cc', 'wc', and 'cw'." = (!any(!states%in%c('wc','ww','cc','cw'))))
@@ -86,12 +86,13 @@ return(reads)
 #'
 #' I'm concerned that these fields are burdensome to store, so I want to get rid of them in the standard implementation
 #'
-#' @param galignments
-#' @param paired_reads
+#' @param galignments A GAlignments object
+#' @param paired_reads Boolean
 #'
-#' @return  [...]
+#' @return  A GAlignments object without the offending mcols
 #'
 #' @export
+
 drop_seq_qual <- function(galignments, paired_reads=TRUE){
 
 stopifnot("Set paired_reads=TRUE when galignments is a GAlignmentPairs object, and set paired_reads=FALSE when galignments is a GAlignments object" = is(galignments,'GAlignmentPairs') == paired_reads)

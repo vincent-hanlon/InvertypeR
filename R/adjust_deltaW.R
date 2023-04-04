@@ -51,10 +51,12 @@ save(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype, file="adjust.RData")
 
 		if(length(inversions[is.na(f_inversions)]) > 0){
 			f_inversions[is.na(f_inversions)] <- GenomicRanges::precede(inversions[is.na(f_inversions)], WW_reads)
+			f_inversions <- replace(f_inversions, is.na(f_inversions), 0)
 		}
 		
                 if(length(inversions[is.na(p_inversions)]) > 0){
                         p_inversions[is.na(p_inversions)] <- GenomicRanges::follow(inversions[is.na(p_inversions)], WW_reads)
+			p_inversions <- replace(p_inversions, is.na(p_inversions), 0)
                 }
 	
 
@@ -62,9 +64,12 @@ save(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype, file="adjust.RData")
 
         #Calculating the start and end coordinates for the widened interval, and making sure they don't spill over onto the next chromosome
         #The new intervals are usually 3x as wide as the originals
+print(WW_reads)
+print(f_inversions)
+print(num_inversions)
+
         start_inversions <- ifelse(as.character(GenomicRanges::seqnames(WW_reads[pmax(1,f_inversions - num_inversions)]))==as.character(GenomicRanges::seqnames(inversions)), GenomicRanges::start(WW_reads[pmax(1,f_inversions - num_inversions)]),1)
-        end_inversions <- ifelse(as.character(GenomicRanges::seqnames(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]))==as.character(GenomicRanges::seqnames(inversions)),
-                GenomicRanges::end(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]), GenomeInfoDb::seqlengths(WW_reads)[as.character(GenomicRanges::seqnames(inversions))])
+        end_inversions <- ifelse(as.character(GenomicRanges::seqnames(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]))==as.character(GenomicRanges::seqnames(inversions)), GenomicRanges::end(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]), GenomeInfoDb::seqlengths(WW_reads)[as.character(GenomicRanges::seqnames(inversions))])
 
 
         #Assembling the new wide intervals, and recording the sort order as well as duplicate entries so that the comparison with "inversions" in pintersect (at the end) can be done correctly.
