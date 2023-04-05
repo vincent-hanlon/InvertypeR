@@ -1,15 +1,15 @@
 # InvertypeR
 
-An R package for genotyping (and discovering) inversions using Strand-seq data. This is supplemented by an "Inversion visualization" section, at bottom, which uses R/PERL scripts to make ideograms linked to the UCSC Genome Browser.
+InvertypeR is an R package for genotyping (and discovering) inversions using Strand-seq data. This is supplemented by an "Inversion visualization" section, at bottom, which uses R/PERL scripts to make ideograms linked to the UCSC Genome Browser.
 
-For more information not provided below, or to cite this tool, please see the InvertypeR paper at doi.org/10.1186/s12864-021-07892-9. If you should run into trouble, please feel free to post an Issue or contact me at vhanlon [at] bccrc.ca
+For further details beyond what is provided below, or to cite InvertypeR, please see the [InvertypeR paper](doi.org/10.1186/s12864-021-07892-9). If you should run into trouble, please feel free to post an Issue or contact me at vincent [AT] alumni.ubc.ca 
 
 ## Pre-processing
 
 The main inputs to InvertypeR are:
 
 1. Strand-seq BAM files for the individual of interest, placed together in a directory. The BAM files should have good Strand-seq quality.
-2. A VCF file containing heterozygous SNVs for the individual of interest (not needed for haploids). If you don't have this, it's always best to use high-coverage NGS data of some kind to call SNVs before using InvertypeR. However, it's also possible to call SNVs directly from the Strand-seq libraries despite their shallow coverage. 
+2. A VCF file containing heterozygous SNVs for the individual of interest (not needed for haploids). If you don't have this, it is usually possible to call enough SNVs from the Strand-seq data.
 3. A BED file containing genomic intervals that you suspect may be inverted. This could be a handful of well-characterized inversions you want to genotype in a new individual, or it could be thousands of dubious inversions from the literature.
 4. Appropriate priors. These aren't as hard to choose as you might think. 
 5. A BED file containing regions that you expect to have poor-quality Strand-seq data. For humans, you can generally just use the one on this repo. For other species, you may want to make one.
@@ -18,17 +18,38 @@ The main inputs to InvertypeR are:
 
 Strand-seq is a single-cell library preparation for DNA sequencing that is quite good at finding inversions. Here are some relevant papers:
 
-doi.org/10.1038/nmeth.2206
-doi.org/10.1038/s41587-020-0719-5
+  - The [original](doi.org/10.1038/nmeth.2206) Strand-seq protocol
+  - A recent [inversion discovery](doi.org/10.1038/s41587-020-0719-5) paper
 
+If you have Strand-seq FASTQ files but are unsure how to align them etc., see the file instructions.txt for a step-by-step guide. 
 
+If you have single-cell Strand-seq BAM files ready, then the next step is to select good-quality libraries. That is best done with [ASHLEYS-QC](https://github.com/friendsofstrandseq/ashleys-qc). Install ASHLEYS-QC, and run it with default parameters as follows:
 
+```
+/PATH/TO/FILE/ashleys.py -j 12 features -f ./ -w 5000000 2000000 1000000 800000 600000 400000 200000 -o ./features.tsv
+/PATH/TO/FILE/ashleys.py predict -p ./features.tsv -o ./quality.txt -m /PATH/TO/OTHER/FILE/svc_default.pkl
+```
 
+Then, libraries that score lower than 0.5 are considered poor quality and should be moved to a subdirectory. 
 
+Typically, I use at least 30 libraries with at least 20 million non-duplicate aligned reads in total for inversion genotyping. However, having more reads will allow InvertypeR to genotype more (smaller) inversions.
 
-Assuming your Strand-seq FASTQ libraries for an individual are now aligned, indexed BAM files, these scripts create two Strand-seq composite files. Poor-quality libraries must first be removed. To create the Watson-Watson (WW or WWCC) composite file, run `bash master_WWCC_composite.sh` in the directory containing the single-cell BAM files. Same goes for the Watson-Crick (WC or WCCW) composite file: run `bash master_WCCW_composite.sh`. You must first edit the header of each master script to set user-specific variables (e.g. # threads, directory containing scripts). Providing a VCF file of high-confidence heterozygous SNPs improves composite file creation, since it can be difficult to call good SNPs from sparse Strand-seq data alone. See "instructions.txt" for more details. 
+### VCF file
 
-In my experience, 30 or more libraries with at least 20 million unique reads in total is sufficient to make good composite files and call inversions. However, it may be possible to make good composite files with fewer reads, especially with the help of a good VCF file of heterozygous SNPs. On the other hand, having more reads will allow InvertypeR to genotype more & smaller inversions.
+InvertypeR uses two composite files consisting of reads merged from all the Strand-seq libraries. Phase/haplotype information is required to create one of the two composite files: luckily, Strand-seq is very good at phasing. However, Strand-seq libraries have shallow depth of coverage, so they are not ideal for calling high-confidence heterozygous SNVs. If WGS sequence data is available for the individual you wish to genotype, it is best to use that to call SNVs and provide the VCF file as input to InvertypeR. 
+
+However, if that is not possible, then it is usually feasible to call enough SNVs from the good- and poor-quality Strand-seq libraries using [bbmap](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbmap-guide/), which can be installed using [conda](https://anaconda.org/bioconda/bbmap):
+
+```
+ls ./*.bam bam_poor_quality/*.bam > samples.list
+callvariants.sh list=samples.list ref=/PATH/TO/FILE/GRCh38.fasta out=strand_seq_snps.vcf ploidy=2 calldel=f callins=f sample="YOUR_SAMPLE_NAME"
+```
+
+InvertypeR doesn't need you to remove homozygous SNVs or indels from any VCF you provide first. It uses the package [StrandPhaseR](https://github.com/daewoooo/StrandPhaseR) for phasing, which will figure all that out.
+
+### Regions to genotype
+
+InvertypeR is primarily an inversion GENOTYPING tool---users provide the coordinates of putative inversions, 
 
 InvertypeR genotyping
 -----------------------
