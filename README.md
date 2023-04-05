@@ -23,7 +23,7 @@ Strand-seq is a single-cell library preparation for DNA sequencing that is quite
 
 If you have Strand-seq FASTQ files but are unsure how to align them etc., see the file instructions.txt for a step-by-step guide. 
 
-If you have single-cell Strand-seq BAM files ready, then the next step is to select good-quality libraries. That is best done with [ASHLEYS-QC](https://github.com/friendsofstrandseq/ashleys-qc). Install ASHLEYS-QC, and run it with default parameters as follows:
+If you have single-cell Strand-seq BAM files ready, then the next step is to select good-quality libraries. That is best done with [ASHLEYS-QC](https://github.com/friendsofstrandseq/ashleys-qc) for human libraries (for non-humans, it's probably best to have the libraries QCed manually by an expert). Install ASHLEYS-QC, and run it with default parameters as follows:
 
 ```
 /PATH/TO/FILE/ashleys.py -j 12 features -f ./ -w 5000000 2000000 1000000 800000 600000 400000 200000 -o ./features.tsv
@@ -42,17 +42,33 @@ However, if that is not possible, then it is usually feasible to call enough SNV
 
 ```
 ls ./*.bam bam_poor_quality/*.bam > samples.list
-callvariants.sh list=samples.list ref=/PATH/TO/FILE/GRCh38.fasta out=strand_seq_snps.vcf ploidy=2 calldel=f callins=f sample="YOUR_SAMPLE_NAME"
+callvariants.sh list=samples.list ref=/PATH/TO/REFERENCE.fasta out=strand_seq_snps.vcf ploidy=2 calldel=f callins=f sample="YOUR_SAMPLE_NAME"
 ```
 
 InvertypeR doesn't need you to remove homozygous SNVs or indels from any VCF you provide first. It uses the package [StrandPhaseR](https://github.com/daewoooo/StrandPhaseR) for phasing, which will figure all that out.
 
 ### Regions to genotype
 
-InvertypeR is primarily an inversion GENOTYPING tool---users provide the coordinates of putative inversions, 
+InvertypeR is primarily an inversion GENOTYPING tool---users provide the coordinates of putative inversions. Although it is possible to use InvertypeR without providing any regions to genotype (in which case [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) will be used to identify putative inversions), this will tend to miss small inversions. 
 
-InvertypeR genotyping
------------------------
+If there are specific inversions you want to genotype, the choice is easy. However, if you want to find as many inversions as possible, then providing a list of coordinates from the literature or the coordinates of the spacers between pairs of inverted repeats (which commonly cause inversions) is a good idea. The file sup_table_24_inversions.bed in the example_output folder contains both of those things for humans.
+
+### Priors
+
+InvertypeR is a very simple Bayesian model that outputs posterior probabilties for inversion genotypes at fixed coordinates. This means we need prior probabilities. In practice, we need a vector that looks like `c(0.98, 0.01, 0.01)`, for example, which has prior probabilities that an average genomic interval in the list of regions to genotype is homozygous reference (no inversion, usually very likely), heterozygous, or homozygous alternate (both copies inverted). 
+
+If the inversions you wish to genotype are well-characterized and you have information about allele frequencies in the population, then this is easy. This might be the case if you are only genotyping the inversions from a paper like [this one](doi.org/10.1038/s41587-020-0719-5). Use the average fraction of individuals in the study that are reference homozygotes, heterozygotes, and alternate homozygotes, respectively, for the prior vector.
+
+If you are using the inversion list from the file sup_table_24_inversions.bed (for humans), then I recommend setting `prior=c(0.9866, 0.0067, 0.0067)`
+and `haploid_prior=c(0.9866, 0.0134)`. This is based on an estimate of the number of unique intervals in the inversion list. If you have your own list of putative inversions that are not well-characterized (ESPECIALLY if they're overlapping and dubious), then the InvertypeR function `choose_priors()` might help.
+
+If you have made a list of putative inversions by calling strand switches with [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) or equivalent, then I typically use `prior=c(0.9, 0.05, 0.05)` and `haploid_prior=c(0.9, 0.1)`, but this is just based on previous experience and may differ for your particular case.
+
+The `haploid_prior` argument is there for chrX and chrY in human males (or more generally, the sex chromosomes of the heterogametic sex), or for all chromosomes if the Strand-seq libraries are from haploid cells. In the fully haploid cells case, the arguments `chromosomes` and `haploid_chromosomes` should both be a list of all chromosomes of interest for inversion genotyping.
+
+## Blacklist
+
+---------------------
 Dependencies:
   - *tool (version we use)*
   - R (3.5.1)
