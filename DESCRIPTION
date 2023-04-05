@@ -44,3 +44,5 @@ Imports:
 	breakpointR,
 	parallel,
 	R.utils,
+Remotes:
+	github::daewoooo/StrandPhaseR@69c9fb4
