@@ -14,6 +14,8 @@ The main inputs to InvertypeR are:
 4. Appropriate priors. These aren't as hard to choose as you might think. 
 5. A BED file containing regions that you expect to have poor-quality Strand-seq data. For humans, you can generally just use the one on this repo. For other species, you may want to make one.
 
+If you have all these ready, skip ahead to 'Installing and running InvertypeR', below.
+
 ### Strand-seq BAM files
 
 Strand-seq is a single-cell library preparation for DNA sequencing that is quite good at finding inversions. Here are some relevant papers:
@@ -78,25 +80,18 @@ InvertypeR can be installed from GitHub with [devtools](https://cran.r-project.o
 ```
 devtools::install_github(repo="vincent-hanlon/InvertypeR")
 ```
-or
-```
-devtools::install_github(url="https://github.com/vincent-hanlon/InvertypeR")
-```
 
-If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand.
+If that doesn't work, try `devtools::install_github(url="https://github.com/vincent-hanlon/InvertypeR")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand. Likewise, StrandPhaseR may or may not need to be installed separately using `devtools::install_github()`. 
 
-
-Once the various inputs are assembled, running InvertypeR is straightforward. The function `invertyper_pipeline()` will create composite files for an individual, attempt to discover putative inversions using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) and the genotype them if desired, and of course genotype a user-provide list of putative inversions as well. It can also save the composite files as .RData files and write any inversions it finds to UCSC Genome Browser files along with the relevant Strand-seq reads. 
+Once everything is installed and the various inputs are assembled, running InvertypeR is straightforward. The function `invertyper_pipeline()` will create composite files for an individual, attempt to discover putative inversions using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) and the genotype them if desired, and of course genotype a user-provide list of putative inversions as well. It can also save the composite files as .RData files and write any inversions it finds to UCSC Genome Browser files along with the relevant Strand-seq reads. 
 
 Many of these steps can also be run separately: for example, `create_composite_files()` creates composite files and `invertyper()` does the actual genotyping once composite files and putative inversions (genomic regions to genotype) are identified. 
 
-One important argument is `adjust_method`, which controls how InvertypeR tries to adjust the provided inversion coordinates before or after genotyping. 
+One important argument is `adjust_method`, which controls how InvertypeR tries to adjust the provided inversion coordinates before or after genotyping. If you want to genotype the exact coordinates you provided with no alterations, choose `adjust_method="raw"`
 
-To install invertyper, you should make sure you have [devtools](https://cran.r-project.org/web/packages/devtools/index.html) installed first. Once that's done, run `devtools::install_github(repo="vincent-hanlon/InvertypeR", subdir="invertyper")`. If that doesn't work, try `devtools::install_git(url="https://github.com/vincent-hanlon/InvertypeR", ref="main", subdir="invertyper")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand.
+For more detail about the various functions in the InvertypeR package, for example for the main wrapper script, write `?invertyper_pipeline` or `?create_composite_files`, etc.
 
-For instructions on how to run the main invertyper wrapper function, load the package in R and write `?invertyper`.
-
-Results for the InvertypeR paper (https://doi.org/10.1186/s12864-021-07892-9) are from commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf. The newest commit produces essentially identical results, up to one or two minor shifts to inversion breakpoints per sample. 
+Results for the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9) are from commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf, when composite files were created using BASH scripts rather than the R package. The newest commit produces essentially identical results and is faster.
 
 ## Inversion visualization
 
