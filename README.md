@@ -51,7 +51,7 @@ InvertypeR doesn't need you to remove homozygous SNVs or indels from any VCF you
 
 InvertypeR is primarily an inversion GENOTYPING tool---users provide the coordinates of putative inversions. Although it is possible to use InvertypeR without providing any regions to genotype (in which case [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) will be used to identify putative inversions), this will tend to miss small inversions. 
 
-If there are specific inversions you want to genotype, the choice is easy. However, if you want to find as many inversions as possible, then providing a list of coordinates from the literature or the coordinates of the spacers between pairs of inverted repeats (which commonly cause inversions) is a good idea. The file sup_table_24_inversions.bed in the example_output folder contains both of those things for humans.
+If there are specific inversions you want to genotype, the choice is easy. However, if you want to find as many inversions as possible, then providing a list of coordinates from the literature or the coordinates of the spacers between pairs of inverted repeats (which commonly cause inversions) is a good idea. The file sup_table_24_inversions.bed in the example_output folder contains both of those things for GRCh38 in humans.
 
 ### Priors
 
@@ -59,24 +59,38 @@ InvertypeR is a very simple Bayesian model that outputs posterior probabilties f
 
 If the inversions you wish to genotype are well-characterized and you have information about allele frequencies in the population, then this is easy. This might be the case if you are only genotyping the inversions from a paper like [this one](doi.org/10.1038/s41587-020-0719-5). Use the average fraction of individuals in the study that are reference homozygotes, heterozygotes, and alternate homozygotes, respectively, for the prior vector.
 
-If you are using the inversion list from the file sup_table_24_inversions.bed (for humans), then I recommend setting `prior=c(0.9866, 0.0067, 0.0067)`
+If you are using the inversion list from the file sup_table_24_inversions.bed (for GRCh38 in humans), then I recommend setting `prior=c(0.9866, 0.0067, 0.0067)`
 and `haploid_prior=c(0.9866, 0.0134)`. This is based on an estimate of the number of unique intervals in the inversion list. If you have your own list of putative inversions that are not well-characterized (ESPECIALLY if they're overlapping and dubious), then the InvertypeR function `choose_priors()` might help.
 
 If you have made a list of putative inversions by calling strand switches with [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) or equivalent, then I typically use `prior=c(0.9, 0.05, 0.05)` and `haploid_prior=c(0.9, 0.1)`, but this is just based on previous experience and may differ for your particular case.
 
 The `haploid_prior` argument is there for chrX and chrY in human males (or more generally, the sex chromosomes of the heterogametic sex), or for all chromosomes if the Strand-seq libraries are from haploid cells. In the fully haploid cells case, the arguments `chromosomes` and `haploid_chromosomes` should both be a list of all chromosomes of interest for inversion genotyping.
 
-## Blacklist
+### Blacklist
 
----------------------
-Dependencies:
-  - *tool (version we use)*
-  - R (3.5.1)
-  - R package invertyper (0.0.0.1)
+Some regions of the genome tend to have poor-quality Strand-seq data. The most problematic are things like reference assembly collapses, where only 1 copy of a region is present in the reference but several copies of the region are present in the physical genome. Depending on where the additional copies are located, the reads in the 1 reference copy map in unexpected directions.
 
-This is done by an R package called "invertyper" that genotypes inversions in Strand-seq data. It will install a few further R packages as sub-dependencies.
+For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a blacklist based on read depth (see the sup mat of the [InvertypeR paper](doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
 
-The package implements a Bayesian binomial model to genotype inversions in Strand-seq data, which must be pre-processed into two composite files (WW and WC, the latter phased). In a sense, InvertypeR can also be used to discover inversions that were not already known to be present in the data. This can be done when many putative inversions are genotyped, for example, if all inversions recorded in dbVar are genotyped with an appropriate prior. This package can also adjust the start and end coordinates of inversions in a variety of ways. The directory "example_output" contains the raw InvertypeR output files (one file per run) used in the paper.
+## Installing and running InvertypeR
+
+InvertypeR can be installed from GitHub with [devtools](https://cran.r-project.org/web/packages/devtools/index.html):
+```
+devtools::install_github(repo="vincent-hanlon/InvertypeR")
+```
+or
+```
+devtools::install_github(url="https://github.com/vincent-hanlon/InvertypeR")
+```
+
+If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand.
+
+
+Once the various inputs are assembled, running InvertypeR is straightforward. The function `invertyper_pipeline()` will create composite files for an individual, attempt to discover putative inversions using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) and the genotype them if desired, and of course genotype a user-provide list of putative inversions as well. It can also save the composite files as .RData files and write any inversions it finds to UCSC Genome Browser files along with the relevant Strand-seq reads. 
+
+Many of these steps can also be run separately: for example, `create_composite_files()` creates composite files and `invertyper()` does the actual genotyping once composite files and putative inversions (genomic regions to genotype) are identified. 
+
+One important argument is `adjust_method`, which controls how InvertypeR tries to adjust the provided inversion coordinates before or after genotyping. 
 
 To install invertyper, you should make sure you have [devtools](https://cran.r-project.org/web/packages/devtools/index.html) installed first. Once that's done, run `devtools::install_github(repo="vincent-hanlon/InvertypeR", subdir="invertyper")`. If that doesn't work, try `devtools::install_git(url="https://github.com/vincent-hanlon/InvertypeR", ref="main", subdir="invertyper")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand.
 
