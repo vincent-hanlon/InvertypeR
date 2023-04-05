@@ -17,7 +17,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 biocViews:
 Imports:
-	StrandPhaseR,
 	GenomicRanges,
 	IRanges,
 	Rsamtools,
@@ -45,5 +44,6 @@ Imports:
 	R.utils,
 	zoo,
 	BSgenome,
+	StrandPhaseR,
 Remotes:
 	github::daewoooo/StrandPhaseR@69c9fb4
