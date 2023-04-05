@@ -44,7 +44,8 @@ However, if that is not possible, then it is usually feasible to call enough SNV
 
 ```
 ls ./*.bam bam_poor_quality/*.bam > samples.list
-callvariants.sh list=samples.list ref=/PATH/TO/REFERENCE.fasta out=strand_seq_snps.vcf ploidy=2 calldel=f callins=f sample="YOUR_SAMPLE_NAME"
+callvariants.sh list=samples.list ref=/PATH/TO/REFERENCE.fasta out=strand_seq_snps.vcf \
+    ploidy=2 calldel=f callins=f sample="YOUR_SAMPLE_NAME"
 ```
 
 InvertypeR doesn't need you to remove homozygous SNVs or indels from any VCF you provide first. It uses the package [StrandPhaseR](https://github.com/daewoooo/StrandPhaseR) for phasing, which will figure all that out.
@@ -54,6 +55,8 @@ InvertypeR doesn't need you to remove homozygous SNVs or indels from any VCF you
 InvertypeR is primarily an inversion GENOTYPING tool---users provide the coordinates of putative inversions. Although it is possible to use InvertypeR without providing any regions to genotype (in which case [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) will be used to identify putative inversions), this will tend to miss small inversions. 
 
 If there are specific inversions you want to genotype, the choice is easy. However, if you want to find as many inversions as possible, then providing a list of coordinates from the literature or the coordinates of the spacers between pairs of inverted repeats (which commonly cause inversions) is a good idea. The file sup_table_24_inversions.bed in the example_output folder contains both of those things for GRCh38 in humans.
+
+Regions to genotype should be provided to InvertypeR as a BED file (at least for the main function, `invertyper_pipeline()`; lower-level functions typically expect BED files to be loaded into GRanges objects with the function `import_bed()`).
 
 ### Priors
 
@@ -70,7 +73,7 @@ The `haploid_prior` argument is there for chrX and chrY in human males (or more 
 
 ### Blacklist
 
-Some regions of the genome tend to have poor-quality Strand-seq data. The most problematic are things like reference assembly collapses, where only 1 copy of a region is present in the reference but several copies of the region are present in the physical genome. Depending on where the additional copies are located, the reads in the 1 reference copy map in unexpected directions.
+Some regions of the genome tend to have poor-quality Strand-seq data. The most problematic are things like reference assembly collapses, where only 1 copy of a region is present in the reference but several copies of the region are present in the physical genome. Depending on where the additional copies are located, the reads in the 1 reference copy map in unexpected directions. Such regions should be provided to InvertypeR as a BED file.
 
 For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a blacklist based on read depth (see the sup mat of the [InvertypeR paper](doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
 
@@ -87,11 +90,26 @@ Once everything is installed and the various inputs are assembled, running Inver
 
 Many of these steps can also be run separately: for example, `create_composite_files()` creates composite files and `invertyper()` does the actual genotyping once composite files and putative inversions (genomic regions to genotype) are identified. 
 
-One important argument is `adjust_method`, which controls how InvertypeR tries to adjust the provided inversion coordinates before or after genotyping. If you want to genotype the exact coordinates you provided with no alterations, choose `adjust_method="raw"`
+One important argument is `adjust_method`, which controls how InvertypeR tries to adjust the provided inversion coordinates before or after genotyping. This is useful because published inversion coordinates are often inaccurate, so both inverted and non-inverted Strand-seq reads will be caught during the genotyping step. If you want to genotype the exact coordinates you provided with no alterations, choose `adjust_method="raw"`. But InvertypeR can also try to find better coordinates for putative inversions by looking for switches in the orientation of Strand-seq reads nearby the coordinates provided. This can be done only for inversions that had confident non-reference genotypes when the original coordinates were used (`adjust_method="deltas"`), or it can even be done for less confident inversions to see whether there was a problems with the coordinates provided (`adjust_method="all"`).
 
 For more detail about the various functions in the InvertypeR package, for example for the main wrapper script, write `?invertyper_pipeline` or `?create_composite_files`, etc.
 
 Results for the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9) are from commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf, when composite files were created using BASH scripts rather than the R package. The newest commit produces essentially identical results and is faster.
+
+### Example of how to run InvertypeR
+
+Open R and move to a directory that contains paired-end BAM files and a VCF of snps. We're assuming here that the individual is male and we want to call inversions on the sex chromosomes as well as chr1, chr2, and chr8 for some reason. 
+
+```
+library(invertyper)
+i <- invertyper_pipeline(regions_to_genotype="sup_table_24_inversions.including_half_intervals.bed", 
+    blacklist='blacklist.highdepth.centromeres.bed',  prior=c(0.9866,0.0067, 0.0067), 
+    haploid_prior=c(0.9866,0.0134), chromosomes=c('chr1','chr2','chr8','chrX','chrY'), 
+    haploid_chromosomes=c('chrX','chrY'), vcf='snps.vcf.gz', numCPU=12, adjust_method='all', 
+    save_composite_files=T, write_browser_files=T, discover_breakpointr_inversions=T,)
+```
+
+This will genotype the list of inversion provided, try to find additional inversions with the help of [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html), and save composite files and UCSC Genome Browser files.
 
 ## Inversion visualization
 
@@ -109,4 +127,4 @@ Dependencies:
   - perl package LWP::UserAgent (6.49)
   
 (Courtesy of Victor Guryev and Carl-Adam Mattsson)
-These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the `in/` directory, and put the two BreakpointR browserfiles for the WW and WC composite files (i.e. `sample_name.WW.CC.bam_reads.bed.gz` and `sample_name.WC.CW.bam_reads.bed.gz` from the composite file creation procedure) in the `in/bed_reads/` directory. Then run `bash haploplot_run.sh`. A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
+These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the `in/` directory, and put the browserfiles for the WW and WC composite files (from `write_browser_files=T`) in the `in/bed_reads/` directory. Then run `bash haploplot_run.sh`. A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
