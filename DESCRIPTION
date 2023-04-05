@@ -43,5 +43,7 @@ Imports:
 	breakpointR,
 	parallel,
 	R.utils,
+	zoo,
+	BSgenome,
 Remotes:
 	github::daewoooo/StrandPhaseR@69c9fb4
