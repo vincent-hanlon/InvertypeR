@@ -84,7 +84,7 @@ InvertypeR can be installed from GitHub with [devtools](https://cran.r-project.o
 devtools::install_github(repo="vincent-hanlon/InvertypeR")
 ```
 
-If that doesn't work, try `devtools::install_github(url="https://github.com/vincent-hanlon/InvertypeR")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand. Likewise, StrandPhaseR may or may not need to be installed separately using `devtools::install_github()`. 
+If that doesn't work, try `devtools::install_github(url="https://github.com/vincent-hanlon/InvertypeR")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand. Likewise, StrandPhaseR may or may need to be installed separately using `devtools::install_github()`. 
 
 Once everything is installed and the various inputs are assembled, running InvertypeR is straightforward. The function `invertyper_pipeline()` will create composite files for an individual, attempt to discover putative inversions using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) and the genotype them if desired, and of course genotype a user-provide list of putative inversions as well. It can also save the composite files as .RData files and write any inversions it finds to UCSC Genome Browser files along with the relevant Strand-seq reads. 
 
@@ -98,7 +98,7 @@ Results for the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9) a
 
 ### Example of how to run InvertypeR
 
-Open R and move to a directory that contains paired-end BAM files and a VCF of snps. We're assuming here that the individual is male and we want to call inversions on the sex chromosomes as well as chr1, chr2, and chr8 for some reason. 
+Open R and move to a directory that contains paired-end BAM files and a VCF of snps. We're assuming here that the individual is a humnan male, the BAM, VCF, and BED files all have coordinates for the reference genome GRCh38, and we want to call inversions on the sex chromosomes as well as chr1, chr2, and chr8 for some reason. 
 
 ```
 library(invertyper)
