@@ -127,4 +127,13 @@ Dependencies:
   - perl package LWP::UserAgent (6.49)
   
 (Courtesy of Victor Guryev and Carl-Adam Mattsson)
-These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the `in/` directory, and put the browserfiles for the WW and WC composite files (from `write_browser_files=T`) in the `in/bed_reads/` directory. Then run `bash haploplot_run.sh`. A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
+
+These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the `in/` directory, and put the browserfiles for the WW and WC composite files (from `write_browser_files()`, below) in the `in/bed_reads/` directory. Then run `bash haploplot_run.sh`. A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
+
+The browserfiles can now be created as follows, if `create_composite_files()` or `invertyper_pipeline()` were run with `save_composite_files=T`:
+
+```
+load("./WW_composite_file.RData")
+load("./WC_composite_file.RData")
+write_UCSC_browser_files(WW_reads=WW_composite_files, WC_reads=WC_composite_file, paired_reads=TRUE)
+```
