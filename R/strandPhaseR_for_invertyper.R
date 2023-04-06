@@ -46,8 +46,8 @@ strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL
 	#===================
 	## Check user input
 
-	outputfolder<-'./SPR_output'
-	inputfolder<-'./'
+	output_folder<-'./SPR_output'
+	input_folder<-'./'
 
 	if(is.null(conf[['chromosomes']]) && !is.null(conf[['WCregions']])){
 		conf[['chromosomes']] <- sort(as.character.factor(unique(GenomicRanges::seqnames(conf[['WCregions']]))))
@@ -78,8 +78,8 @@ parallel::clusterExport(cl=cl, 'galignmentslist_global_for_invertyper')
 
 message("remember to add suppressMessages( back to strandphaser here!") 
 message( "using the right foreach loop")
-invertyper::phaseChromosome_for_invertyper(inputfolder=inputfolder, 
-outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i],
+phaseChromosome_for_invertyper(input_folder=input_folder, 
+output_folder=output_folder, positions=snvs[GenomicRanges::seqnames(snvs) == i],
                                         chromosome=i,
                                        WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']],
                                 min.baseq=20, num.iterations=conf[['num.iterations']],
@@ -99,7 +99,7 @@ outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i],
 	for(i in conf[['chromosomes']]){
 
 	message("remember to add suppressMessages( back to strandphaser!")
-	temp <- invertyper::phaseChromosome_for_invertyper(inputfolder=inputfolder, outputfolder=outputfolder, positions=snvs[GenomicRanges::seqnames(snvs) == i], 
+	temp <- phaseChromosome_for_invertyper(input_folder=input_folder, output_folder=output_folder, positions=snvs[GenomicRanges::seqnames(snvs) == i], 
 					chromosome=i,
                                        WCregions=WCregions[GenomicRanges::seqnames(WCregions)==i], pairedEndReads=conf[['pairedEndReads']], min.mapq=conf[['min.mapq']], 
 				min.baseq=20, num.iterations=conf[['num.iterations']],

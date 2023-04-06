@@ -5,8 +5,8 @@
 \title{A stripped-down version of the StrandPhaseR function phaseChromosome by David Porubsky}
 \usage{
 phaseChromosome_for_invertyper(
-  inputfolder,
-  outputfolder = "./StrandPhaseR_analysis",
+  input_folder,
+  output_folder = "./StrandPhaseR_analysis",
   positions = NULL,
   WCregions = NULL,
   chromosome = NULL,
@@ -22,9 +22,9 @@ phaseChromosome_for_invertyper(
 )
 }
 \arguments{
-\item{inputfolder}{Path to the bam files to process}
+\item{input_folder}{Path to the bam files to process}
 
-\item{outputfolder}{Output directory.}
+\item{output_folder}{Output directory.}
 
 \item{positions}{Filename with listed position of SNVs for given chromosome (format: chrName SNVpos).}
 

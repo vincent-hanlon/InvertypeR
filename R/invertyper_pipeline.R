@@ -25,8 +25,8 @@
 #' @param chromosomes Vector of chromosome names to restrict the search for inversions.
 #' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.
 #' @param numCPU Integer. How many parallel threads to use, where possible?
-#' @param inputfolder Path to a directory containing Strand-seq BAM files
-#' @param outputfolder Path to a directory for output files
+#' @param input_folder Path to a directory containing Strand-seq BAM files
+#' @param output_folder Path to a directory for output files
 #' @param output_file Name of the inversion genotype file(s) to write to. Default "inversions.txt".
 #' @param save_composite_files Should composite files be saved as RData objects?
 #' @param write_browser_files Should inversions and associated reads be saved to UCSC Genome Browser files?
@@ -51,7 +51,7 @@
 #' @export
 
 invertyper_pipeline <- function(regions_to_genotype=NULL, prior = c(0.333,0.333,0.333), haploid_prior=c(0.5,0.5),  adjust_method=c("raw","merge","deltas","minimal", "low", 
-"all"), inputfolder='./', outputfolder='./', haploid_chromosomes=NULL, vcf=NULL, paired_reads=TRUE, confidence=0.95, blacklist=NULL, chromosomes=NULL, numCPU=24, 
+"all"), input_folder='./', output_folder='./', haploid_chromosomes=NULL, vcf=NULL, paired_reads=TRUE, confidence=0.95, blacklist=NULL, chromosomes=NULL, numCPU=24, 
 save_composite_files=FALSE, write_browser_files=FALSE, discover_breakpointr_inversions=TRUE, breakpointr_prior=c(0.9,0.05,0.05), breakpointr_haploid_prior=c(0.9,0.1), windowsize=c(40,120,360), minReads=c(15,50,50), background=0.2, output_file="inversions.txt") {
 
 stopifnot("There is nothing to genotype: either provide a list of putative inversions (regions_to_genotype) or set discover_breakpointr_inversions=TRUE" = !is.null(regions_to_genotype) | discover_breakpointr_inversions)
@@ -61,7 +61,7 @@ stopifnot("The arguments minReads and windowsize should be parallel (have the sa
 stopifnot("The regions_to_genotype file cannot be found" = is.null(regions_to_genotype) || file.exists(regions_to_genotype))
 stopifnot("The blacklist file cannot be found" = is.null(blacklist) || file.exists(blacklist))
 stopifnot("The vcf file cannot be found" = is.null(vcf) || file.exists(vcf))
-stopifnot("The inputfolder cannot be found" = file.exists(inputfolder))
+stopifnot("The input_folder cannot be found" = file.exists(input_folder))
 stopifnot("Any haploid chromosomes you specify should be include as chromosomes too. This means including chrX and chrY as chromosomes AND as haploid_chromosomes for human males" = all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes))
 if(!is.null(regions_to_genotype) & (all(prior == c(0.333,0.333,0.333)) & !all(sort(chromosomes)==sort(haploid_chromosomes)) | (!is.null(haploid_chromosomes) & all(haploid_prior == c(0.5,0.5))))){
 
@@ -82,14 +82,14 @@ if(!is.null(blacklist)){
 
 type <- c("wc","ww")
 
-if(all(sort(chromosomes)==sort(haploid_chromosomes)) & !is.null(haploid_chromosomes)){
+if(!is.null(haploid_chromosomes) & !is.null(chromosomes) & all(sort(chromosomes)==sort(haploid_chromosomes))){
 
 type <- 'ww'
 
 } 
 
 
-composite_files <- create_composite_files(inputfolder=inputfolder, type=type, numCPU=numCPU, vcf=vcf, paired_reads=paired_reads, blacklist=blacklist, outputfolder=outputfolder, save_composite_files=save_composite_files, chromosomes=chromosomes)
+composite_files <- create_composite_files(input_folder=input_folder, type=type, numCPU=numCPU, vcf=vcf, paired_reads=paired_reads, blacklist=blacklist, output_folder=output_folder, save_composite_files=save_composite_files, chromosomes=chromosomes)
 
 
 for(i in composite_files){
@@ -114,14 +114,14 @@ names(composite_files)[2] <- 'WC'
 
 save(composite_files, possible_inversions, file='pre-bpr.RData')
 message('start inv genotyping (bpr)')
-breakpointr_inversions <- invertyper(WW_reads=composite_files$WW, WC_reads=composite_files$WC, regions_to_genotype=possible_inversions, blacklist=blacklist,paired_reads=paired_reads, haploid_chromosomes=haploid_chromosomes, confidence=confidence,prior=breakpointr_prior, haploid_prior=breakpointr_haploid_prior, output_file=paste0("breakpointr_",output_file), adjust_method=c("merge"))
+breakpointr_inversions <- invertyper(WW_reads=composite_files$WW, WC_reads=composite_files$WC, regions_to_genotype=possible_inversions,blacklist=blacklist,paired_reads=paired_reads, haploid_chromosomes=haploid_chromosomes, confidence=confidence,prior=breakpointr_prior, haploid_prior=breakpointr_haploid_prior, output_file=paste0("breakpointr_",output_file), adjust_method=c("merge"), output_folder=output_folder)
 
 
 
 
 if( write_browser_files){
 
-write_UCSC_browser_files(inversions=breakpointr_inversions, WW_reads=composite_files$WW, WC_reads=composite_files$WC, confidence=confidence, paired_reads=paired_reads, outputfolder=outputfolder, prefix='breakpointr_', type=type)
+write_UCSC_browser_files(inversions=breakpointr_inversions, WW_reads=composite_files$WW, WC_reads=composite_files$WC, confidence=confidence, paired_reads=paired_reads, output_folder=output_folder, prefix='breakpointr_', type=type)
 
 }
 
@@ -133,13 +133,14 @@ message('now for std genotyping')
 
 if(!is.null(regions_to_genotype)){
 
-inversions <- invertyper(WW_reads=composite_files$WW, WC_reads=composite_files$WC, regions_to_genotype=regions_to_genotype, blacklist=blacklist, paired_reads=paired_reads, haploid_chromosomes=haploid_chromosomes, confidence=confidence,prior=prior,haploid_prior=haploid_prior, output_file=output_file, adjust_method=adjust_method)
+inversions <- invertyper(WW_reads=composite_files$WW, WC_reads=composite_files$WC, regions_to_genotype=regions_to_genotype, blacklist=blacklist, paired_reads=paired_reads, 
+haploid_chromosomes=haploid_chromosomes, confidence=confidence,prior=prior,haploid_prior=haploid_prior, output_file=output_file, adjust_method=adjust_method, output_folder=output_folder)
 
 
 
 if( write_browser_files){
 
-write_UCSC_browser_files(inversions=inversions, WW_reads=composite_files$WW, WC_reads=composite_files$WC, confidence=confidence, paired_reads=paired_reads, outputfolder=outputfolder, prefix='', type=type)
+write_UCSC_browser_files(inversions=inversions, WW_reads=composite_files$WW, WC_reads=composite_files$WC, confidence=confidence, paired_reads=paired_reads, output_folder=output_folder, prefix='', type=type)
 
 }
 

@@ -10,7 +10,7 @@ write_UCSC_browser_files(
   WC_reads = NULL,
   confidence = 0.95,
   paired_reads = TRUE,
-  outputfolder = "./",
+  output_folder = "./",
   prefix = "",
   type = c("ww", "wc")
 )
@@ -26,7 +26,7 @@ write_UCSC_browser_files(
 
 \item{paired_reads}{Boolean. Are the reads paired?}
 
-\item{outputfolder}{Path where files should be written}
+\item{output_folder}{Path where files should be written}
 
 \item{prefix}{Start of the output filenames}
 

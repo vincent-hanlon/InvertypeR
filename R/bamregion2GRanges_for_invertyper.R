@@ -12,7 +12,8 @@
 #' @param all_alignments A list of GAlignments objects for the Strand-seq libraries. Global so that there are no problems accessing it in parallel
 #' @return a GRanges object
 #' @export
-bamregion2GRanges <- function(bamfile, bamindex, region=NULL, pairedEndReads=FALSE, min.mapq=10, filterAltAlign=TRUE, all_alignments=galignmentslist_global_for_invertyper) {
+bamregion2GRanges_for_invertyper <- function(bamfile, bamindex, region=NULL, pairedEndReads=FALSE, min.mapq=10, filterAltAlign=TRUE, 
+all_alignments=galignmentslist_global_for_invertyper) {
 
 	# Extracting the BAM name from the BAM file path + name
 	message('using Vincents altered bamregion2GRanges...')

@@ -9,8 +9,8 @@ invertyper_pipeline(
   prior = c(0.333, 0.333, 0.333),
   haploid_prior = c(0.5, 0.5),
   adjust_method = c("raw", "merge", "deltas", "minimal", "low", "all"),
-  inputfolder = "./",
-  outputfolder = "./",
+  input_folder = "./",
+  output_folder = "./",
   haploid_chromosomes = NULL,
   vcf = NULL,
   paired_reads = TRUE,
@@ -46,9 +46,9 @@ same genotype. "minimal": An experimental method. For confident overlapping inve
 that we only adjust inversions for which no confident genotype could be found (i.e., all prior probabilities < confidence). Sometimes this will "find" a confident inversion if the original coordinates
 were slightly off. "all": Does both "deltas" and "low".}
 
-\item{inputfolder}{Path to a directory containing Strand-seq BAM files}
+\item{input_folder}{Path to a directory containing Strand-seq BAM files}
 
-\item{outputfolder}{Path to a directory for output files}
+\item{output_folder}{Path to a directory for output files}
 
 \item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.}
 

@@ -8,7 +8,7 @@
 #' @param WC_reads A GenomicAlignments object for the WC composite file
 #' @param confidence Cutoff for posterior probabilities of inversions. Inversions more confident than this will be displayed in the files. Default 0.95
 #' @param paired_reads Boolean. Are the reads paired?
-#' @param outputfolder Path where files should be written
+#' @param output_folder Path where files should be written
 #' @param prefix Start of the output filenames
 #' @param type What type of composite files are we dealing with? 'wc' for Watson-Crick, 'ww' for Watson-Watson, or both (for both). 
 #'
@@ -16,10 +16,10 @@
 #'
 #' @export
 
-write_UCSC_browser_files <- function(inversions=NULL, WW_reads=NULL, WC_reads=NULL, confidence=0.95, paired_reads=TRUE, outputfolder="./", prefix='', type=c('ww','wc')){
+write_UCSC_browser_files <- function(inversions=NULL, WW_reads=NULL, WC_reads=NULL, confidence=0.95, paired_reads=TRUE, output_folder="./", prefix='', type=c('ww','wc')){
 
-if (!file.exists(outputfolder)) {
-    dir.create(outputfolder)
+if (!file.exists(output_folder)) {
+    dir.create(output_folder)
 }
 
 
@@ -30,13 +30,13 @@ if(nrow(region)>0){
 region <- GenomicRanges::reduce(widen(granges=GenomicRanges::makeGRangesFromDataFrame(region, ignore.strand=TRUE, seqnames.field=names(region)[1], start.field=names(region)[2],end.field=names(region)[3]), seqlengths=GenomeInfoDb::seqlengths(WW_reads), distance=5e06), min.gapwidth=1000)
 
 WW_reads <- galignment_to_granges(WW_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)
-suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WW_composite_file"), outputDirectory=outputfolder, fragments=WW_reads))
+suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WW_composite_file"), outputDirectory=output_folder, fragments=WW_reads))
 
 
 if('wc' %in% type){
 
 WC_reads <- galignment_to_granges(WC_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)
-suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WC_composite_file"), outputDirectory=outputfolder, fragments=WC_reads))
+suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WC_composite_file"), outputDirectory=output_folder, fragments=WC_reads))
 }
 
 inversions <- inversions[inversions[,9]>confidence,]
@@ -52,7 +52,7 @@ inversions[inversions[,4]=="1|0" | inversions[,4]=="0|1",9] <- "125,125,125"
 inversions[inversions[,4]=="1|1" | inversions[,4]=="1",9] <- "0,0,0"
 inversions[,10] <- NULL
 
-savefile.invs <- file.path(outputfolder, paste0(prefix,'inversions.bed.gz'))
+savefile.invs <- file.path(output_folder, paste0(prefix,'inversions.bed.gz'))
 savefile.invs.gz <- gzfile(savefile.invs, 'w') 
 utils::write.table(paste0("track name=",prefix,"inversions itemRgb=On"), file=savefile.invs.gz, row.names=FALSE, col.names=FALSE, quote=FALSE, append=FALSE, sep='\t')
 utils::write.table(inversions,file=savefile.invs.gz, row.names=FALSE, col.names=FALSE, quote=FALSE, append=TRUE, sep='\t')

@@ -1,5 +1,5 @@
 #' Copied from StrandPhaseR so that it accesses InvertypeR's version of bamregion2granges
-#' The function is unchanged (except for @inheritParams), and it's just here for namespace finagling
+#' The function is unchanged (except for @inheritParams, the bamregions function, and some added package:: tags), and it's just here for namespace finagling
 #'
 #' This funcion will read in partial single cell haplotypes into
 #' two parallel matrices separately for Watson and Crick reads
@@ -12,7 +12,7 @@
 #' @export
  
 
-loadMatrices <- function(inputfolder=NULL, positions=NULL, WCregions=NULL, pairedEndReads=FALSE, min.mapq=10, min.baseq=30) {
+loadMatrices_for_invertyper <- function(input_folder=NULL, positions=NULL, WCregions=NULL, pairedEndReads=FALSE, min.mapq=10, min.baseq=30) {
   
   ## function to collapese list of letters
   collapse.str <- function(x) {
@@ -39,8 +39,8 @@ loadMatrices <- function(inputfolder=NULL, positions=NULL, WCregions=NULL, paire
   for (file in file.list) {
     #message("Processing ", file)
     
-    bamfile <- file.path(inputfolder, file)
-    bam.reads <- bamregion2GRanges(bamfile, region=positions, pairedEndReads=pairedEndReads, min.mapq=min.mapq)
+    bamfile <- file.path(input_folder, file)
+    bam.reads <- bamregion2GRanges_for_invertyper(bamfile, region=positions, pairedEndReads=pairedEndReads, min.mapq=min.mapq)
     seqlengths(WCregions) <- seqlengths(bam.reads)
     
     regions <- WCregions[WCregions$filename == file]
@@ -55,19 +55,19 @@ loadMatrices <- function(inputfolder=NULL, positions=NULL, WCregions=NULL, paire
         region.ID <- as.character(region)
         filename.ID <- paste(filename, region.ID, sep="__")
         
-        bamfile <- file.path(inputfolder, filename)
+        bamfile <- file.path(input_folder, filename)
         
         ## get snv position overlaping with given WC region
-        mask <- findOverlaps(region, positions)
-        region.snvs <- positions[subjectHits(mask)]
+        mask <- GenomicRanges::findOverlaps(region, positions)
+        region.snvs <- positions[S4Vectors::subjectHits(mask)]
         region.snvs <- sort(region.snvs)
         
         ## make sure that there are no duplicated snv positions in region.snv list
-        region.snvs <- region.snvs[!duplicated(start(region.snvs))]
+        region.snvs <- region.snvs[!duplicated(GenomicRanges::start(region.snvs))]
         
         ## Get data from the list of GRanges
-        bam.overlaps <- findOverlaps(region, bam.reads)
-        data <- bam.reads[subjectHits(bam.overlaps)]
+        bam.overlaps <- GenomicRanges::findOverlaps(region, bam.reads)
+        data <- bam.reads[S4Vectors::subjectHits(bam.overlaps)]
         seqlevels(data) <- seqlevels(region)
         
         ## Split reads by directionality
@@ -75,20 +75,20 @@ loadMatrices <- function(inputfolder=NULL, positions=NULL, WCregions=NULL, paire
         watson <- data[strand(data) == "-"]
         
         ## extract read sequences for watson and crick reads
-        crick.seq <- mcols(crick)$seq
-        watson.seq <- mcols(watson)$seq
+        crick.seq <- GenomicRanges::mcols(crick)$seq
+        watson.seq <- GenomicRanges::mcols(watson)$seq
         
         ## extract base qualities for watson and crick reads
-        crick.qual <- mcols(crick)$qual
-        watson.qual <- mcols(watson)$qual
+        crick.qual <- GenomicRanges::mcols(crick)$qual
+        watson.qual <- GenomicRanges::mcols(watson)$qual
         
         ## get piles of bases at each variable position
-        piles.crick <- GenomicAlignments::pileLettersAt(crick.seq, seqnames(crick), start(crick), mcols(crick)$cigar, region.snvs)
-        piles.watson <- GenomicAlignments::pileLettersAt(watson.seq, seqnames(watson), start(watson), mcols(watson)$cigar, region.snvs)
+        piles.crick <- GenomicAlignments::pileLettersAt(crick.seq, GenomicRanges::seqnames(crick), GenomicRanges::start(crick), GenomicRanges::mcols(crick)$cigar, region.snvs)
+        piles.watson <- GenomicAlignments::pileLettersAt(watson.seq, GenomicRanges::seqnames(watson), GenomicRanges::start(watson), GenomicRanges::mcols(watson)$cigar,region.snvs)
         
         ## get piles of qualities at each variable position
-        quals.crick <- GenomicAlignments::pileLettersAt(crick.qual, seqnames(crick), start(crick), mcols(crick)$cigar, region.snvs)
-        quals.watson <- GenomicAlignments::pileLettersAt(watson.qual, seqnames(watson), start(watson), mcols(watson)$cigar, region.snvs)
+        quals.crick <- GenomicAlignments::pileLettersAt(crick.qual, GenomicRanges::seqnames(crick), GenomicRanges::start(crick), GenomicRanges::mcols(crick)$cigar, region.snvs)
+        quals.watson <- GenomicAlignments::pileLettersAt(watson.qual, GenomicRanges::seqnames(watson), GenomicRanges::start(watson), GenomicRanges::mcols(watson)$cigar, region.snvs)
         
         ## Filter bases based on base quality
         df.pilesCrick <- as(piles.crick, "data.frame")
@@ -145,18 +145,18 @@ loadMatrices <- function(inputfolder=NULL, positions=NULL, WCregions=NULL, paire
         watson.pos <- watsonBaseFreq.collapsed.srt[,1]
         
         ## transform obtained matrix into a vector with covered snv positions as values and base IDs as names
-        crickBases.v <- start(region.snvs[crick.pos])
+        crickBases.v <- GenomicRanges::start(region.snvs[crick.pos])
         crickBases.df <- as.data.frame(crickBaseFreq.collapsed.srt)
         names(crickBases.v) <- crickBases.df[crickBases.df$row %in% crick.pos,]$col
         
         #watsonBases.v <- watson.pos
-        watsonBases.v <- start(region.snvs[watson.pos])
+        watsonBases.v <- GenomicRanges::start(region.snvs[watson.pos])
         watsonBases.df <- as.data.frame(watsonBaseFreq.collapsed.srt)
         names(watsonBases.v) <- watsonBases.df[watsonBases.df$row %in% watson.pos,]$col
         
         ## transform base qualities into a vector
-        crickQuals.v <- start(region.snvs[crick.pos])
-        watsonQuals.v <- start(region.snvs[watson.pos])
+        crickQuals.v <- GenomicRanges::start(region.snvs[crick.pos])
+        watsonQuals.v <- GenomicRanges::start(region.snvs[watson.pos])
         names(crickQuals.v) <- filtquals.crick[crick.pos]
         names(watsonQuals.v) <- filtquals.watson[watson.pos]
         

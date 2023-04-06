@@ -16,6 +16,8 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 biocViews:
+Depends:
+	StrandPhaseR,
 Imports:
 	GenomicRanges,
 	IRanges,
@@ -44,6 +46,5 @@ Imports:
 	R.utils,
 	zoo,
 	BSgenome,
-	StrandPhaseR,
 Remotes:
-	github::daewoooo/StrandPhaseR@69c9fb4
+	github::daewoooo/StrandPhaseR@95f77a8

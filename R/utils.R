@@ -34,7 +34,7 @@ stopifnot("Allowable states are 'ww', 'cc', and 'wc'." = (!any(!states%in%c('wc'
 process_counts <- function(index, states, region_size, list_of_breakpoint_objects){
 
 	y <- list_of_breakpoint_objects[[index]]$counts
-	y <- y[width(y) >= region_size & y$states %in% states]
+	y <- y[GenomicRanges::width(y) >= region_size & y$states %in% states]
 	y$filename <- names(list_of_breakpoint_objects)[index]
 	return(y)
 }

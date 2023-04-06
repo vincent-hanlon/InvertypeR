@@ -16,7 +16,8 @@ invertyper(
   haploid_prior = c(0.5, 0.5),
   chromosomes = NULL,
   output_file = "inversions.txt",
-  adjust_method = c("raw", "merge", "deltas", "minimal", "low", "all")
+  adjust_method = c("raw", "merge", "deltas", "minimal", "low", "all"),
+  output_folder = "."
 )
 }
 \arguments{

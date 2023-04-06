@@ -40,7 +40,7 @@
 #'
 #' @export
 invertyper <- function(WW_reads, WC_reads, regions_to_genotype, blacklist=NULL, paired_reads=TRUE, haploid_chromosomes=NULL, confidence=0.95,prior=c(0.333,0.333,0.333), haploid_prior=c(0.5,0.5), 
-					chromosomes=NULL, output_file="inversions.txt", adjust_method=c("raw","merge","deltas","minimal", "low", "all")){
+					chromosomes=NULL, output_file="inversions.txt", adjust_method=c("raw","merge","deltas","minimal", "low", "all"), output_folder='.'){
 
 stopifnot('Please choose a value for adjust_method. This controls how InvertypeR will attempt to improve the inversion coordinates you supply. Valid values are "raw","merge","deltas","minimal", "low", or "all".' = all(length(adjust_method)==1 & adjust_method %in% c("raw","merge","deltas","minimal", "low", "all")))
 stopifnot("Any haploid chromosomes you specify should be include as chromosomes too. This means including chrX and chrY as chromosomes AND as haploid_chromosomes for human males" = all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes))
@@ -74,7 +74,7 @@ warning("Using the default priors (prior for homogametic diploids (e.g., human f
 
 if(!is.character(WW_reads) & !haploid){
 
-	WW_chromosomes <- unique(sort(as.vector(seqnames(WW_reads))))
+	WW_chromosomes <- unique(sort(as.vector(GenomicRanges::seqnames(WW_reads))))
 
 	if(any(!WW_chromosomes[!WW_chromosomes %in% WC_chromosomes] %in% haploid_chromosomes)){
 
@@ -94,7 +94,7 @@ if(!is.null(chromosomes)){
 
 } else {
 
-	chromosomes <- unique(sort(as.vector(seqnames(regions_to_genotype))))
+	chromosomes <- unique(sort(as.vector(GenomicRanges::seqnames(regions_to_genotype))))
 
 }
 
@@ -150,7 +150,7 @@ paired_reads=paired_reads, blacklist=blacklist)
 	colnames(inversions)[10] <- "low_read_density"
 
 	if(!is.null(output_file)){
-		write.table(inversions, output_file, quote=FALSE, sep="\t", row.names=FALSE)
+		write.table(inversions, file.path(output_folder, output_file), quote=FALSE, sep="\t", row.names=FALSE)
 	}
 
 	return(inversions)

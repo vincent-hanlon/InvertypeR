@@ -5,19 +5,19 @@
 \title{Creates Strand-seq composite files for inversion genotyping}
 \usage{
 create_composite_files(
-  inputfolder = "./",
+  input_folder = "./",
   type = c("wc", "ww"),
   numCPU = 24,
   vcf = NULL,
   paired_reads = TRUE,
   blacklist = NULL,
-  outputfolder = "./",
+  output_folder = "./",
   save_composite_files = FALSE,
   chromosomes = NULL
 )
 }
 \arguments{
-\item{inputfolder}{The path to a directory containing good-quality Strand-seq BAM files}
+\item{input_folder}{The path to a directory containing good-quality Strand-seq BAM files}
 
 \item{type}{Either 'ww', or 'wc', or both. The 'wc' file is only available for diploids for which heterozygous SNPs are available, but it greatly improves inversion calls}
 
@@ -30,7 +30,7 @@ directly from the Strand-seq data using BBTOOLS callvariants.sh (see README on G
 
 \item{blacklist}{A GRanges object containing regions that are thought to contain unreliable Strand-seq data. Highly recommended.}
 
-\item{outputfolder}{The name of a folder to which output files should be written.}
+\item{output_folder}{The name of a folder to which output files should be written.}
 
 \item{save_composite_files}{Boolean. Should composite files be saved as RData objects, or not at all?}
 

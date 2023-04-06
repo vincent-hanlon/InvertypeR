@@ -5,8 +5,8 @@
 #'
 #' The descriptions of arguments here are just copied from StrandPhaseR
 #'
-#' @param inputfolder Path to the bam files to process
-#' @param outputfolder Output directory.
+#' @param input_folder Path to the bam files to process
+#' @param output_folder Output directory.
 #' @param positions Filename with listed position of SNVs for given chromosome (format: chrName SNVpos).
 #' @param WCregions Filename of all WC region for a given chromosome (format: chrName:Start:End:FileName).
 #' @param chromosome If only a subset of the chromosomes should be processed, specify them here.
@@ -23,13 +23,13 @@
 #' @return A subset of the StrandPhaseR output that phases the strand state of wc regions
 #' 
 #' @export
-phaseChromosome_for_invertyper <- function(inputfolder, outputfolder='./StrandPhaseR_analysis', positions=NULL, WCregions=NULL, chromosome=NULL, pairedEndReads=TRUE, min.mapq=10, min.baseq=30, num.iterations=2, translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL) {
+phaseChromosome_for_invertyper <- function(input_folder, output_folder='./StrandPhaseR_analysis', positions=NULL, WCregions=NULL, chromosome=NULL, pairedEndReads=TRUE, min.mapq=10, min.baseq=30, num.iterations=2, translateBases=TRUE, fillMissAllele=NULL, splitPhasedReads=FALSE, compareSingleCells=FALSE, exportVCF=NULL) {
 
 	message("Using Vincents altered PhaseChromosome...")
         GenomeInfoDb::seqlevels(positions, pruning.mode='coarse') <- chromosome
         GenomeInfoDb::seqlevels(WCregions, pruning.mode='coarse') <- chromosome
   #load data into matrix
-  matrices <- invertyper::loadMatrices(inputfolder=inputfolder, positions=positions, WCregions=WCregions, pairedEndReads=pairedEndReads, min.mapq=min.mapq, min.baseq=min.baseq)
+  matrices <- loadMatrices_for_invertyper(input_folder=input_folder, positions=positions, WCregions=WCregions, pairedEndReads=pairedEndReads, min.mapq=min.mapq, min.baseq=min.baseq)
 
   #Check if sufficient data were loaded
   if (length(matrices) > 0) {

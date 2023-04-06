@@ -10,21 +10,21 @@
 #' The composite files can be saved to an RData object for later use. However, since the composite files are GenomicAlignments or GenomicAlignmentPairs objects, it should
 #' also be possible to save them as samtools-compatible BAM files using rtracklayer::export().
 #'
-#' @param inputfolder The path to a directory containing good-quality Strand-seq BAM files 
+#' @param input_folder The path to a directory containing good-quality Strand-seq BAM files 
 #' @param type Either 'ww', or 'wc', or both. The 'wc' file is only available for diploids for which heterozygous SNPs are available, but it greatly improves inversion calls
 #' @param numCPU An integer; the number of threads to use
 #' @param vcf The path to a VCF file containing heterozygous SNPs for an individual. External SNPs (e.g. from WGS data) are best, but they can also usually be called
 #' directly from the Strand-seq data using BBTOOLS callvariants.sh (see README on GitHub).
 #' @param paired_reads Boolean. Are the reads paired-end?
 #' @param blacklist A GRanges object containing regions that are thought to contain unreliable Strand-seq data. Highly recommended.
-#' @param outputfolder The name of a folder to which output files should be written. 
+#' @param output_folder The name of a folder to which output files should be written. 
 #' @param save_composite_files Boolean. Should composite files be saved as RData objects, or not at all?
 #' @param chromosomes A character vector of chromosome names for which composite files should be created.
 #'
 #' @return  A list containing 1 or 2 composite files in GenomicAlignments format.
 #'
 #' @export
-create_composite_files <- function(inputfolder='./', type=c("wc","ww"), numCPU=24, vcf=NULL, paired_reads=TRUE, blacklist=NULL, outputfolder='./', save_composite_files=FALSE, chromosomes=NULL){
+create_composite_files <- function(input_folder='./', type=c("wc","ww"), numCPU=24, vcf=NULL, paired_reads=TRUE, blacklist=NULL, output_folder='./', save_composite_files=FALSE, chromosomes=NULL){
 
 message('start composite')
 
@@ -35,12 +35,12 @@ if(is.null(blacklist)){
 warning("A blacklist is highly recommended both for creating composite files and for genotyping inversions.")
 }
 
-if (!file.exists(outputfolder)) {
-    dir.create(outputfolder)
+if (!file.exists(output_folder)) {
+    dir.create(output_folder)
 }
 
-bamlist <- list.files(inputfolder, pattern="\\.bam$")
-stopifnot("No BAM files found in inputfolder for composite file creation." = length(bamlist) > 0)
+bamlist <- list.files(input_folder, pattern="\\.bam$")
+stopifnot("No BAM files found in input_folder for composite file creation." = length(bamlist) > 0)
 
 # We first must read in the BAM files without removing reads in blacklisted regions or chromosomes that are left out
 message('start read bams')
@@ -164,17 +164,17 @@ names(composite) <- c("WW", "WC")
 
 
 
-invisible(suppressMessages(breakpointr_for_invertyper(to_plot, plotspath=outputfolder,numCPU=numCPU, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=NULL,chromosomes=chromosomes)))
+invisible(suppressMessages(breakpointr_for_invertyper(to_plot, plotspath=output_folder,numCPU=numCPU, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=NULL,chromosomes=chromosomes)))
 
 message('start save composites')
 if(save_composite_files){
 
 	if('ww' %in% type){
-		save(WW_composite_file,file=file.path(outputfolder,"WW_composite_file.RData"))
+		save(WW_composite_file,file=file.path(output_folder,"WW_composite_file.RData"))
 	}
 
 	if('wc' %in% type){
-		save(WC_composite_file,file=file.path(outputfolder,"WC_composite_file.RData"))
+		save(WC_composite_file,file=file.path(output_folder,"WC_composite_file.RData"))
 	}
 }
 
