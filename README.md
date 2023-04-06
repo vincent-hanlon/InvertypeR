@@ -135,5 +135,5 @@ The browserfiles can now be created as follows, if `create_composite_files()` or
 ```
 load("./WW_composite_file.RData")
 load("./WC_composite_file.RData")
-write_UCSC_browser_files(WW_reads=WW_composite_files, WC_reads=WC_composite_file, paired_reads=TRUE)
+write_UCSC_browser_files(WW_reads=WW_composite_file, WC_reads=WC_composite_file, paired_reads=TRUE)
 ```
