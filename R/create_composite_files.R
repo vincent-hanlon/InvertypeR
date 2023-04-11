@@ -118,14 +118,24 @@ invisible(gc())
 
 message('start composite assembly')
 
+if(.Platform$OS.type == "windows"){
+
+mc.cores <- 1
+
+} else {
+
+mc.cores <- numCPU
+
+}
+
 # If this is parallelized with parLapply instead it might work on Windows, but unfortunately parLapply can't subset GenomicRanges like granges[vector] for some weird reason.
-CC <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=WWCCregions, paired_reads=paired_reads, states='cc', flip_reads=TRUE, mc.cores=numCPU)
-WW <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=WWCCregions, paired_reads=paired_reads, states='ww', flip_reads=FALSE, mc.cores=numCPU)
+CC <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=WWCCregions, paired_reads=paired_reads, states='cc', flip_reads=TRUE, mc.cores=mc.cores)
+WW <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=WWCCregions, paired_reads=paired_reads, states='ww', flip_reads=FALSE, mc.cores=mc.cores)
 
 if('wc' %in% type){
 message('choose wc composite reads')
-CW <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=all_phased_WCregions, paired_reads=paired_reads, states='cw', flip_reads=TRUE, mc.cores=numCPU)
-WC <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=all_phased_WCregions, paired_reads=paired_reads, states='wc', flip_reads=FALSE, mc.cores=numCPU)
+CW <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=all_phased_WCregions, paired_reads=paired_reads, states='cw', flip_reads=TRUE, mc.cores=mc.cores)
+WC <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=all_phased_WCregions, paired_reads=paired_reads, states='wc', flip_reads=FALSE, mc.cores=mc.cores)
 
 }
 

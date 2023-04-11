@@ -74,6 +74,7 @@ warning("Using the default priors (prior for homogametic diploids (e.g., human f
 
 if(!is.character(WW_reads) & !haploid){
 
+	WC_chromosomes <- unique(sort(as.vector(GenomicRanges::seqnames(WC_reads))))
 	WW_chromosomes <- unique(sort(as.vector(GenomicRanges::seqnames(WW_reads))))
 
 	if(any(!WW_chromosomes[!WW_chromosomes %in% WC_chromosomes] %in% haploid_chromosomes)){
