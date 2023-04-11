@@ -84,7 +84,7 @@ InvertypeR can be installed from GitHub with [devtools](https://cran.r-project.o
 devtools::install_github(repo="vincent-hanlon/InvertypeR")
 ```
 
-If that doesn't work, try `devtools::install_github(url="https://github.com/vincent-hanlon/InvertypeR")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand. Likewise, StrandPhaseR may or may not need to be installed separately using `devtools::install_github()`. 
+If that doesn't work, try `devtools::install_github(url="https://github.com/vincent-hanlon/InvertypeR")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand. Likewise, StrandPhaseR may or may need to be installed separately using `devtools::install_github()`. 
 
 Once everything is installed and the various inputs are assembled, running InvertypeR is straightforward. The function `invertyper_pipeline()` will create composite files for an individual, attempt to discover putative inversions using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) and the genotype them if desired, and of course genotype a user-provide list of putative inversions as well. It can also save the composite files as .RData files and write any inversions it finds to UCSC Genome Browser files along with the relevant Strand-seq reads. 
 
@@ -98,7 +98,7 @@ Results for the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9) a
 
 ### Example of how to run InvertypeR
 
-Open R and move to a directory that contains paired-end BAM files and a VCF of snps. We're assuming here that the individual is male and we want to call inversions on the sex chromosomes as well as chr1, chr2, and chr8 for some reason. 
+Open R and move to a directory that contains paired-end BAM files and a VCF of snps. We're assuming here that the individual is a humnan male, the BAM, VCF, and BED files all have coordinates for the reference genome GRCh38, and we want to call inversions on the sex chromosomes as well as chr1, chr2, and chr8 for some reason. 
 
 ```
 library(invertyper)
@@ -127,4 +127,13 @@ Dependencies:
   - perl package LWP::UserAgent (6.49)
   
 (Courtesy of Victor Guryev and Carl-Adam Mattsson)
-These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the `in/` directory, and put the browserfiles for the WW and WC composite files (from `write_browser_files=T`) in the `in/bed_reads/` directory. Then run `bash haploplot_run.sh`. A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
+
+These scripts can be found [here](https://github.com/mattssca/haploplotR), along with more detailed instructions. In brief, clone the repository, install the dependencies, put an InvertypeR output file in the `in/` directory, and put the browserfiles for the WW and WC composite files (from `write_browser_files()`, below) in the `in/bed_reads/` directory. Then run `bash haploplot_run.sh`. A PDF ideogram linked to a UCSC Genome Browser session will be created automatically.
+
+The browserfiles can now be created as follows, if `create_composite_files()` or `invertyper_pipeline()` were run with `save_composite_files=T`:
+
+```
+load("./WW_composite_file.RData")
+load("./WC_composite_file.RData")
+write_UCSC_browser_files(WW_reads=WW_composite_file, WC_reads=WC_composite_file, paired_reads=TRUE)
+```
