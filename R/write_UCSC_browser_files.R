@@ -25,19 +25,9 @@ if (!file.exists(output_folder)) {
 
 region <- inversions[inversions[,9]>confidence & inversions[,8]!=0 & inversions[,8]!="0|0",]
 
-if(nrow(region)>0){
+if(is.data.frame(region) && nrow(region) > 0){
 
 region <- GenomicRanges::reduce(widen(granges=GenomicRanges::makeGRangesFromDataFrame(region, ignore.strand=TRUE, seqnames.field=names(region)[1], start.field=names(region)[2],end.field=names(region)[3]), seqlengths=GenomeInfoDb::seqlengths(WW_reads), distance=5e06), min.gapwidth=1000)
-
-WW_reads <- galignment_to_granges(WW_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)
-suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WW_composite_file"), outputDirectory=output_folder, fragments=WW_reads))
-
-
-if('wc' %in% type){
-
-WC_reads <- galignment_to_granges(WC_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)
-suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WC_composite_file"), outputDirectory=output_folder, fragments=WC_reads))
-}
 
 inversions <- inversions[inversions[,9]>confidence,]
 inversions[,2] <- inversions[,2]-1
@@ -59,9 +49,18 @@ utils::write.table(inversions,file=savefile.invs.gz, row.names=FALSE, col.names=
 close(savefile.invs.gz)
 } else {
 
- warning("There are no confident inversions to create a UCSC browser file")
+ message("No confident inversion supplied. Only the composite files will be saved as UCSC browser files")
 
 }
 
+WW_reads <- galignment_to_granges(WW_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)
+suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WW_composite_file"), outputDirectory=output_folder, fragments=WW_reads))
+
+
+if('wc' %in% type){
+
+WC_reads <- galignment_to_granges(WC_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)
+suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WC_composite_file"), outputDirectory=output_folder, fragments=WC_reads))
+}
 
 }

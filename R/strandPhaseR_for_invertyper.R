@@ -67,15 +67,17 @@ strandPhaseR_for_invertyper <- function(numCPU=4, positions=NULL, WCregions=NULL
 
 message("bamregions should write a whole bunch of empty files if the correct one is being used")
 	if(conf[['numCPU']]>1) {
-
+message("remove all the file.creates")
 
     cl <- parallel::makeCluster(conf[['numCPU']])
+file.create("cl_create")
     doParallel::registerDoParallel(cl)
 parallel::clusterExport(cl=cl, 'galignmentslist_global_for_invertyper')  
     all_phased_WCregions <- foreach::foreach (i = conf[['chromosomes']], .packages=c('StrandPhaseR', 'invertyper')) %dopar% {
-    
+   file.create("exported")
         tC <- tryCatch({
 
+file.create('in_cluster')
 message("remember to add suppressMessages( back to strandphaser here!") 
 message( "using the right foreach loop")
 phaseChromosome_for_invertyper(input_folder=input_folder, 

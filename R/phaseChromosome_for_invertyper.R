@@ -29,17 +29,17 @@ phaseChromosome_for_invertyper <- function(input_folder, output_folder='./Strand
         GenomeInfoDb::seqlevels(positions, pruning.mode='coarse') <- chromosome
         GenomeInfoDb::seqlevels(WCregions, pruning.mode='coarse') <- chromosome
   #load data into matrix
+file.create('pC')
   matrices <- loadMatrices_for_invertyper(input_folder=input_folder, positions=positions, WCregions=WCregions, pairedEndReads=pairedEndReads, min.mapq=min.mapq, min.baseq=min.baseq)
-
+file.create('matrix')
   #Check if sufficient data were loaded
   if (length(matrices) > 0) {
     #phase data
     srt.matrices <-  StrandPhaseR::sortMatrices(data.object=matrices, num.iterations=num.iterations)
-
+file.create('sorted')
     assem.haps <-  StrandPhaseR::assembleHaps(data.object=srt.matrices, translateBases=translateBases)
     hap1 <- data.frame(names(assem.haps$hap1.files), do.call(rbind, lapply(assem.haps$hap1.files, rbind)))
     names(hap1) <- c("Filenames", "Simil", "Disimil")
-
 
     return(hap1$Filenames)
  }
