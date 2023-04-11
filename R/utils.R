@@ -223,3 +223,24 @@ return(granges)
 }
 
 
+
+
+#' Timing function from BreakpointR/AneuFinder (but not exported)
+#' Credit due to the authors of those packages.
+startTimedMessage <- function(...) {
+
+    x <- paste0(..., collapse='')
+    message(x, appendLF=FALSE)
+    ptm <- proc.time()
+    return(ptm)
+
+}
+
+#' A second timing function from BreakpointR/AneuFinder (but not exported)
+#' Credit due to the authors of those packages.
+stopTimedMessage <- function(ptm) {
+
+    time <- proc.time() - ptm
+    message(" ", round(time[3],2), "s")
+
+}

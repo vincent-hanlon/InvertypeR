@@ -72,18 +72,6 @@ warning("Using the default priors (prior for homogametic diploids (e.g., human f
 
 
 
-if(!is.character(WW_reads) & !haploid){
-
-	WC_chromosomes <- unique(sort(as.vector(GenomicRanges::seqnames(WC_reads))))
-	WW_chromosomes <- unique(sort(as.vector(GenomicRanges::seqnames(WW_reads))))
-
-	if(any(!WW_chromosomes[!WW_chromosomes %in% WC_chromosomes] %in% haploid_chromosomes)){
-
-	warning("Make sure that haploid chromosomes appear in the argument haploid_chromosomes if they appear in the argument chromosomes. For example, chrX and chrY for human males")
-	}
-}
-
-
 if(!is.null(chromosomes)){
 	found_chromosomes <- unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(WW_reads)))))
 
@@ -110,6 +98,7 @@ if(is.character(WW_reads)){
 }
 
 
+ptm <- startTimedMessage("\n       subsetting composite files and estimating background ...")
 
 	#Takes reads from the BAM files that overlap the regions and stores them as GRanges
 	WW_reads <- import_bam(WW_reads, chromosomes=chromosomes, paired_reads=paired_reads, blacklist=blacklist)
@@ -125,19 +114,23 @@ if(is.character(WW_reads)){
         #Accurate background estimate, plus base strand state for the WW/CC file
         base <- WWCC_background(WW_reads, binsize=1000000, paired_reads=paired_reads, chromosomes=chromosomes)
 
-	WW_reads <- WW_reads <- import_bam(WW_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=seqlengths_WW, distance=1e06), min.gapwidth=1000), 
-paired_reads=paired_reads, blacklist=blacklist)
-
+	WW_reads <- import_bam(WW_reads, region=GenomicRanges::reduce(widen(granges=regions, seqlengths=seqlengths_WW, distance=1e06), min.gapwidth=1000), paired_reads=paired_reads, blacklist=blacklist)
+	stopTimedMessage(ptm)
 	#Genotyping the inversions
+	msg <- paste0("       genotyping ", length(regions) ," putative inversions ...")
+
+	ptm <- startTimedMessage(msg)
 	inversions <- genotype_inversions(WW_reads=WW_reads, WC_reads=WC_reads, regions=regions, background=base[[1]], base_state=base[[2]],  haploid_chromosomes=haploid_chromosomes, 
 		prior=prior, haploid_prior=haploid_prior)
-
+	stopTimedMessage(ptm)
 	#two methods under development for dealing with overlapping intervals
 	if( adjust_method != "raw" ){
+		ptm <- startTimedMessage("       adjusting inversion coordinates ...")
 		reads <- list(WW_reads, WC_reads)
 		inversions <- adjust_intervals(inversions=inversions, reads=reads, confidence=confidence, base=base,  haploid_chromosomes=haploid_chromosomes, prior=prior, haploid_prior=haploid_prior, 
 			adjust_method=adjust_method, paired_reads=paired_reads)
 		inversions <- inversions[order(-inversions$probability),]
+		stopTimedMessage(ptm)
 	}
 
 

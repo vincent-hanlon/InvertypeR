@@ -51,7 +51,7 @@
 #' @export
 
 invertyper_pipeline <- function(regions_to_genotype=NULL, prior = c(0.333,0.333,0.333), haploid_prior=c(0.5,0.5),  adjust_method=c("raw","merge","deltas","minimal", "low", 
-"all"), input_folder='./', output_folder='./', haploid_chromosomes=NULL, vcf=NULL, paired_reads=TRUE, confidence=0.95, blacklist=NULL, chromosomes=NULL, numCPU=24, 
+"all"), input_folder='./', output_folder='./', haploid_chromosomes=NULL, vcf=NULL, paired_reads=TRUE, confidence=0.95, blacklist=NULL, chromosomes=NULL, numCPU=4, 
 save_composite_files=FALSE, write_browser_files=FALSE, discover_breakpointr_inversions=TRUE, breakpointr_prior=c(0.9,0.05,0.05), breakpointr_haploid_prior=c(0.9,0.1), windowsize=c(40,120,360), minReads=c(15,50,50), background=0.2, output_file="inversions.txt") {
 
 stopifnot("There is nothing to genotype: either provide a list of putative inversions (regions_to_genotype) or set discover_breakpointr_inversions=TRUE" = !is.null(regions_to_genotype) | discover_breakpointr_inversions)

@@ -22,6 +22,7 @@ if (!file.exists(output_folder)) {
     dir.create(output_folder)
 }
 
+ptm <- startTimedMessage("\n       writing genome browser files ...")
 
 region <- inversions[inversions[,9]>confidence & inversions[,8]!=0 & inversions[,8]!="0|0",]
 
@@ -62,5 +63,8 @@ if('wc' %in% type){
 WC_reads <- galignment_to_granges(WC_reads, paired_reads=paired_reads, purpose='BreakpointR', region=region)
 suppressMessages(breakpointR::breakpointr2UCSC(paste0(prefix,"WC_composite_file"), outputDirectory=output_folder, fragments=WC_reads))
 }
+
+stopTimedMessage(ptm)
+
 
 }

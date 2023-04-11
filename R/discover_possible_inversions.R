@@ -15,8 +15,7 @@
 #' @return  A GRanges object of potential inversions for genoptyping with invertyper()
 #'
 #' @export
-discover_possible_inversions <- function(composite_files=list(), windowsize=c(40,120,260), minReads=c(15,50,50), paired_reads=FALSE, numCPU=24, chromosomes=NULL, blacklist=NULL, background=0.2, type=c('wc','ww')){
-
+discover_possible_inversions <- function(composite_files=list(), windowsize=c(40,120,260), minReads=c(15,50,50), paired_reads=FALSE, numCPU=4, chromosomes=NULL, blacklist=NULL, background=0.2, type=c('wc','ww')){
 
 stopifnot("The arguments minReads and windowsize should be parallel (have the same length)" = (length(minReads)==length(windowsize)))
 stopifnot("This function should be used with two composite files named 'WC' and 'WW', for diploids (names(composite_files)). Also, a CC composite file won't work."  = (all(names(composite_files) %in% c('WC','WW')) & length(composite_files)==2) | all(type=='ww'))
@@ -27,11 +26,31 @@ composite_files <- lapply(composite_files, galignment_to_granges, purpose='Break
 names(composite_files) <- n
 
 bpr <- list()
+start <- ""
+
 for(i in c(1:length(windowsize))){
+
+if(i>3){
+	suffix <- "th"
+} else if(i==3) {
+	suffix <- "rd"
+} else if(i==2) {
+	suffix <- "nd"
+} else if(i==1) {
+	suffix <- "st"
+	start <- "\n"
+}
+
+msg <- paste0(start, "       running BreakpointR for the ", i, suffix, " time ...")
+ptm <- startTimedMessage(msg)
+
 
 bpr[[i]] <- suppressMessages(breakpointr_for_invertyper(composite_files, plotspath=NULL,numCPU=numCPU, windowsize=as.integer(windowsize[i]), binMethod="reads", 
 minReads=as.integer(minReads[i]), background=background,maskRegions=blacklist,chromosomes=chromosomes))
 invisible(gc())
+stopTimedMessage(ptm)
+
+start <- ""
 }
 
 

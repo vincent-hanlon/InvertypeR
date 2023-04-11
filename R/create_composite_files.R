@@ -24,7 +24,7 @@
 #' @return  A list containing 1 or 2 composite files in GenomicAlignments format.
 #'
 #' @export
-create_composite_files <- function(input_folder='./', type=c("wc","ww"), numCPU=24, vcf=NULL, paired_reads=TRUE, blacklist=NULL, output_folder='./', save_composite_files=FALSE, chromosomes=NULL){
+create_composite_files <- function(input_folder='./', type=c("wc","ww"), numCPU=4, vcf=NULL, paired_reads=TRUE, blacklist=NULL, output_folder='./', save_composite_files=FALSE, chromosomes=NULL){
 
 stopifnot("The type argument should be 'wc' for a Watson-Crick composite file, 'ww' for a Watson-Watson composite file, or c('ww','wc') for both." = (!any(!type %in% c('wc','ww'))))
 stopifnot("The path to a VCF file is required for a Watson-Crick ('wc') composite file." = !(is.null(vcf) & 'wc' %in% type))
@@ -37,6 +37,7 @@ if (!file.exists(output_folder)) {
     dir.create(output_folder)
 }
 
+ptm <- startTimedMessage("\n       loading BAM files ...")
 bamlist <- list.files(input_folder, pattern="\\.bam$")
 stopifnot("No BAM files found in input_folder for composite file creation." = length(bamlist) > 0)
 
@@ -55,13 +56,16 @@ grangeslist <- parallel::parLapply(cl, galignmentslist, galignment_to_granges, p
 names(grangeslist) <- names(galignmentslist)
 parallel::stopCluster(cl)
 
+stopTimedMessage(ptm)
+ptm <- startTimedMessage("       recording the strand states of genomic regions ...")
 
 # breakpointR unfortunately can't find the strand state of segments in the genome if reads in blacklisted regions are first removed. 
 # This is probably because there aren't enough Strand-switches
 # Could be a github issue: subtract blacklisted regions from BAM file directly?
 # This means it's best to read in the offending reads, and then only remove them later on.
 # ALSO: the galignments_to_granges should really just take the first read for PE reads, unless pair2frgm is specified
-bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist, numCPU=8, windowsize=20000000, binMethod="size", minReads=50, background=0.2, maskRegions=blacklist, chromosomes=NULL))
+bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist, numCPU=numCPU, windowsize=20000000, binMethod="size", minReads=50, background=0.2, maskRegions=blacklist, 
+chromosomes=NULL))
 
 rm('grangeslist')
 invisible(gc())
@@ -98,7 +102,8 @@ all_phased_WCregions <- strandPhaseR_for_invertyper(numCPU=numCPU, positions=vcf
 rm('bpr')
 invisible(gc())
 }
-
+stopTimedMessage(ptm)
+ptm <- startTimedMessage("       combining reads into composite files ...")
 
 if(.Platform$OS.type == "windows"){
 
@@ -153,9 +158,10 @@ names(composite) <- c("WW", "WC")
 
 
 invisible(suppressMessages(breakpointr_for_invertyper(to_plot, plotspath=output_folder,numCPU=numCPU, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=NULL,chromosomes=chromosomes)))
+stopTimedMessage(ptm)
 
 if(save_composite_files){
-
+ptm <- startTimedMessage("       saving composite files ...")
 	if('ww' %in% type){
 		save(WW_composite_file,file=file.path(output_folder,"WW_composite_file.RData"))
 	}
@@ -163,6 +169,7 @@ if(save_composite_files){
 	if('wc' %in% type){
 		save(WC_composite_file,file=file.path(output_folder,"WC_composite_file.RData"))
 	}
+stopTimedMessage(ptm)
 }
 
 
