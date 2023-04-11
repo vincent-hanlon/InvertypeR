@@ -122,8 +122,6 @@ if(is.character(WW_reads)){
 	} else {
 	WC_reads <- WW_reads[0]
 	}
-print(WW_reads)
-save(WW_reads, file='ww-b4.RData')
         #Accurate background estimate, plus base strand state for the WW/CC file
         base <- WWCC_background(WW_reads, binsize=1000000, paired_reads=paired_reads, chromosomes=chromosomes)
 

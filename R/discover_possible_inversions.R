@@ -23,28 +23,17 @@ stopifnot("This function should be used with two composite files named 'WC' and 
 stopifnot("This function should be used with a composite file named 'WW', for haploids (names(composite_files)). Also, a CC composite file won't work." = (all(names(composite_files) %in% c('WW')) & length(composite_files)==1) | any('wc' %in% type))
 
 n <- names(composite_files)
-message("begin granges conversion")
 composite_files <- lapply(composite_files, galignment_to_granges, purpose='BreakpointR', paired_reads=paired_reads, region=NULL)
 names(composite_files) <- n
 
-		print(composite_files)
-
 bpr <- list()
-message("begin bpr loop")
 for(i in c(1:length(windowsize))){
 
-
-print(is.integer(minReads[i]))
-print(is.integer(windowsize[i]))
-
-message('replace binmethod size')
-message(paste0("start bpr loop ",i))
-bpr[[i]] <- breakpointr_for_invertyper(composite_files, plotspath=NULL,numCPU=numCPU, windowsize=as.integer(windowsize[i]), binMethod="size", minReads=as.integer(minReads[i]), background=background,maskRegions=blacklist,chromosomes=chromosomes)
-message('remember to put back suppressMessages() above!!!')
-gc()
+bpr[[i]] <- suppressMessages(breakpointr_for_invertyper(composite_files, plotspath=NULL,numCPU=numCPU, windowsize=as.integer(windowsize[i]), binMethod="reads", 
+minReads=as.integer(minReads[i]), background=background,maskRegions=blacklist,chromosomes=chromosomes))
+invisible(gc())
 }
 
-message("end bpr loop")
 
 if('wc' %in% type) {
 
@@ -57,7 +46,6 @@ possible_inversions <- sort(do.call('c',lapply(bpr, function(x)x$WW$counts[x$WW$
 }
 
 
-message("time to return")
 
 return(possible_inversions)
 

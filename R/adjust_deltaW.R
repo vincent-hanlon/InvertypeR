@@ -19,9 +19,6 @@
 #' @export
 adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype=c("het","hom","low")){
 
-message("remove unnecessary adjust save")
-save(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype, file="adjust.RData")
-
         #Next I want to merge and expand the inversions. The wider, expanded inversion intervals will be used to look for alternative breakpoints
         inversions <- GenomicRanges::sort(GenomicRanges::reduce(inversions))
 
@@ -64,9 +61,6 @@ save(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype, file="adjust.RData")
 
         #Calculating the start and end coordinates for the widened interval, and making sure they don't spill over onto the next chromosome
         #The new intervals are usually 3x as wide as the originals
-print(WW_reads)
-print(f_inversions)
-print(num_inversions)
 
         start_inversions <- ifelse(as.character(GenomicRanges::seqnames(WW_reads[pmax(1,f_inversions - num_inversions)]))==as.character(GenomicRanges::seqnames(inversions)), GenomicRanges::start(WW_reads[pmax(1,f_inversions - num_inversions)]),1)
         end_inversions <- ifelse(as.character(GenomicRanges::seqnames(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]))==as.character(GenomicRanges::seqnames(inversions)), GenomicRanges::end(WW_reads[pmin(length(WW_reads), p_inversions + num_inversions)]), GenomeInfoDb::seqlengths(WW_reads)[as.character(GenomicRanges::seqnames(inversions))])

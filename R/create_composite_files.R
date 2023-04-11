@@ -26,8 +26,6 @@
 #' @export
 create_composite_files <- function(input_folder='./', type=c("wc","ww"), numCPU=24, vcf=NULL, paired_reads=TRUE, blacklist=NULL, output_folder='./', save_composite_files=FALSE, chromosomes=NULL){
 
-message('start composite')
-
 stopifnot("The type argument should be 'wc' for a Watson-Crick composite file, 'ww' for a Watson-Watson composite file, or c('ww','wc') for both." = (!any(!type %in% c('wc','ww'))))
 stopifnot("The path to a VCF file is required for a Watson-Crick ('wc') composite file." = !(is.null(vcf) & 'wc' %in% type))
 
@@ -43,8 +41,6 @@ bamlist <- list.files(input_folder, pattern="\\.bam$")
 stopifnot("No BAM files found in input_folder for composite file creation." = length(bamlist) > 0)
 
 # We first must read in the BAM files without removing reads in blacklisted regions or chromosomes that are left out
-message('start read bams')
-
 cl <- suppressMessages(parallel::makeCluster(numCPU))
 galignmentslist <- parallel::parLapply(cl, bamlist, import_bam, blacklist=NULL, chromosomes=NULL, paired_reads=paired_reads)
 
@@ -55,15 +51,11 @@ if(!all(chromosomes %in% found_chromosomes)){
 	warning(paste0("Some chromosomes you provided (", paste(chromosomes[!(chromosomes %in% found_chromosomes)], collapse=" "), ") don't have any reads in the BAM files."))
 }
 
-message('start granges conversion')
-
 grangeslist <- parallel::parLapply(cl, galignmentslist, galignment_to_granges, purpose='BreakpointR', paired_reads=paired_reads, pair2frgm=FALSE)
 names(grangeslist) <- names(galignmentslist)
 parallel::stopCluster(cl)
 
 
-
-message('start bpr')
 # breakpointR unfortunately can't find the strand state of segments in the genome if reads in blacklisted regions are first removed. 
 # This is probably because there aren't enough Strand-switches
 # Could be a github issue: subtract blacklisted regions from BAM file directly?
@@ -71,12 +63,9 @@ message('start bpr')
 # ALSO: the galignments_to_granges should really just take the first read for PE reads, unless pair2frgm is specified
 bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist, numCPU=8, windowsize=20000000, binMethod="size", minReads=50, background=0.2, maskRegions=blacklist, chromosomes=NULL))
 
-message('done bpr')
-
 rm('grangeslist')
 invisible(gc())
 
-message('start chromosome downsample')
 if(!is.null(blacklist) | !is.null(chromosomes)){
 cl <- suppressMessages(parallel::makeCluster(numCPU))
 
@@ -86,8 +75,6 @@ names(galignmentslist) <- bamlist
 
 parallel::stopCluster(cl)
 }
-
-message('start extract regions')
 
 WWCCregions <- sort(find_regions_with_strand_state(bpr, states=c('ww','cc'), region_size=100000))
 WWCCregions$Cs <- NULL
@@ -104,10 +91,6 @@ WCregions$state <- NULL
 GenomeInfoDb::seqlevels(WCregions) <- GenomeInfoDb::seqlevels(galignmentslist[[1]])
 rm('bpr')
 invisible(gc())
-message('start phasing')
-save(WCregions, galignmentslist, file='sprtest.RData')
-message('remove all these annoying phasing files')
-
 
 all_phased_WCregions <- strandPhaseR_for_invertyper(numCPU=numCPU, positions=vcf, WCregions=WCregions, chromosomes=chromosomes, paired_reads=paired_reads, num.iterations=3, galignmentslist=galignmentslist)
 
@@ -116,7 +99,6 @@ rm('bpr')
 invisible(gc())
 }
 
-message('start composite assembly')
 
 if(.Platform$OS.type == "windows"){
 
@@ -133,7 +115,7 @@ CC <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_sta
 WW <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=WWCCregions, paired_reads=paired_reads, states='ww', flip_reads=FALSE, mc.cores=mc.cores)
 
 if('wc' %in% type){
-message('choose wc composite reads')
+
 CW <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=all_phased_WCregions, paired_reads=paired_reads, states='cw', flip_reads=TRUE, mc.cores=mc.cores)
 WC <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state, galignmentslist=galignmentslist, regions=all_phased_WCregions, paired_reads=paired_reads, states='wc', flip_reads=FALSE, mc.cores=mc.cores)
 
@@ -143,10 +125,8 @@ rm('galignmentslist')
 invisible(gc())
 
 
-message('make ww file')
 WW_composite_file <- do.call('c',c(CC,WW))
 
-message('make ww file to plot')
 to_plot <- list(galignment_to_granges(WW_composite_file[sort(sample(length(WW_composite_file),min(length(WW_composite_file),500000)))], purpose='BreakpointR', paired_reads=paired_reads,  pair2frgm=FALSE))
 names(to_plot)[1] <- 'WW_composite_file'
 
@@ -154,10 +134,8 @@ composite <- list(WW_composite_file)
 names(composite) <- c("WW")
 
 if('wc' %in% type){
-message('assemble wc file')
 
 WC_composite_file <- do.call('c',c(WC,CW))
-message('make wc toplot')
 to_plot <- append(to_plot,galignment_to_granges(WC_composite_file[sort(sample(length(WC_composite_file),min(length(WC_composite_file),500000)))], purpose='BreakpointR', pair2frgm=FALSE, paired_reads=paired_reads))
 
 names(to_plot)[2] <- 'WC_composite_file'
@@ -176,7 +154,6 @@ names(composite) <- c("WW", "WC")
 
 invisible(suppressMessages(breakpointr_for_invertyper(to_plot, plotspath=output_folder,numCPU=numCPU, windowsize=1000000, binMethod="size", minReads=50, background=0.2,maskRegions=NULL,chromosomes=chromosomes)))
 
-message('start save composites')
 if(save_composite_files){
 
 	if('ww' %in% type){

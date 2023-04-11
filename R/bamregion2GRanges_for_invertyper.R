@@ -16,8 +16,6 @@ bamregion2GRanges_for_invertyper <- function(bamfile, bamindex, region=NULL, pai
 all_alignments=galignmentslist_global_for_invertyper) {
 
 	# Extracting the BAM name from the BAM file path + name
-	message('using Vincents altered bamregion2GRanges...')
-
 	bamfile <- intToUtf8(rev(utf8ToInt(bamfile)))
 	bamfile <- gsub("/.*","", bamfile)
 
@@ -27,9 +25,6 @@ all_alignments=galignmentslist_global_for_invertyper) {
 
 	reads <- galignment_to_granges(galignment, purpose="StrandPhaseR", paired_reads=pairedEndReads, region=region)
 	
-	name <- paste0(as.character(bamfile),".txt")
-	file.create(name)
-
 	return(reads)
 
 }

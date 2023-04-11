@@ -100,7 +100,6 @@ i <- drop_seq_qual(i, paired_reads=paired_reads)
 
 
 if(discover_breakpointr_inversions){
-message('start inv discovery')
 possible_inversions <- discover_possible_inversions(composite_files=composite_files, windowsize=windowsize, minReads=minReads, paired_reads=paired_reads, numCPU=numCPU, chromosomes=chromosomes, blacklist=blacklist, background=background, type=type)
 	
 
@@ -112,8 +111,6 @@ names(composite_files)[2] <- 'WC'
 }
 
 
-save(composite_files, possible_inversions, file='pre-bpr.RData')
-message('start inv genotyping (bpr)')
 breakpointr_inversions <- invertyper(WW_reads=composite_files$WW, WC_reads=composite_files$WC, regions_to_genotype=possible_inversions,blacklist=blacklist,paired_reads=paired_reads, haploid_chromosomes=haploid_chromosomes, confidence=confidence,prior=breakpointr_prior, haploid_prior=breakpointr_haploid_prior, output_file=paste0("breakpointr_",output_file), adjust_method=c("merge"), output_folder=output_folder)
 
 
@@ -127,7 +124,6 @@ write_UCSC_browser_files(inversions=breakpointr_inversions, WW_reads=composite_f
 
 
 }
-message('now for std genotyping')
 
 
 
@@ -146,7 +142,6 @@ write_UCSC_browser_files(inversions=inversions, WW_reads=composite_files$WW, WC_
 
 }
 
-message('about to return for the last time')
 
 
 
