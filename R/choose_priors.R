@@ -17,22 +17,19 @@
 #'
 #' @return A list with the recommended prior and haploid_prior
 #' @export
+choose_priors <- function(regions_to_genotype, expected_number_inversions = 100) {
 
-choose_priors <- function(regions_to_genotype, expected_number_inversions=100) {
+    hits <- GenomicRanges::findOverlaps(regions_to_genotype, regions_to_genotype)
+    overlaps <- GenomicRanges::pintersect(regions_to_genotype[S4Vectors::queryHits(hits)], regions_to_genotype[S4Vectors::subjectHits(hits)])
+    percentOverlap1 <- GenomicRanges::width(overlaps) / GenomicRanges::width(regions_to_genotype[S4Vectors::subjectHits(hits)])
+    percentOverlap2 <- GenomicRanges::width(overlaps) / GenomicRanges::width(regions_to_genotype[S4Vectors::queryHits(hits)])
+    intersections <- length(hits[percentOverlap1 > 0.8 & percentOverlap2 > 0.8])
 
-hits <- GenomicRanges::findOverlaps(regions_to_genotype, regions_to_genotype)
-overlaps <- GenomicRanges::pintersect(regions_to_genotype[S4Vectors::queryHits(hits)], regions_to_genotype[S4Vectors::subjectHits(hits)])
-percentOverlap1 <- GenomicRanges::width(overlaps) / GenomicRanges::width(regions_to_genotype[S4Vectors::subjectHits(hits)])
-percentOverlap2 <- GenomicRanges::width(overlaps) / GenomicRanges::width(regions_to_genotype[S4Vectors::queryHits(hits)])
-intersections <- length(hits[percentOverlap1 > 0.8 & percentOverlap2 > 0.8])
+    hom <- expected_number_inversions * intersections / (2 * length(regions_to_genotype)^2)
+    het <- hom
+    ref <- 1 - hom - het
 
-hom <- expected_number_inversions * intersections / ( 2 * length(regions_to_genotype) ^ 2)
-het <- hom
-ref <- 1-hom-het
+    cat(paste0("Consider using the following priors:\n\tprior = c(", round(ref, 5), ", ", round(het, 5), ", ", round(hom, 5), ")\n\thaploid_prior = c(", round(ref, 5), ", ", round(het + hom, 5), ")\n"))
 
-
-cat(paste0("Consider using the following priors:\n\tprior = c(", round(ref,5), ", ",round(het,5),", ", round(hom,5),")\n\thaploid_prior = c(", round(ref,5), ", ",round(het+hom,5),")\n"))
-
-return(invisible(list(c(ref,het,hom),c(ref,het+hom))))
-
+    return(invisible(list(c(ref, het, hom), c(ref, het + hom))))
 }

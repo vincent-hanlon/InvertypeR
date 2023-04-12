@@ -2,15 +2,14 @@
 % Please edit documentation in R/discover_possible_inversions.R
 \name{discover_possible_inversions}
 \alias{discover_possible_inversions}
-\title{For BreakpointR version 1.16.0, it is currently unwise to use this with a blacklist and few reads/chromosomes, because when no reads intersect the blacklist it removes
-all reads. This bug will hopefully be fixed in the next version}
+\title{Discovering putative inversions as strand-switches with BreakpointR}
 \usage{
 discover_possible_inversions(
   composite_files = list(),
   windowsize = c(40, 120, 260),
   minReads = c(15, 50, 50),
   paired_reads = FALSE,
-  numCPU = 24,
+  numCPU = 4,
   chromosomes = NULL,
   blacklist = NULL,
   background = 0.2,

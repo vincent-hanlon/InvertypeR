@@ -7,7 +7,7 @@
 create_composite_files(
   input_folder = "./",
   type = c("wc", "ww"),
-  numCPU = 24,
+  numCPU = 4,
   vcf = NULL,
   paired_reads = TRUE,
   blacklist = NULL,

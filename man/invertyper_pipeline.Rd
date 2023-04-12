@@ -17,7 +17,7 @@ invertyper_pipeline(
   confidence = 0.95,
   blacklist = NULL,
   chromosomes = NULL,
-  numCPU = 24,
+  numCPU = 4,
   save_composite_files = FALSE,
   write_browser_files = FALSE,
   discover_breakpointr_inversions = TRUE,
@@ -100,5 +100,6 @@ In brief, this function:
 (vii) Returns dataframe(s) with inversion coordinates, genotypes, and posterior probabilities
 
 One tricky thing for human males is that it is necessary to set haploid_chromosomes=c('chrX','chrY')
+
 This was primarily set up for diploids, but haploids can be accomodated if haploid_chromosomes == chromosomes
 }
