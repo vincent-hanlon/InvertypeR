@@ -206,6 +206,7 @@ widen <- function(granges, seqlengths, distance) {
 
 #' Timing function from BreakpointR/AneuFinder (but not exported)
 #' Credit due to the authors of those packages.
+#' @export
 startTimedMessage <- function(...) {
 
     x <- paste0(..., collapse = "")
@@ -221,6 +222,7 @@ startTimedMessage <- function(...) {
 
 #' A second timing function from BreakpointR/AneuFinder (but not exported)
 #' Credit due to the authors of those packages.
+#' @export
 stopTimedMessage <- function(ptm) {
 
     time <- proc.time() - ptm
