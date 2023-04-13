@@ -20,7 +20,7 @@ import_bam <- function(bam = NULL, region = NULL, paired_reads = TRUE, blacklist
         region <- GenomicRanges::reduce(region, min.gapwidth = 1000)
     } else if (length(region) == 0 & !is.character(bam) & (!is.null(chromosomes) | !is.null(blacklist))) {
         lengths <- GenomeInfoDb::seqlengths(bam)
-        region <- GenomicRanges::GRanges(seqnames = names(lengths), ranges = IRanges::IRanges(start = c(1:length(lengths)), end = lengths))
+        region <- GenomicRanges::GRanges(seqnames = names(lengths), ranges = IRanges::IRanges(start = rep(x=1, times=length(lengths)), end = lengths))
     } else {
         warning("import_bam is returning the input reads unaltered because neither a subsetting region nor the path to a BAM file were supplied. This may also be a consequence of not providing a blacklist")
         return(bam)
