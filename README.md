@@ -98,25 +98,6 @@ Some regions of the genome tend to have poor-quality Strand-seq data. The most p
 
 For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a hard mask file based on read depth (see the sup mat of the [InvertypeR paper](doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
 
-#### Soft masked regions
-
-Composite file creation isn't perfect. The function `create_composite_files()` generates a PDF of each composite file created, which you should inspect for anomalies. Most commonly, a large (real) inversion or reference misorient can reorient so many reads that InvertypeR has trouble identifying strand states nearby, so it just doesn't use reads from that region or chromosome. The solution is to find the coordinates of those regions (typically using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html)), and provide them to InvertypeR using the `soft_mask` argument. Reads from those regions will appear in composite files and be used for inversion calling (so the large inversion/misorient won't be overlooked), but they won't be used to identify strand states to MAKE the composite files. This often appears as a chromosome that has way fewer reads than other chromosomes (see below). However, some variation in coverage between chromosomes is expected, especially when a low-coverage chromosome in one composite file (e.g., Watson-Watson, or WW) has high coverage in the other composite file (e.g., Watson-Crick or WC). 
-
-For humans, the big inversion on chr8 very occasionally causes this problem, or in some males the large inversion at the start of chrY.
-
-<img src="https://github.com/vincent-hanlon/InvertypeR/blob/main/composite_errors.png" width=680>
-<em>An example of a non-human WW composite file with an error caused by reference assembly misorients on chromosome 16 (green bumps). </em>
-<br>
-<br>
-
-Other rare issues: If you know that a large heterozygous inversion (>2 Mb) is present in your sample but it doesn't appear in the WC composite file (or it appears, but with an unclear strand switch that has high background), something may be wrong with phasing. Alternatively, very occasionally the WW composite file might have high background, that is, across a large region or chromosome, there is a consistent fraction of reads which are not the same orientation (or colour) as the majority. 
-
-#### Notes on ploidy
-
-InvertypeR was built for diploids, and although it won't work well on polyploids, haploids are ok. The difference here is that we don't need a Watson-Crick composite file or a VCF of SNVs to build one with. 
-
-The arguments `chromosomes` and `haploid_chromosomes` are a little convoluted in this case. For haploids, they should be equal---they should both be a list of all chromosomes of interest for inversion genotyping. If you're running `invertyper_pipeline()` that should be all you need to know, but if you're running `create_composite_files()` you need to set `type='ww'`.
-
 ### Installing and running InvertypeR
 
 InvertypeR can be installed from GitHub with [devtools](https://cran.r-project.org/web/packages/devtools/index.html):
@@ -150,6 +131,25 @@ i <- invertyper_pipeline(regions_to_genotype="sup_table_24_inversions.including_
 ```
 
 This will genotype the list of inversion provided, try to find additional inversions with the help of [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html), and save composite files and UCSC Genome Browser files.
+
+#### Soft masked regions: checking your composite files
+
+Composite file creation isn't perfect. The function `create_composite_files()` generates a PDF of each composite file created, which you should inspect for anomalies. Most commonly, a large (real) inversion or reference misorient can reorient so many reads that InvertypeR has trouble identifying strand states nearby, so it just doesn't use reads from that region or chromosome. The solution is to find the coordinates of those regions (typically using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html)), and provide them to InvertypeR using the `soft_mask` argument. Reads from those regions will appear in composite files and be used for inversion calling (so the large inversion/misorient won't be overlooked), but they won't be used to identify strand states to MAKE the composite files. This often appears as a chromosome that has way fewer reads than other chromosomes (see below). However, some variation in coverage between chromosomes is expected, especially when a low-coverage chromosome in one composite file (e.g., Watson-Watson, or WW) has high coverage in the other composite file (e.g., Watson-Crick or WC). 
+
+For humans, the big inversion on chr8 very occasionally causes this problem, or in some males the large inversion at the start of chrY.
+
+<img src="https://github.com/vincent-hanlon/InvertypeR/blob/main/composite_errors.png" width=680>
+<em>An example of a non-human WW composite file with an error caused by reference assembly misorients on chromosome 16 (green bumps). </em>
+<br>
+<br>
+
+Other rare issues: If you know that a large heterozygous inversion (>2 Mb) is present in your sample but it doesn't appear in the WC composite file (or it appears, but with an unclear strand switch that has high background), something may be wrong with phasing. Alternatively, very occasionally the WW composite file might have high background, that is, across a large region or chromosome, there is a consistent fraction of reads which are not the same orientation (or colour) as the majority. 
+
+#### A note on ploidy
+
+InvertypeR was built for diploids, and although it won't work well on polyploids, haploids are ok. The difference here is that we don't need a Watson-Crick composite file or a VCF of SNVs to build one with. 
+
+The arguments `chromosomes` and `haploid_chromosomes` are a little convoluted in this case. For haploids, they should be equal---they should both be a list of all chromosomes of interest for inversion genotyping. If you're running `invertyper_pipeline()` that should be all you need to know, but if you're running `create_composite_files()` you need to set `type='ww'`.
 
 ### Inversion visualization
 
