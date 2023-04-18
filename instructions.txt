@@ -93,7 +93,7 @@ orange and half green for each chromosome). In rare cases, a chromosome may be m
 composite file creation (usually visible in the breakpoint plots for individual libraries in ./BPR_output/plots/breaksPlot.pdf). If it affects a whole 
 chromosome (e.g. 3-somy of chr7), proceed with the analysis but discard any inversion calls from the affected chromosome. If the SV affects only part of a 
 chromosome, use the library-specific breakpoint plots or the UCSC Genome Browser files in ./BPR_output/browserfiles to estimate its coordinates, and add
-those coordinates to the blacklist file InvertypeR/composite_files/blacklist.highdepth.centromeres.bed. Then, re-run the composite file scripts. 
+those coordinates to the hard mask file InvertypeR/composite_files/blacklist.highdepth.centromeres.bed. Then, re-run the composite file scripts. 
 However, such problems are rare and this is usually unnecessary. 
 
 A second useful check of the integrity of your composite files is below. If errors appear (other than missing read groups), it may mean that the scripts 
@@ -130,7 +130,7 @@ inversions in mind, consider using the list of 8787 (overlapping) putative inver
 (also on GitHub under example_output). For this we recommend using the prior c("REF","HET","HOM")=c(0.9866,0.0067,0.0067). For male samples, you will also
 need to provide prior probabilities for inversion on the X and Y chromoosomes. For the 8787 inversion coordinates, we use c(0.9866,2*0.0067). Similarly, choose an 
 adjust_method that fits your analysis. If using the 8787 inversion coordinates provided, we recommend adjust_method="all". However, if you wish to leave the
-inversion coordinates you provided unchanged, consider using adjust_method="raw". Finally, you should also provide a list of blacklisted regions, which can be the
+inversion coordinates you provided unchanged, consider using adjust_method="raw". Finally, you should also provide a list of hard masked regions, which can be the
 same file used for composite file creation, above. For more information on the options available, open R, load invertyper, and run the command ?invertyper.
 
 Here is an example of the code used to run InvertypeR.

@@ -71,11 +71,11 @@ If you have made a list of putative inversions by calling strand switches with [
 
 The `haploid_prior` argument is there for chrX and chrY in human males (or more generally, the sex chromosomes of the heterogametic sex), or for all chromosomes if the Strand-seq libraries are from haploid cells. In the fully haploid cells case, the arguments `chromosomes` and `haploid_chromosomes` should both be a list of all chromosomes of interest for inversion genotyping.
 
-### Blacklist
+### Hard masked regions / blacklist
 
 Some regions of the genome tend to have poor-quality Strand-seq data. The most problematic are things like reference assembly collapses, where only 1 copy of a region is present in the reference but several copies of the region are present in the physical genome. Depending on where the additional copies are located, the reads in the 1 reference copy map in unexpected directions. Such regions should be provided to InvertypeR as a BED file.
 
-For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a blacklist based on read depth (see the sup mat of the [InvertypeR paper](doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
+For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a hard mask file based on read depth (see the sup mat of the [InvertypeR paper](doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
 
 ## Installing and running InvertypeR
 
@@ -103,7 +103,7 @@ Open R and move to a directory that contains paired-end BAM files and a VCF of s
 ```
 library(invertyper)
 i <- invertyper_pipeline(regions_to_genotype="sup_table_24_inversions.including_half_intervals.bed", 
-    blacklist='blacklist.highdepth.centromeres.bed',  prior=c(0.9866,0.0067, 0.0067), 
+    hard_mask='blacklist.highdepth.centromeres.bed',  prior=c(0.9866,0.0067, 0.0067), 
     haploid_prior=c(0.9866,0.0134), chromosomes=c('chr1','chr2','chr8','chrX','chrY'), 
     haploid_chromosomes=c('chrX','chrY'), vcf='snps.vcf.gz', numCPU=12, adjust_method='all', 
     save_composite_files=T, write_browser_files=T, discover_breakpointr_inversions=T,)

@@ -5,29 +5,29 @@
 #' @param bam Path to a BAM file. Alternatively, a GRanges or GAlignments object
 #' @param region A GRanges object of regions from which reads should be taken. Default NULL.
 #' @param paired_reads Boolean. Are the reads paired?
-#' @param blacklist A GRanges object of regions from which reads should NOT be taken. Default NULL
+#' @param hard_mask A GRanges object of regions from which reads should NOT be taken. Default NULL
 #' @param chromosomes A character vector of chromosome names. Reads from other chromosomes will not be loaded. Default NULL (all chromosomes).
 #'
 #' @return A GAlignments object of reads
 #'
 #' @export
-import_bam <- function(bam = NULL, region = NULL, paired_reads = TRUE, blacklist = NULL, chromosomes = NULL) {
+import_bam <- function(bam = NULL, region = NULL, paired_reads = TRUE, hard_mask = NULL, chromosomes = NULL) {
 
     if (length(region) == 0 & is.character(bam)) {
         lengths <- Rsamtools::scanBamHeader(bam)[[1]]$targets
         region <- GenomicRanges::GRanges(names(lengths), ranges = IRanges::IRanges(start = 1, end = lengths))
     } else if (length(region) > 0) {
         region <- GenomicRanges::reduce(region, min.gapwidth = 1000)
-    } else if (length(region) == 0 & !is.character(bam) & (!is.null(chromosomes) | !is.null(blacklist))) {
+    } else if (length(region) == 0 & !is.character(bam) & (!is.null(chromosomes) | !is.null(hard_mask))) {
         lengths <- GenomeInfoDb::seqlengths(bam)
         region <- GenomicRanges::GRanges(seqnames = names(lengths), ranges = IRanges::IRanges(start = 1, end = lengths))
     } else {
-        warning("import_bam is returning the input reads unaltered because neither a subsetting region nor the path to a BAM file were supplied. This may also be a consequence of not providing a blacklist")
+        warning("import_bam is returning the input reads unaltered because neither a subsetting region nor the path to a BAM file were supplied. This may also be a consequence of not providing a hard_mask")
         return(bam)
     }
 
-    if (length(blacklist) > 0) {
-        region <- GenomicRanges::setdiff(region, blacklist)
+    if (length(hard_mask) > 0) {
+        region <- GenomicRanges::setdiff(region, hard_mask)
     }
 
     if (!is.null(chromosomes)) {

@@ -1,6 +1,6 @@
 #' Discovering putative inversions as strand-switches with BreakpointR
 #'
-#' For BreakpointR version 1.16.0, it is currently unwise to use this with a blacklist and few reads/chromosomes, because when no reads intersect the blacklist it removes
+#' For BreakpointR version 1.16.0, it is currently unwise to use this with a hard_mask and few reads/chromosomes, because when no reads intersect the hard_mask it removes
 #' all reads. This bug will hopefully be fixed in the next version
 #'
 #' @param composite_files A list of 1 or 2 composite files, named WC and WW (or just WW for haploids)
@@ -9,7 +9,7 @@
 #' @param paired_reads Boolean. Paired-end reads?
 #' @param numCPU Integer. How many threads to use?
 #' @param chromosomes A character vector of chromosome names to examine
-#' @param blacklist A GRanges object containing intervals with suspected poor-quality Strand-seq data.
+#' @param hard_mask A GRanges object containing intervals with suspected poor-quality Strand-seq data.
 #' @param background A parameter to be passed on to BreakpointR, setting the maximum amount of background allowable for ww or cc calls.
 #' @param type 'wc', 'ww', or both. Describes the input composite files (which are either Watson-Watson or Watson-Crick, or both).
 #'
@@ -23,7 +23,7 @@ discover_possible_inversions <- function(
     paired_reads = FALSE,
     numCPU = 4,
     chromosomes = NULL,
-    blacklist = NULL,
+    hard_mask = NULL,
     background = 0.2,
     type = c("wc", "ww")) {
 
@@ -61,7 +61,7 @@ discover_possible_inversions <- function(
 
         bpr[[i]] <- suppressMessages(breakpointr_for_invertyper(composite_files,
             plotspath = NULL, numCPU = numCPU, windowsize = as.integer(windowsize[i]), binMethod = "reads",
-            minReads = as.integer(minReads[i]), background = background, maskRegions = blacklist, chromosomes = chromosomes
+            minReads = as.integer(minReads[i]), background = background, maskRegions = hard_mask, chromosomes = chromosomes
         ))
         invisible(gc())
         stopTimedMessage(ptm)

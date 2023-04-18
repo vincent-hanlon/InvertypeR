@@ -2,8 +2,8 @@
 #'
 #' Requires WW and WC composite files (from create_composite_files() or in BAM format) and a GRanges object containing putative inversion coordinates
 #'
-#' We highly recommend using a blacklist, and we provide one on the GitHub page for humans. For non-humans, regions that have anomalously high depth of coverage in many cells or that always have WC
-#' (Watson-Crick) strand-state are suspect and should be added to a blacklist by some custom analysis (for example, see the sup mat of https://doi.org/10.1186/s12864-021-07892-9).
+#' We highly recommend using a hard_mask, and we provide one on the GitHub page for humans. For non-humans, regions that have anomalously high depth of coverage in many cells or that always have WC
+#' (Watson-Crick) strand-state are suspect and should be added to a hard_mask by some custom analysis (for example, see the sup mat of https://doi.org/10.1186/s12864-021-07892-9).
 #'
 #' Priors should chosen to reflect the number of inversions you expect to find in an individual (up to ~100 if you use, for example, all publised inversion coordinates (2020)) and the number of unique
 #  intervals in your BED file of putative inversions (many ways to calculate this, but 80% overlapping intervals could be considered the same, for example). If you are confident in the coordinates of
@@ -16,7 +16,7 @@
 #' @param WW_reads A GenomicAlignments or GenomicAlignmentPairs object of reads from a Strand-seq WW composite file for an individual. Alternatively, the path to a BAM-formatted WW composite file.
 #' @param WC_reads A GenomicAlignments or GenomicAlignmentPairs object of reads from a Strand-seq WC composite file for an individual. Alternatively, the path to a BAM-formatted WC composite file.
 #' @param regions_to_genotype A GRanges object containing genomic intervals to be genotyped (putative inversions).
-#' @param blacklist A GRanges containing regions genomic intervals with poor-quality Strand-seq data. Reads that overlap these intervals will not be used. Highly recommended. Default "".
+#' @param hard_mask A GRanges containing regions genomic intervals with poor-quality Strand-seq data. Reads that overlap these intervals will not be used. Highly recommended. Default "".
 #' @param paired_reads Boolean: are the reads paired-end? Default TRUE.
 #' @param confidence Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions, as well as to identify low-confidence
 #'   calls for adjust_method "low". Default 0.95.
@@ -43,7 +43,7 @@ invertyper <- function(
     WW_reads,
     WC_reads,
     regions_to_genotype,
-    blacklist = NULL,
+    hard_mask = NULL,
     paired_reads = TRUE,
     haploid_chromosomes = NULL,
     confidence = 0.95,
@@ -62,7 +62,7 @@ invertyper <- function(
         "Any haploid chromosomes you specify should be include as chromosomes too. This means including chrX and chrY as chromosomes AND as haploid_chromosomes for human males" =
             all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes)
     )
-    stopifnot("The blacklist and regions_to_genotype arguments must be GRanges objects. Use import_bed()" = !is.character(regions_to_genotype) & !is.character(blacklist))
+    stopifnot("The hard_mask and regions_to_genotype arguments must be GRanges objects. Use import_bed()" = !is.character(regions_to_genotype) & !is.character(hard_mask))
 
     haploid <- all(sort(haploid_chromosomes) == sort(chromosomes)) & !(is.null(chromosomes) & is.null(haploid_chromosomes))
 
@@ -107,7 +107,7 @@ invertyper <- function(
         ptm <- startTimedMessage("\n       subsetting composite files and estimating background ...")
 
         # Takes reads from the BAM files that overlap the regions and stores them as GRanges
-        WW_reads <- import_bam(WW_reads, chromosomes = chromosomes, paired_reads = paired_reads, blacklist = blacklist)
+        WW_reads <- import_bam(WW_reads, chromosomes = chromosomes, paired_reads = paired_reads, hard_mask = hard_mask)
         if (!is.null(WC_reads)) {
             if (!is.character(WC_reads)) {
                 seqlengths_WC <- GenomeInfoDb::seqlengths(WC_reads)
@@ -115,7 +115,7 @@ invertyper <- function(
             WC_reads <- import_bam(WC_reads, region = GenomicRanges::reduce(widen(
                 granges = regions, seqlengths = seqlengths_WC,
                 distance = 1e06
-            ), min.gapwidth = 1000), paired_reads = paired_reads, blacklist = blacklist)
+            ), min.gapwidth = 1000), paired_reads = paired_reads, hard_mask = hard_mask)
         } else {
             WC_reads <- WW_reads[0]
         }
@@ -126,7 +126,7 @@ invertyper <- function(
         WW_reads <- import_bam(WW_reads, region = GenomicRanges::reduce(widen(
             granges = regions, seqlengths = seqlengths_WW,
             distance = 1e06
-        ), min.gapwidth = 1000), paired_reads = paired_reads, blacklist = blacklist)
+        ), min.gapwidth = 1000), paired_reads = paired_reads, hard_mask = hard_mask)
         stopTimedMessage(ptm)
         # Genotyping the inversions
         msg <- paste0("       genotyping ", length(regions), " putative inversions ...")

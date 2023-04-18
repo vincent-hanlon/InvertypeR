@@ -15,7 +15,10 @@
 #'
 #' This was primarily set up for diploids, but haploids can be accomodated if haploid_chromosomes == chromosomes
 #' @param regions_to_genotype A BED file containing genomic intervals to be genotyped (putative inversions). Default NULL.
-#' @param blacklist A BED file containing regions genomic intervals with poor-quality Strand-seq data. Reads that overlap these intervals will not be used. Highly recommended. Default NULL.
+#' @param hard_mask A BED file containing regions genomic intervals with poor-quality Strand-seq data. Reads that overlap these intervals will not be used. Highly recommended. Default NULL.
+#' @param soft_mask A BED file containing regions with good Strand-seq data, but which interfere with composite file creation. These reads will appear in composite 
+#'   files and inversion calls, but won't be used to identify regions with a given strand state. Typically these are large, obvious inversions or misorients, like the big chr8 
+#'   inversion in humans. Initially, using the default NULL value is fine.
 #' @param vcf A VCF file containing heterozygous SNVs for the sample. If there is no external source of SNVs, they can be called directly from the Strand-seq BAMs at a pinch
 #' @param paired_reads Boolean: are the reads paired-end? Default TRUE.
 #' @param confidence Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions, as well as to identify low-confidence
@@ -61,7 +64,8 @@ invertyper_pipeline <- function(
     vcf = NULL,
     paired_reads = TRUE,
     confidence = 0.95,
-    blacklist = NULL,
+    hard_mask = NULL,
+    soft_mask = NULL,
     chromosomes = NULL,
     numCPU = 4,
     save_composite_files = FALSE,
@@ -88,7 +92,8 @@ invertyper_pipeline <- function(
     )
     stopifnot("The arguments minReads and windowsize should be parallel (have the same length)" = (length(minReads) == length(windowsize)))
     stopifnot("The regions_to_genotype file cannot be found" = is.null(regions_to_genotype) || file.exists(regions_to_genotype))
-    stopifnot("The blacklist file cannot be found" = is.null(blacklist) || file.exists(blacklist))
+    stopifnot("The hard_mask file cannot be found" = is.null(hard_mask) || file.exists(hard_mask))
+    stopifnot("The soft_mask file cannot be found" = is.null(soft_mask) || file.exists(soft_mask))
     stopifnot("The vcf file cannot be found" = is.null(vcf) || file.exists(vcf))
     stopifnot("The input_folder cannot be found" = file.exists(input_folder))
     stopifnot(
@@ -105,8 +110,12 @@ invertyper_pipeline <- function(
         regions_to_genotype <- import_bed(regions_to_genotype)
     }
 
-    if (!is.null(blacklist)) {
-        blacklist <- import_bed(blacklist)
+    if (!is.null(hard_mask)) {
+        hard_mask <- import_bed(hard_mask)
+    }
+
+    if (!is.null(soft_mask)) {
+        hard_mask <- import_bed(soft_mask)
     }
 
     type <- c("wc", "ww")
@@ -116,8 +125,8 @@ invertyper_pipeline <- function(
     }
 
     composite_files <- create_composite_files(
-        input_folder = input_folder, type = type, numCPU = numCPU, vcf = vcf, paired_reads = paired_reads, blacklist = blacklist,
-        output_folder = output_folder, save_composite_files = save_composite_files, chromosomes = chromosomes
+        input_folder = input_folder, type = type, numCPU = numCPU, vcf = vcf, paired_reads = paired_reads, hard_mask = hard_mask,
+        soft_mask=soft_mask, output_folder = output_folder, save_composite_files = save_composite_files, chromosomes = chromosomes
     )
 
     for (i in composite_files) {
@@ -127,7 +136,7 @@ invertyper_pipeline <- function(
     if (discover_breakpointr_inversions) {
         possible_inversions <- discover_possible_inversions(
             composite_files = composite_files, windowsize = windowsize, minReads = minReads, paired_reads = paired_reads,
-            numCPU = numCPU, chromosomes = chromosomes, blacklist = blacklist, background = background, type = type
+            numCPU = numCPU, chromosomes = chromosomes, hard_mask = hard_mask, background = background, type = type
         )
 
         if (length(composite_files) == 1) {
@@ -136,7 +145,7 @@ invertyper_pipeline <- function(
         }
 
         breakpointr_inversions <- invertyper(
-            WW_reads = composite_files$WW, WC_reads = composite_files$WC, regions_to_genotype = possible_inversions, blacklist = blacklist, paired_reads = paired_reads, 
+            WW_reads = composite_files$WW, WC_reads = composite_files$WC, regions_to_genotype = possible_inversions, hard_mask = hard_mask, paired_reads = paired_reads, 
             haploid_chromosomes = haploid_chromosomes, confidence = confidence, prior = breakpointr_prior,
             haploid_prior = breakpointr_haploid_prior, output_file = paste0("breakpointr_", output_file), adjust_method = c("merge"), output_folder = output_folder
         )
@@ -151,7 +160,7 @@ invertyper_pipeline <- function(
 
     if (!is.null(regions_to_genotype)) {
         inversions <- invertyper(
-            WW_reads = composite_files$WW, WC_reads = composite_files$WC, regions_to_genotype = regions_to_genotype, blacklist = blacklist, paired_reads = paired_reads, 
+            WW_reads = composite_files$WW, WC_reads = composite_files$WC, regions_to_genotype = regions_to_genotype, hard_mask = hard_mask, paired_reads = paired_reads, 
             haploid_chromosomes = haploid_chromosomes, confidence = confidence, prior = prior, haploid_prior = haploid_prior,
             output_file = output_file, adjust_method = adjust_method, output_folder = output_folder
         )

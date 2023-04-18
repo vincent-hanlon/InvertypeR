@@ -16,7 +16,8 @@
 #' @param vcf The path to a VCF file containing heterozygous SNPs for an individual. External SNPs (e.g. from WGS data) are best, but they can also usually be called
 #' directly from the Strand-seq data using BBTOOLS callvariants.sh (see README on GitHub).
 #' @param paired_reads Boolean. Are the reads paired-end?
-#' @param blacklist A GRanges object containing regions that are thought to contain unreliable Strand-seq data. Highly recommended.
+#' @param hard_mask A GRanges object containing regions that are thought to contain unreliable Strand-seq data. Highly recommended.
+#' @param soft_mask A GRanges object containing regions with good Strand-seq data, but which interfere with composite file creation. These reads will appear in composite files and inversion calls, but won't be used to identify regions with a given strand state. Typically these are large, obvious inversions or misorients, like the big chr8 inversion in humans. Initially, using the default NULL value is fine.
 #' @param output_folder The name of a folder to which output files should be written.
 #' @param save_composite_files Boolean. Should composite files be saved as RData objects, or not at all?
 #' @param chromosomes A character vector of chromosome names for which composite files should be created.
@@ -30,7 +31,8 @@ create_composite_files <- function(
     numCPU = 4,
     vcf = NULL,
     paired_reads = TRUE,
-    blacklist = NULL,
+    hard_mask = NULL,
+    soft_mask = NULL,
     output_folder = "./",
     save_composite_files = FALSE,
     chromosomes = NULL) {
@@ -41,8 +43,8 @@ create_composite_files <- function(
     )
     stopifnot("The path to a VCF file is required for a Watson-Crick ('wc') composite file." = !(is.null(vcf) & "wc" %in% type))
 
-    if (is.null(blacklist)) {
-        warning("A blacklist is highly recommended both for creating composite files and for genotyping inversions.")
+    if (is.null(hard_mask)) {
+        warning("A hard_mask is highly recommended both for creating composite files and for genotyping inversions.")
     }
 
     if (!file.exists(output_folder)) {
@@ -53,10 +55,10 @@ create_composite_files <- function(
     bamlist <- list.files(input_folder, pattern = "\\.bam$")
     stopifnot("No BAM files found in input_folder for composite file creation." = length(bamlist) > 0)
 
-    # We first must read in the BAM files without removing reads in blacklisted regions or chromosomes that are left out
+    # We first must read in the BAM files without removing reads in hard_masked regions or chromosomes that are left out
     # Sometimes this is WAYYYYY slower than just subsetting, even if only to the chromosomes that actually have reads
     cl <- suppressMessages(parallel::makeCluster(numCPU))
-    galignmentslist <- parallel::parLapply(cl, bamlist, import_bam, blacklist = NULL, chromosomes = NULL, paired_reads = paired_reads)
+    galignmentslist <- parallel::parLapply(cl, bamlist, import_bam, hard_mask = NULL, chromosomes = NULL, paired_reads = paired_reads)
 
     names(galignmentslist) <- bamlist
     found_chromosomes <- unique(sort(do.call("c", lapply(galignmentslist, function(x) unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
@@ -72,24 +74,24 @@ create_composite_files <- function(
     stopTimedMessage(ptm)
     ptm <- startTimedMessage("       recording the strand states of genomic regions ...")
 
-    # breakpointR unfortunately can't find the strand state of segments in the genome if reads in blacklisted regions are first removed.
+    # breakpointR unfortunately can't find the strand state of segments in the genome if reads in hard_masked regions are first removed.
     # This is probably because there aren't enough Strand-switches
-    # Could be a github issue: subtract blacklisted regions from BAM file directly?
+    # Could be a github issue: subtract hard_masked regions from BAM file directly?
     # This means it's best to read in the offending reads, and then only remove them later on.
     # ALSO: the galignments_to_granges should really just take the first read for PE reads, unless pair2frgm is specified
     bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist,
-        numCPU = numCPU, windowsize = 20000000, binMethod = "size", minReads = 50, background = 0.2, maskRegions = blacklist,
+        numCPU = numCPU, windowsize = 20000000, binMethod = "size", minReads = 50, background = 0.2, maskRegions = GenomicRanges::sort(c(hard_mask, soft_mask)),
         chromosomes = NULL
     ))
 
     rm("grangeslist")
     invisible(gc())
 
-    if (!is.null(blacklist) | !is.null(chromosomes)) {
+    if (!is.null(hard_mask) | !is.null(chromosomes)) {
         cl <- suppressMessages(parallel::makeCluster(numCPU))
 
-        # now we "re-read" the BAM files, but in reality we're just subsetting Galignments objects according to the chromosomes and blacklist
-        galignmentslist <- parallel::parLapply(cl, galignmentslist, import_bam, blacklist = blacklist, chromosomes = chromosomes)
+        # now we "re-read" the BAM files, but in reality we're just subsetting Galignments objects according to the chromosomes and hard_mask
+        galignmentslist <- parallel::parLapply(cl, galignmentslist, import_bam, hard_mask = hard_mask, chromosomes = chromosomes)
         names(galignmentslist) <- bamlist
 
         parallel::stopCluster(cl)
