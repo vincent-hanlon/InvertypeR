@@ -54,6 +54,7 @@ create_composite_files <- function(
     stopifnot("No BAM files found in input_folder for composite file creation." = length(bamlist) > 0)
 
     # We first must read in the BAM files without removing reads in blacklisted regions or chromosomes that are left out
+    # Sometimes this is WAYYYYY slower than just subsetting, even if only to the chromosomes that actually have reads
     cl <- suppressMessages(parallel::makeCluster(numCPU))
     galignmentslist <- parallel::parLapply(cl, bamlist, import_bam, blacklist = NULL, chromosomes = NULL, paired_reads = paired_reads)
 

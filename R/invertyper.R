@@ -154,7 +154,7 @@ invertyper <- function(
         # Marking inversions with <0.001 reads per bp as being low-density, because they may span centromeres or chromosome ends/
         # The 0.001 figure is somewhat arbitrary, but it's adjusted based on the read count in the WW file of any submitted inversions.
         inversions[inversions[, 9] >= confidence & inversions[, 8] != 0 & inversions[, 8] != "0|0" & rowSums(inversions[, c(4:7)]) / (
-            inversions[, 3] - inversions[, 2] + 1) < (0.001 * base[[3]] / 27734969), 10] <- "low read density: check for inaccurate inversion coordinates"
+            inversions[, 3] - inversions[, 2] + 1) < (0.001 * base[[3]] / 27734969), 10] <- "low_read_density_check_for_inaccurate_inversion_coordinates"
 
         colnames(inversions)[10] <- "low_read_density"
 
