@@ -74,13 +74,22 @@ create_composite_files <- function(
     stopTimedMessage(ptm)
     ptm <- startTimedMessage("       recording the strand states of genomic regions ...")
 
+    mask <- NULL
+    if (!is.null(soft_mask) & !is.null(hard_mask)) {
+        mask <- GenomicRanges::reduce(GenomicRanges::sort(c(hard_mask, soft_mask)))
+    } else if (!is.null(soft_mask)) {
+        mask <- soft_mask
+    } else if (!is.null(hard_mask)) {
+        mask <- hard_mask
+    }
+
     # breakpointR unfortunately can't find the strand state of segments in the genome if reads in hard_masked regions are first removed.
     # This is probably because there aren't enough Strand-switches
     # Could be a github issue: subtract hard_masked regions from BAM file directly?
     # This means it's best to read in the offending reads, and then only remove them later on.
     # ALSO: the galignments_to_granges should really just take the first read for PE reads, unless pair2frgm is specified
     bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist,
-        numCPU = numCPU, windowsize = 20000000, binMethod = "size", minReads = 50, background = 0.2, maskRegions = GenomicRanges::sort(c(hard_mask, soft_mask)),
+        numCPU = numCPU, windowsize = 20000000, binMethod = "size", minReads = 50, background = 0.2, maskRegions = mask,
         chromosomes = NULL
     ))
 
