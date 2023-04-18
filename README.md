@@ -26,11 +26,6 @@ If your diploid individual has haploid sex chromosomes, list them under the hapl
 
 InvertypeR outputs a tab-delimited text file with the posterior probabilties for inversion genotypes. Optionally, you can also save the composite files to an RData file (since they are slow to make), and you can write reads and inversion calls to UCSC genome browser files to examine the data yourself. InvertypeR also outputs PDF files containing [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) plots of the composite files, so that you can check they generated correctly (described below).
 
-<img src="https://github.com/vincent-hanlon/InvertypeR/blob/main/composite_errors.png" width=680>
-<em>InvertypeR's primary output file. The first 3 columns are the genomic coordinates of the inversions. </em>
-<br>
-<br>
-
 ## Long form user guide
 ### Pre-processing
 
@@ -151,6 +146,17 @@ For humans, the big inversion on chr8 very occasionally causes this problem, or 
 <br>
 
 Other rare issues: If you know that a large heterozygous inversion (>2 Mb) is present in your sample but it doesn't appear in the WC composite file (or it appears, but with an unclear strand switch that has high background), something may be wrong with phasing. Alternatively, very occasionally the WW composite file might have high background, that is, across a large region or chromosome, there is a consistent fraction of reads which are not the same orientation (or colour) as the majority. 
+
+#### Interpreting InvertypeR output
+
+The first 3 columns of InvertypeR's primary output file (below) are the genomic coordinates of the inversions. The next 4 columns (WW_counts_C, etc.) are counts of forward and reverse reads in the two composite files, i.e., the information InvertypeR used to make genotype calls. Column 8 is the inversion genotype, including reference aka non-inverted genotypes. Heterozygous inversions on the same chromosome are phased relative to each other. Column 9 is the posterior probability of the genotype (and typically we only consider a genotype 'confident' if the posterior is above some threshold, like 0.95), and column 10 indicates whether the inversion coordinates span a large read-poor area like a centromere, and may need to be adjusted manually based using the UCSC browser files.
+
+<br>
+
+<img src="https://github.com/vincent-hanlon/InvertypeR/blob/main/output_example.png">
+<em>InvertypeR's primary output file.</em>
+
+<br>
 
 #### A note on ploidy
 
