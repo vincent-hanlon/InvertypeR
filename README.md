@@ -27,6 +27,20 @@ If your diploid individual has haploid sex chromosomes, list them under the hapl
 InvertypeR outputs a tab-delimited text file with the posterior probabilties for inversion genotypes. Optionally, you can also save the composite files to an RData file (since they are slow to make), and you can write reads and inversion calls to UCSC genome browser files to examine the data yourself. InvertypeR also outputs PDF files containing [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) plots of the composite files, so that you can check they generated correctly (described below).
 
 ## Long form user guide
+
+- [Pre-processing](#pre-processing)
+  * [Strand-seq BAM files](#strand-seq-bam-files)
+  * [VCF file](#vcf-file)
+  * [Regions to genotype](#regions-to-genotype)
+  * [Priors](#priors)
+  * [Hard masked regions / blacklist](#hard-masked-regions--blacklist)
+- [Installing and running InvertypeR](#installing-and-running-invertyper)
+  * [Example of how to run InvertypeR](#example-of-how-to-run-invertyper)
+  * [Soft masked regions: checking your composite files](#soft-masked-regions-checking-your-composite-files)
+  * [Interpreting InvertypeR output](#interpreting-invertyper-output)
+  * [A note on ploidy](#a-note-on-ploidy)
+- [Inversion visualization](#inversion-visualization)
+
 ### Pre-processing
 
 The main inputs to InvertypeR are:
