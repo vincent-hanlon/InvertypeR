@@ -34,7 +34,8 @@ InvertypeR outputs a tab-delimited text file with the posterior probabilties for
   * [Regions to genotype](#regions-to-genotype)
   * [Priors](#priors)
   * [Hard masked regions / blacklist](#hard-masked-regions--blacklist)
-- [Installing and running InvertypeR](#installing-and-running-invertyper)
+- [Running InvertypeR](#running-invertyper)
+  * [Installation and overview](#installation-and-overview)
   * [Example of how to run InvertypeR](#example-of-how-to-run-invertyper)
   * [Soft masked regions: checking your composite files](#soft-masked-regions-checking-your-composite-files)
   * [Interpreting InvertypeR output](#interpreting-invertyper-output)
@@ -114,7 +115,11 @@ Some regions of the genome tend to have poor-quality Strand-seq data. The most p
 
 For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a hard mask file based on read depth (see the sup mat of the [InvertypeR paper](doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
 
-### Installing and running InvertypeR
+### Running InvertypeR
+
+Results for the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9) are from commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf, when composite files were created using BASH scripts rather than the R package. The newest commit (described in this user guide) produces essentially identical results and is faster and simpler.
+
+#### Installation and overview
 
 InvertypeR can be installed from GitHub with [devtools](https://cran.r-project.org/web/packages/devtools/index.html):
 ```
@@ -130,8 +135,6 @@ Many of these steps can also be run separately: for example, `create_composite_f
 One important argument is `adjust_method`, which controls how InvertypeR tries to adjust the provided inversion coordinates before or after genotyping. This is useful because published inversion coordinates are often inaccurate, so both inverted and non-inverted Strand-seq reads will be caught during the genotyping step. If you want to genotype the exact coordinates you provided with no alterations, choose `adjust_method="raw"`. But InvertypeR can also try to find better coordinates for putative inversions by looking for switches in the orientation of Strand-seq reads nearby the coordinates provided. This can be done only for inversions that had confident non-reference genotypes when the original coordinates were used (`adjust_method="deltas"`), or it can even be done for less confident inversions to see whether there was a problems with the coordinates provided (`adjust_method="all"`).
 
 For more detail about the various functions in the InvertypeR package, for example for the main wrapper script, write `?invertyper_pipeline` or `?create_composite_files`, etc.
-
-Results for the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9) are from commit ca17a576fcbfeeb81ecd30c2c6c41ef4f1bc68cf, when composite files were created using BASH scripts rather than the R package. The newest commit produces essentially identical results and is faster.
 
 #### Example of how to run InvertypeR
 
