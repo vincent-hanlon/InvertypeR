@@ -11,7 +11,7 @@ devtools::install_github(repo="vincent-hanlon/InvertypeR")
 ```
 
 Then collect good-quality Strand-seq libraries for a single diploid individual in an input directory (see below for haploid species), along with a VCF file of their SNVs. 
-Provide a list of putative inversions (for humans: sup_table_24_inversions.bed from this repo in the subdirectory example_output) and appropriate priors. Provide a list of hard masked regions (for humans: blacklist.GRCh38.humans.bed from this repo in example_output).
+Provide a list of putative inversions (for humans: example_output/sup_table_24_inversions.bed from this repo) and appropriate priors. Provide a list of hard masked regions (for humans: example_output/blacklist.GRCh38.humans.bed from this repo).
 
 Run the full InvertypeR pipeline using something like this command, which will probably take several hours:
 ```
