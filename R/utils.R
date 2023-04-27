@@ -34,7 +34,17 @@ find_regions_with_strand_state <- function(list_of_breakpoint_objects = list(), 
     process_counts <- function(index, states, region_size, list_of_breakpoint_objects) {
         y <- list_of_breakpoint_objects[[index]]$counts
         y <- y[GenomicRanges::width(y) >= region_size & y$states %in% states]
-        y$filename <- names(list_of_breakpoint_objects)[index]
+
+	if (length(y) > 0){
+	    y$filename <- names(list_of_breakpoint_objects)[index]
+        } else {
+            g <- GenomicRanges::GRanges()
+            file <- data.frame(matrix(ncol=1,nrow=0))
+            colnames(file) <- "filename"
+            GenomicRanges::mcols(g) <- cbind(GenomicRanges::mcols(y), file)
+            y <- g            
+	}
+
         return(y)
     }
 

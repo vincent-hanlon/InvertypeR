@@ -41,7 +41,7 @@ Imports:
 	doParallel,
 	foreach,
 	breakpointRdata,
-	breakpointR,
+	breakpointR (>= 1.18.0),
 	parallel,
 	R.utils,
 	zoo,

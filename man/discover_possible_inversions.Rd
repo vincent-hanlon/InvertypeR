@@ -39,6 +39,5 @@ discover_possible_inversions(
 A GRanges object of potential inversions for genoptyping with invertyper()
 }
 \description{
-For BreakpointR version 1.16.0, it is currently unwise to use this with a hard_mask and few reads/chromosomes, because when no reads intersect the hard_mask it removes
-all reads. This bug will hopefully be fixed in the next version
+Discovering putative inversions as strand-switches with BreakpointR
 }

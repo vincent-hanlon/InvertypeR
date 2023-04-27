@@ -25,9 +25,10 @@
 #' @param chromosomes Vector of chromosome names to restrict the search for inversions.
 #' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.
 #' @param output_file Name of the file to write to. Default "inversions.txt".
-#' @param adjust_method One of "raw", "merge", "deltas", "minimal", "low", or "all". Specifies which method to use to adjust the inversion coordinates (start- and end-points). The adjustment routine
-#'   ensures that adjusted inversions have the same genotype as they did before adjustment (if applicable), and that they overlap at least one of the original unadjusted inversions in every cluster of
-#'   overlapping events. If after adjustment (except with "raw") overlapping inversions still remain, we merge the ones of the same genotype. If there are still overlapping inversions, we take the largest.
+#' @param adjust_method One of "raw", "merge", "deltas", "minimal", "low", or "all". Default "all". Specifies which method to use to adjust the inversion coordinates 
+#'   (start- and end-points). The adjustment routine ensures that adjusted inversions have the same genotype as they did before adjustment (if applicable), and that they 
+#'   overlap at least one of the original unadjusted inversions in every cluster of overlapping events. If after adjustment (except with "raw") 
+#'   overlapping inversions still remain, we merge the ones of the same genotype. If there are still overlapping inversions, we take the largest.
 #'   "raw": No adjustment. "merge": Merge overlapping confident (i.e., posterior probability >= confidence for a genotype) inversions of the same genotype. "Deltas": adjust the endpoints of confident
 #'   inversions based on the Strand-seq data. We calculate deltaW values for each read, which measure the change in read direction for nearby reads, and take the coordinates that correspond to the two
 #'   highest values (i.e. the two spots with the greates change in read direction, which we hope will correspond to inversion breakpoints). This is done once for every set of overlapping inversions of the
@@ -51,7 +52,7 @@ invertyper <- function(
     haploid_prior = c(0.5, 0.5),
     chromosomes = NULL,
     output_file = "inversions.txt",
-    adjust_method = c("raw", "merge", "deltas", "minimal", "low", "all"),
+    adjust_method = "all",
     output_folder = ".") {
 
     stopifnot(

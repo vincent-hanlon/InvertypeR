@@ -55,10 +55,8 @@ create_composite_files <- function(
     bamlist <- list.files(input_folder, pattern = "\\.bam$")
     stopifnot("No BAM files found in input_folder for composite file creation." = length(bamlist) > 0)
 
-    # We first must read in the BAM files without removing reads in hard_masked regions or chromosomes that are left out
-    # Sometimes this is WAYYYYY slower than just subsetting, even if only to the chromosomes that actually have reads
     cl <- suppressMessages(parallel::makeCluster(numCPU))
-    galignmentslist <- parallel::parLapply(cl, bamlist, import_bam, hard_mask = NULL, chromosomes = NULL, paired_reads = paired_reads)
+    galignmentslist <- parallel::parLapply(cl, bamlist, import_bam, hard_mask = hard_mask, chromosomes = chromosomes, paired_reads = paired_reads)
 
     names(galignmentslist) <- bamlist
     found_chromosomes <- unique(sort(do.call("c", lapply(galignmentslist, function(x) unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
@@ -83,28 +81,13 @@ create_composite_files <- function(
         mask <- hard_mask
     }
 
-    # breakpointR unfortunately can't find the strand state of segments in the genome if reads in hard_masked regions are first removed.
-    # This is probably because there aren't enough Strand-switches
-    # Could be a github issue: subtract hard_masked regions from BAM file directly?
-    # This means it's best to read in the offending reads, and then only remove them later on.
-    # ALSO: the galignments_to_granges should really just take the first read for PE reads, unless pair2frgm is specified
     bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist,
         numCPU = numCPU, windowsize = 20000000, binMethod = "size", minReads = 50, background = 0.2, maskRegions = mask,
-        chromosomes = NULL
+        chromosomes = chromosomes
     ))
 
     rm("grangeslist")
     invisible(gc())
-
-    if (!is.null(hard_mask) | !is.null(chromosomes)) {
-        cl <- suppressMessages(parallel::makeCluster(numCPU))
-
-        # now we "re-read" the BAM files, but in reality we're just subsetting Galignments objects according to the chromosomes and hard_mask
-        galignmentslist <- parallel::parLapply(cl, galignmentslist, import_bam, hard_mask = hard_mask, chromosomes = chromosomes)
-        names(galignmentslist) <- bamlist
-
-        parallel::stopCluster(cl)
-    }
 
     WWCCregions <- sort(find_regions_with_strand_state(bpr, states = c("ww", "cc"), region_size = 100000))
     WWCCregions$Cs <- NULL

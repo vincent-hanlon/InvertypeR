@@ -1,3 +1,9 @@
+
+
+THIS INSTRUCTIONS FILE HAS NOT BEEN FULLY UPDATED SINCE THE MAJOR INVERTYPER UPDATE. DON'T USE THIS FOR NOW: CHANGES COMING SOON.
+
+
+
 0. OVERVIEW 
 
 These step-by-step instructions detail how to turn a set of FASTQ-formatted Strand-seq libraries into inversion genotype calls. First, we align the FASTQ files

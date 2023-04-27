@@ -1,8 +1,5 @@
 #' Discovering putative inversions as strand-switches with BreakpointR
 #'
-#' For BreakpointR version 1.16.0, it is currently unwise to use this with a hard_mask and few reads/chromosomes, because when no reads intersect the hard_mask it removes
-#' all reads. This bug will hopefully be fixed in the next version
-#'
 #' @param composite_files A list of 1 or 2 composite files, named WC and WW (or just WW for haploids)
 #' @param windowsize A vector of integers. Each integer will be used the set the number of reads in a bin for a BreakpointR run.
 #' @param minReads A vector of integers parallel to windowsize, giving the minimum number of reads in a bin for it to be considered/genotyped
