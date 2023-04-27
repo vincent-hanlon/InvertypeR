@@ -1,11 +1,19 @@
+
+
+THIS INSTRUCTIONS FILE HAS NOT BEEN FULLY UPDATED SINCE THE MAJOR INVERTYPER UPDATE. DON'T USE THIS FOR NOW: CHANGES COMING SOON.
+
+
+
 0. OVERVIEW 
 
 These step-by-step instructions detail how to turn a set of FASTQ-formatted Strand-seq libraries into inversion genotype calls. First, we align the FASTQ files
 and select high-quality Strand-seq libraries. Second, we use the aligned BAM files to generate two composite files for the sample. Third, we install and run 
 InvertypeR to call inversion genotypes. Fourth, we create plots and UCSC Genome Browser sessiosn to visualize the inversions.
 
-We assume that you use Bash (a Unix shell), and that you have installed all the software listed on the README of the git repository. Note that for StrandPhaseR, we originally
-installed an old commit (2019) from the development branch of the GitHub repository. However, installing the current newest commit (3c8d905bf0269b93f4da1e1ca7934887a32db024)
+We assume that you use Bash (a Unix shell), and that you have installed all the software listed on the README of the git repository. Note that for StrandPhaseR, we 
+originally
+installed an old commit (2019) from the development branch of the GitHub repository. However, installing the current newest commit 
+(3c8d905bf0269b93f4da1e1ca7934887a32db024)
 from the master branch produces the same inversion results in recent tests. We also assume you have cloned the InvertypeR repository, and that you have a set of gzipped, 
 paired-end Strand-seq FASTQ files for a single individual that you would like to analyze.
 
@@ -74,7 +82,8 @@ The headers of the two composite file scripts (InvertypeR/composite_files/master
 need to be altered to match your requirements. For each, input the number of threads you wish to use for parallelization, the path to your copy of the GRCh38
 reference genome (FASTA), the sex of the sample ("male" or "female"), and the path to the directory containing the composite bam scripts (e.g., 
 PATH/TO/DIR/InvertypeR/composite_files/). Optionally, you can also input the path to a VCF file with the positions of known heterozygous SNPs
-for your sample (for the WC composite file). Good-quality SNPs are essential to produce a good WC composite file, and in samples for which there is not enough sequence data, the composite file creation routine might be unable to call good enough SNPs from the Strand-seq data alone.
+for your sample (for the WC composite file). Good-quality SNPs are essential to produce a good WC composite file, and in samples for which there is not enough sequence 
+data, the composite file creation routine might be unable to call good enough SNPs from the Strand-seq data alone.
 
 Then, simply run the following.
 
@@ -90,7 +99,7 @@ orange and half green for each chromosome). In rare cases, a chromosome may be m
 composite file creation (usually visible in the breakpoint plots for individual libraries in ./BPR_output/plots/breaksPlot.pdf). If it affects a whole 
 chromosome (e.g. 3-somy of chr7), proceed with the analysis but discard any inversion calls from the affected chromosome. If the SV affects only part of a 
 chromosome, use the library-specific breakpoint plots or the UCSC Genome Browser files in ./BPR_output/browserfiles to estimate its coordinates, and add
-those coordinates to the blacklist file InvertypeR/composite_files/blacklist.highdepth.centromeres.bed. Then, re-run the composite file scripts. 
+those coordinates to the hard mask file InvertypeR/composite_files/blacklist.highdepth.centromeres.bed. Then, re-run the composite file scripts. 
 However, such problems are rare and this is usually unnecessary. 
 
 A second useful check of the integrity of your composite files is below. If errors appear (other than missing read groups), it may mean that the scripts 
@@ -100,7 +109,11 @@ crashed and the files are incomplete.
 		java -jar '/PATH/TO/picard.jar' ValidateSamFile I="WC_CW/merged.WC.CW.bam" MODE=SUMMARY
 		gunzip -t "WC_CW/merged.WC.CW.bam" && printf "VALID\n"
 
-Finally, if you know of a large heterozygous inversion in your sample beforehand, it is often useful to check that it is properly represented in the WC composite file. For example, there is a very common 4-5 Mb inversion on chromosome 8p, which if present is visible in individual (non-composite) Strand-seq libraries. If your sample happens to be heterozygous for this inversion, check whether the WC composite file shows a strand switch at the expected location. If not, it is likely that the input SNPs were too poor quality or there was not enough Strand-seq data. 30-60 libraries with at least 20 million unique reads in total seems to be sufficient for good composite files, but more testing is needed.
+Finally, if you know of a large heterozygous inversion in your sample beforehand, it is often useful to check that it is properly represented in the WC composite file. For 
+example, there is a very common 4-5 Mb inversion on chromosome 8p, which if present is visible in individual (non-composite) Strand-seq libraries. If your sample happens to 
+be heterozygous for this inversion, check whether the WC composite file shows a strand switch at the expected location. If not, it is likely that the input SNPs were too 
+poor quality or there was not enough Strand-seq data. 30-60 libraries with at least 20 million unique reads in total seems to be sufficient for good composite files, but 
+more testing is needed.
 
 
 3. INVERSION CALLING
@@ -123,7 +136,7 @@ inversions in mind, consider using the list of 8787 (overlapping) putative inver
 (also on GitHub under example_output). For this we recommend using the prior c("REF","HET","HOM")=c(0.9866,0.0067,0.0067). For male samples, you will also
 need to provide prior probabilities for inversion on the X and Y chromoosomes. For the 8787 inversion coordinates, we use c(0.9866,2*0.0067). Similarly, choose an 
 adjust_method that fits your analysis. If using the 8787 inversion coordinates provided, we recommend adjust_method="all". However, if you wish to leave the
-inversion coordinates you provided unchanged, consider using adjust_method="raw". Finally, you should also provide a list of blacklisted regions, which can be the
+inversion coordinates you provided unchanged, consider using adjust_method="raw". Finally, you should also provide a list of hard masked regions, which can be the
 same file used for composite file creation, above. For more information on the options available, open R, load invertyper, and run the command ?invertyper.
 
 Here is an example of the code used to run InvertypeR.
@@ -153,7 +166,7 @@ may actually be misoriented contigs in the reference genome; these cannot be ide
 To visualize the inversion genotypes, we create PDF chromosome ideograms with lollipops representing (phased) inversions. Clicking on a lollipop opens a Genome
 Browser session displaying reads from the composite files. Note that the links to the Genome Browser are impermanent, lasting for ~ 1 week. To create these
 ideograms, clone the haplotplotR repository (linked from the InvertypeR repository), and after installing dependencies put an InvertypeR output file into
-haploplotR/in. Then put the Genome Browser files for the composite files, created in Section 3 (WW_CC/BPR_output/browserfiles/*reads* and
+haploplotR/in. Then put the Genome Browser files for the composite files (
 WC_CW/BPR_output/browserfiles/*reads*) in the directory haploplotR/in/bed_reads/. Then move to the directory haplotplotR and execute the master script.
 
 	code:
