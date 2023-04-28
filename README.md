@@ -63,7 +63,7 @@ Strand-seq is a single-cell library preparation for DNA sequencing that is quite
   - The [original](doi.org/10.1038/nmeth.2206) Strand-seq protocol
   - A recent [inversion discovery](doi.org/10.1038/s41587-020-0719-5) paper
 
-If you have Strand-seq FASTQ files but are unsure how to align them etc., see the file instructions.txt for a step-by-step guide. 
+If you have Strand-seq FASTQ files but are unsure how to align them etc., see the file alignment_and_QC_instructions.txt for a step-by-step guide. 
 
 If you have single-cell Strand-seq BAM files ready, then the next step is to select good-quality libraries. That is best done with [ASHLEYS-QC](https://github.com/friendsofstrandseq/ashleys-qc) for human libraries aligned to the GRCh38 reference genome (for non-humans, it's probably best to have the libraries QCed manually by an expert). Install ASHLEYS-QC, and run it with default parameters as follows:
 
