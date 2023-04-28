@@ -24,7 +24,7 @@ i <- invertyper_pipeline(regions_to_genotype="sup_table_24_inversions.including_
     save_composite_files=T, write_browser_files=T, discover_breakpointr_inversions=T,)
 ```
 
-If your diploid individual has haploid sex chromosomes, list them under the haploid_chromosomes argument (for human males: `haploid_chromosomes=c("chrX", "chrY")`)
+If your diploid individual has haploid sex chromosomes, list them under the haploid_chromosomes argument as well as under chromosomes (for human males: `haploid_chromosomes=c("chrX", "chrY")`)
 
 InvertypeR outputs a tab-delimited text file with the posterior probabilties for inversion genotypes. Optionally, you can also save the composite files to an RData file (since they are slow to make), and you can write reads and inversion calls to UCSC genome browser files to examine the data yourself. InvertypeR also outputs PDF files containing [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) plots of the composite files, so that you can check they generated correctly (described below).
 
