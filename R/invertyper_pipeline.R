@@ -102,7 +102,7 @@ invertyper_pipeline <- function(
             all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes)
     )
 
-    if (!is.null(regions_to_genotype) & (all(prior == c(0.333, 0.333, 0.333)) & !all(sort(chromosomes) == sort(haploid_chromosomes)) |
+    if (!is.null(regions_to_genotype) & (all(prior == c(0.333, 0.333, 0.333)) & (!all(sort(chromosomes) == sort(haploid_chromosomes)) | is.null(haploid_chromosomes)) |
         (!is.null(haploid_chromosomes) & all(haploid_prior == c(0.5, 0.5))))) {
         warning("Using the default priors (prior for homogametic diploids (e.g., human females), haploid_prior for haploids, or both for heterogametic dipoids (e.g., human males)) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes.")
     }
