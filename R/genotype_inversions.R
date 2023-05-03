@@ -15,7 +15,7 @@
 #' @param WW_reads A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WW composite file. See create_composite_files() or import_bam().
 #' @param WC_reads A GRanges object (or GAlignmentPairs in the PE case) containing reads for a WC composite file. See create_composite_files() or import_bam().
 #' @param regions A Granges object containing genomic intervals that are thought to be inversions.
-#' @param background The fraction of background reads for the WW composite file. See WWCC_background().
+#' @param background The fraction of background reads for the WW composite file. See WW_background().
 #' @param base_state The strand state of the WW composite file: either "WW" (mostly + reads) or "CC" (mostly - reads).
 #' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.
 #' @param prior Vector of three prior weights for inversion genotypes. For example, c("ref","het","hom") = c(0.9,0.05,0.05). Default c(0.33,0.33,0.33).
@@ -65,7 +65,7 @@ genotype_inversions <- function(WW_reads, WC_reads, regions, background, base_st
         counts <- counts[!counts[, 1] %in% haploid_chromosomes_present, ]
         n <- nrow(haploid_counts)
 
-        # The binomial distribution gives us likelihoods for the read counts given the possible strand states W and C for the WWCC file
+        # The binomial distribution gives us likelihoods for the read counts given the possible strand states W and C for the WW file
         likelihoods <- array(mapply(function(z) mapply(function(x, y) dbinom(x, size = x + y, prob = z, log = TRUE), haploid_counts[, 4], haploid_counts[, 5]), theta), dim = c(n, 4))
 
         # I want to give it the possibility of alignment errors (I won't allow deletions) so that it doesn't naively call 4 W reads out of 10 a 99% homozygote

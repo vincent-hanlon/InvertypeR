@@ -22,7 +22,7 @@ genotype_inversions(
 
 \item{regions}{A Granges object containing genomic intervals that are thought to be inversions.}
 
-\item{background}{The fraction of background reads for the WW composite file. See WWCC_background().}
+\item{background}{The fraction of background reads for the WW composite file. See WW_background().}
 
 \item{base_state}{The strand state of the WW composite file: either "WW" (mostly + reads) or "CC" (mostly - reads).}
 

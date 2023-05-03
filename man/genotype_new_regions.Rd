@@ -28,7 +28,7 @@ genotype_new_regions(
 
 \item{confidence}{Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions. Default 0.95.}
 
-\item{base}{A list output by WWCC_background().}
+\item{base}{A list output by WW_background().}
 
 \item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.}
 

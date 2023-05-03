@@ -89,11 +89,11 @@ create_composite_files <- function(
     rm("grangeslist")
     invisible(gc())
 
-    WWCCregions <- sort(find_regions_with_strand_state(bpr, states = c("ww", "cc"), region_size = 100000))
-    WWCCregions$Cs <- NULL
-    WWCCregions$Ws <- NULL
-    WWCCregions$state <- NULL
-    GenomeInfoDb::seqlevels(WWCCregions) <- GenomeInfoDb::seqlevels(galignmentslist[[1]])
+    WWregions <- sort(find_regions_with_strand_state(bpr, states = c("ww", "cc"), region_size = 100000))
+    WWregions$Cs <- NULL
+    WWregions$Ws <- NULL
+    WWregions$state <- NULL
+    GenomeInfoDb::seqlevels(WWregions) <- GenomeInfoDb::seqlevels(galignmentslist[[1]])
 
     if ("wc" %in% type) {
         WCregions <- sort(find_regions_with_strand_state(bpr, states = c("wc"), region_size = 100000))
@@ -123,11 +123,11 @@ create_composite_files <- function(
 
     # If this is parallelized with parLapply instead it might work on Windows, but unfortunately parLapply can't subset GenomicRanges like granges[vector] for some weird reason.
     CC <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state,
-        galignmentslist = galignmentslist, regions = WWCCregions,
+        galignmentslist = galignmentslist, regions = WWregions,
         paired_reads = paired_reads, states = "cc", flip_reads = TRUE, mc.cores = mc.cores
     )
     WW <- parallel::mclapply(names(galignmentslist), extract_reads_by_region_and_state,
-        galignmentslist = galignmentslist, regions = WWCCregions,
+        galignmentslist = galignmentslist, regions = WWregions,
         paired_reads = paired_reads, states = "ww", flip_reads = FALSE, mc.cores = mc.cores
     )
 

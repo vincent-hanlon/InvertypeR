@@ -7,7 +7,7 @@
 #' @param hom A GRanges object of homozygous inversions.
 #' @param reads reads A list of two Granges objects: reads from a WW composite file and a WC composite file.
 #' @param confidence Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions. Default 0.95.
-#' @param base A list output by WWCC_background().
+#' @param base A list output by WW_background().
 #' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.
 #' @param prior Vector of three prior weights for inversion genotypes. For example, c("ref","het","hom") = c(0.9,0.05,0.05).
 #' @param haploid_prior Vector of two prior weights for haploid chromosomes (e.g., chrX and chrY in human males). For example, c("ref", "inv") = c(0.9,0.1).

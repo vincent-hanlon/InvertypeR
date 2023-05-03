@@ -16,7 +16,7 @@
 #'
 #'
 #' @export
-WWCC_background <- function(WW_reads, binsize = 1000000, paired_reads = TRUE, chromosomes = chromosomes) {
+WW_background <- function(WW_reads, binsize = 1000000, paired_reads = TRUE, chromosomes = chromosomes) {
 
     # chromosome lengths
     lengths <- GenomeInfoDb::seqlengths(WW_reads)
@@ -26,8 +26,8 @@ WWCC_background <- function(WW_reads, binsize = 1000000, paired_reads = TRUE, ch
     bins <- GenomicRanges::tileGenome(chr_lengths, tilewidth = binsize, cut.last.tile.in.chrom = TRUE)
 
     # Counting reads by strand per bin, and using this to estimate background per bin
-    num_c_bins <- GenomicRanges::countOverlaps(bins, WW_reads[GenomicRanges::strand(WW_reads) == "-"])
-    num_w_bins <- GenomicRanges::countOverlaps(bins, WW_reads[GenomicRanges::strand(WW_reads) == "+"])
+    num_w_bins <- GenomicRanges::countOverlaps(bins, WW_reads[GenomicRanges::strand(WW_reads) == "-"])
+    num_c_bins <- GenomicRanges::countOverlaps(bins, WW_reads[GenomicRanges::strand(WW_reads) == "+"])
 
     num_reads <- sum(num_c_bins + num_w_bins)
 

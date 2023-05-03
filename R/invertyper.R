@@ -68,7 +68,7 @@ invertyper <- function(
     haploid <- all(sort(haploid_chromosomes) == sort(chromosomes)) & !(is.null(chromosomes) & is.null(haploid_chromosomes))
 
     if (all(prior == c(0.333, 0.333, 0.333)) & !haploid | (haploid & all(haploid_prior == c(0.5, 0.5)))) {
-        warning("Using the default priors (prior for homogametic diploids (e.g., human females), haploid_prior for haploids, or both for heterogametic dipoids (e.g., human males)) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes.")
+        warning(paste0("Using the default priors (",prior," for homogametic diploids (e.g., human females), ",haploid_prior," for haploids, or both for heterogametic dipoids (e.g., human males)) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes."))
     }
 
     # An irrelevant internal name change
@@ -122,7 +122,7 @@ invertyper <- function(
         }
 
         # Accurate background estimate, plus base strand state for the WW/CC file
-        base <- WWCC_background(WW_reads, binsize = 1000000, paired_reads = paired_reads, chromosomes = chromosomes)
+        base <- WW_background(WW_reads, binsize = 1000000, paired_reads = paired_reads, chromosomes = chromosomes)
 
         WW_reads <- import_bam(WW_reads, region = GenomicRanges::reduce(widen(
             granges = regions, seqlengths = seqlengths_WW,

@@ -8,7 +8,7 @@ invertyper_pipeline(
   regions_to_genotype = NULL,
   prior = c(0.333, 0.333, 0.333),
   haploid_prior = c(0.5, 0.5),
-  adjust_method = c("raw", "merge", "deltas", "minimal", "low", "all"),
+  adjust_method = "all",
   input_folder = "./",
   output_folder = "./",
   haploid_chromosomes = NULL,
@@ -37,8 +37,9 @@ invertyper_pipeline(
 
 \item{haploid_prior}{Vector of two prior weights for inversions on haploid chromosomes, like chrX and chrY in human males. For example, c("REF", "INV") = c(0.9,0.1). Default c(0.5,0.5).}
 
-\item{adjust_method}{One of "raw", "merge", "deltas", "minimal", "low", or "all". (usually 'all' !). Specifies which method to use to adjust the inversion coordinates (start- and end-points). The adjustment routine
-ensures that adjusted inversions have the same genotype as they did before adjustment (if applicable), and that they overlap at least one of the original unadjusted inversions in every cluster of
+\item{adjust_method}{One of "raw", "merge", "deltas", "minimal", "low", or "all". (default "all"). Specifies which method to use to adjust the inversion coordinates
+(start- and end-points). The adjustment routine ensures that adjusted inversions have the same genotype as they
+did before adjustment (if applicable), and that they overlap at least one of the original unadjusted inversions in every cluster of
 overlapping events. If after adjustment (except with "raw") overlapping inversions still remain, we merge the ones of the same genotype. If there are still overlapping inversions, we take the largest.
 "raw": No adjustment. "merge": Merge overlapping confident (i.e., posterior probability >= confidence for a genotype) inversions of the same genotype. "Deltas": adjust the endpoints of confident
 inversions based on the Strand-seq data. We calculate deltaW values for each read, which measure the change in read direction for nearby reads, and take the coordinates that correspond to the two
