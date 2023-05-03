@@ -12,13 +12,13 @@ devtools::install_github(repo="vincent-hanlon/InvertypeR")
 ```
 
 Then collect good-quality Strand-seq libraries for a single diploid individual in an input directory (see below for haploid species), along with a VCF file of their SNVs. 
-Provide a list of putative inversions (for humans: example_output/sup_table_24_inversions.bed from this repo) and appropriate priors. Provide a list of hard masked regions (for humans: example_output/blacklist.GRCh38.humans.bed from this repo).
+Provide a list of putative inversions (for humans: hanlon_2021_BMCgenomics_augmented.bed from this repo) and appropriate priors. Provide a list of hard masked regions (for humans: hard_mask.GRCh38.humans.bed from this repo).
 
 Run the full InvertypeR pipeline using something like this command, which will probably take several hours:
 ```
 library(invertyper)
-i <- invertyper_pipeline(regions_to_genotype="sup_table_24_inversions.including_half_intervals.bed", 
-    hard_mask='blacklist.highdepth.centromeres.bed', prior=c(0.9866,0.0067, 0.0067), 
+i <- invertyper_pipeline(regions_to_genotype="hanlon_2021_BMCgenomics_augmented.bed", 
+    hard_mask='hard_mask.GRCh38.humans.bed', prior=c(0.9866,0.0067, 0.0067), 
     haploid_prior=c(0.9866,0.0134), chromosomes=c('chr1','chr2','chr8','chrX','chrY'), 
     haploid_chromosomes=c('chrX','chrY'), vcf='snps.vcf.gz', numCPU=12, adjust_method='all', 
     save_composite_files=T, write_browser_files=T, discover_breakpointr_inversions=T,)
@@ -94,7 +94,7 @@ InvertypeR doesn't need you to remove homozygous SNVs or indels from any VCF you
 
 InvertypeR is primarily an inversion GENOTYPING tool---users provide the coordinates of putative inversions. Although it is possible to use InvertypeR without providing any regions to genotype (in which case [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) will be used to identify putative inversions), this will tend to miss small inversions. 
 
-If there are specific inversions you want to genotype, the choice is easy. However, if you want to find as many inversions as possible, then providing a list of coordinates from the literature or the coordinates of the spacers between pairs of inverted repeats (which commonly cause inversions) is a good idea. The file sup_table_24_inversions.bed in the example_output folder contains both of those things for GRCh38 in humans.
+If there are specific inversions you want to genotype, the choice is easy. However, if you want to find as many inversions as possible, then providing a list of coordinates from the literature or the coordinates of the spacers between pairs of inverted repeats (which commonly cause inversions) is a good idea. The file hanlon_2021_BMCgenomics_augmented.bed contains both of those things for GRCh38 in humans. Alternatively, if you want to genotype a smaller set of common inversions in human populations, the 292 inversions in the file porubsky_2022_cell.bed are a good place to start, which are from [this paper](https://doi.org/10.1016/j.cell.2022.04.017). See below to choose appropriate priors.
 
 Regions to genotype should be provided to InvertypeR as a BED file (at least for the main function, `invertyper_pipeline()`; lower-level functions typically expect BED files to be loaded into GRanges objects with the function `import_bed()`).
 
@@ -102,20 +102,23 @@ Regions to genotype should be provided to InvertypeR as a BED file (at least for
 
 InvertypeR is a very simple Bayesian model that outputs posterior probabilties for inversion genotypes at fixed coordinates. This means we need prior probabilities. In practice, we need a vector that looks like `c(0.98, 0.01, 0.01)`, for example, which has prior probabilities that an average genomic interval in the list of regions to genotype is homozygous reference (no inversion, usually very likely), heterozygous, or homozygous alternate (both copies inverted). 
 
-If the inversions you wish to genotype are well-characterized and you have information about allele frequencies in the population, then this is easy. This might be the case if you are only genotyping the inversions from a paper like [this one](https://doi.org/10.1016/j.cell.2022.04.017). Use the average fraction of individuals in the study that are reference homozygotes, heterozygotes, and alternate homozygotes, respectively, for the prior vector.
-
-If you are using the inversion list from the file sup_table_24_inversions.bed (for GRCh38 in humans), then I recommend setting `prior=c(0.9866, 0.0067, 0.0067)`
-and `haploid_prior=c(0.9866, 0.0134)`. This is based on an estimate of the number of unique intervals in the inversion list. If you have your own list of putative inversions that are not well-characterized (ESPECIALLY if they're overlapping and dubious), then the InvertypeR function `choose_priors()` might help.
-
-If you have made a list of putative inversions by calling strand switches with [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) or equivalent, then I typically use `prior=c(0.9, 0.05, 0.05)` and `haploid_prior=c(0.9, 0.1)`, but this is just based on previous experience and may differ for your particular case. These are the defaults for the `breakpointr_prior` and breakpointr_haploid_prior` arguments.
+If the inversions you wish to genotype are well-characterized and you have information about allele frequencies in the population, then this is easy. This might be the case if you are only genotyping the inversions from a paper like [this one](https://doi.org/10.1016/j.cell.2022.04.017). Use known allele frequencies, or the average fraction of individuals in the study that are reference homozygotes, heterozygotes, and alternate homozygotes, respectively.
 
 The `haploid_prior` argument is there for chrX and chrY in human males (or more generally, the sex chromosomes of the heterogametic sex), or for all chromosomes if the Strand-seq libraries are from haploid cells.
+
+<em>Some recommended priors for provided regions to genotype (for humans, GRCh38). The first two rows were done using InvertypeR's `choose_priors()` function, the third row was done using the genotypes of simple inversions from [Porubsky et al. 2022](https://doi.org/10.1016/j.cell.2022.04.017), and the last row is a rule of thumb used used for the arguments `breakpointr_prior` and `breakpointr_haploid_prior`.</em>
+| `regions_to_genotype`  | `prior` | `haploid_prior` |
+| ------------- | ------------- | ------------- |
+| hanlon_2021_BMCgenomics_augmented.bed |  `c(0.9683, 0.0158, 0.0158)` | `c(0.9683, 0.0317)` |
+| hanlon_2021_BMCgenomics_original.bed |  `c(0.9730, 0.0135, 0.0135)` | `c(0.9730, 0.0270)` |
+| porubsky_2022_cell.bed  | `c(0.5166, 0.4043, 0.0791)` | `c(0.6202, 0.3798)` |
+| BreakpointR as used by InvertypeR | `c(0.9, 0.05, 0.05)` | `c(0.9, 0.1)` | 
 
 #### Hard masked regions / blacklist
 
 Some regions of the genome tend to have poor-quality Strand-seq data. The most problematic are things like reference assembly collapses, where only 1 copy of a region is present in the reference but several copies of the region are present in the physical genome. Depending on where the additional copies are located, the reads in the 1 reference copy map in unexpected directions. Such regions should be provided to InvertypeR as a BED file (for `invertyper_pipeline()`; lower-level functions expext a GRanges object produced with `import_bed()`).
 
-For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a hard mask file based on read depth (see the sup mat of the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
+For GRCh38 in humans, the file hard_mask.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a hard mask file based on read depth (see the sup mat of the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
 
 ### Running InvertypeR
 
@@ -144,8 +147,8 @@ Open R and move to a directory that contains paired-end BAM files and a VCF of s
 
 ```
 library(invertyper)
-i <- invertyper_pipeline(regions_to_genotype="sup_table_24_inversions.including_half_intervals.bed", 
-    hard_mask='blacklist.highdepth.centromeres.bed',  prior=c(0.9866,0.0067, 0.0067), 
+i <- invertyper_pipeline(regions_to_genotype="hanlon_2021_BMCgenomics_augmented.bed", 
+    hard_mask='hard_mask.GRCh38.humans.bed',  prior=c(0.9866,0.0067, 0.0067), 
     haploid_prior=c(0.9866,0.0134), chromosomes=c('chr1','chr2','chr8','chrX','chrY'), 
     haploid_chromosomes=c('chrX','chrY'), vcf='snps.vcf.gz', numCPU=12, adjust_method='all', 
     save_composite_files=T, write_browser_files=T, discover_breakpointr_inversions=T,)
