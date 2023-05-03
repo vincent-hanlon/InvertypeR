@@ -102,7 +102,7 @@ Regions to genotype should be provided to InvertypeR as a BED file (at least for
 
 InvertypeR is a very simple Bayesian model that outputs posterior probabilties for inversion genotypes at fixed coordinates. This means we need prior probabilities. In practice, we need a vector that looks like `c(0.98, 0.01, 0.01)`, for example, which has prior probabilities that an average genomic interval in the list of regions to genotype is homozygous reference (no inversion, usually very likely), heterozygous, or homozygous alternate (both copies inverted). 
 
-If the inversions you wish to genotype are well-characterized and you have information about allele frequencies in the population, then this is easy. This might be the case if you are only genotyping the inversions from a paper like [this one](doi.org/10.1038/s41587-020-0719-5). Use the average fraction of individuals in the study that are reference homozygotes, heterozygotes, and alternate homozygotes, respectively, for the prior vector.
+If the inversions you wish to genotype are well-characterized and you have information about allele frequencies in the population, then this is easy. This might be the case if you are only genotyping the inversions from a paper like [this one](https://doi.org/10.1038/s41587-020-0719-5). Use the average fraction of individuals in the study that are reference homozygotes, heterozygotes, and alternate homozygotes, respectively, for the prior vector.
 
 If you are using the inversion list from the file sup_table_24_inversions.bed (for GRCh38 in humans), then I recommend setting `prior=c(0.9866, 0.0067, 0.0067)`
 and `haploid_prior=c(0.9866, 0.0134)`. This is based on an estimate of the number of unique intervals in the inversion list. If you have your own list of putative inversions that are not well-characterized (ESPECIALLY if they're overlapping and dubious), then the InvertypeR function `choose_priors()` might help.
@@ -115,7 +115,7 @@ The `haploid_prior` argument is there for chrX and chrY in human males (or more 
 
 Some regions of the genome tend to have poor-quality Strand-seq data. The most problematic are things like reference assembly collapses, where only 1 copy of a region is present in the reference but several copies of the region are present in the physical genome. Depending on where the additional copies are located, the reads in the 1 reference copy map in unexpected directions. Such regions should be provided to InvertypeR as a BED file (for `invertyper_pipeline()`; lower-level functions expext a GRanges object produced with `import_bed()`).
 
-For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a hard mask file based on read depth (see the sup mat of the [InvertypeR paper](doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
+For GRCh38 in humans, the file blacklist.GRCh38.humans.bed is an appropriate choice. For other species, it would be best to make a hard mask file based on read depth (see the sup mat of the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9)) or based on the orientation of reads in Strand-seq libraries in many individuals.
 
 ### Running InvertypeR
 
