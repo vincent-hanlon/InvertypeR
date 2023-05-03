@@ -60,8 +60,8 @@ If you have all these ready, you can probably skip ahead to 'Installing and runn
 
 Strand-seq is a single-cell library preparation for DNA sequencing that is quite good at finding inversions. Here are some relevant papers:
 
-  - The [original](doi.org/10.1038/nmeth.2206) Strand-seq protocol
-  - A recent [inversion discovery](doi.org/10.1038/s41587-020-0719-5) paper
+  - The [original](https://doi.org/10.1038/nmeth.2206) Strand-seq protocol
+  - A recent [inversion discovery](https://doi.org/10.1038/s41587-020-0719-5) paper
 
 If you have Strand-seq FASTQ files but are unsure how to align them etc., see the file alignment_and_QC_instructions.txt for a step-by-step guide. 
 
