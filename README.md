@@ -18,8 +18,8 @@ Run the full InvertypeR pipeline using something like this command, which will p
 ```
 library(invertyper)
 i <- invertyper_pipeline(regions_to_genotype="hanlon_2021_BMCgenomics_augmented.bed", 
-    hard_mask='hard_mask.GRCh38.humans.bed', prior=c(0.9866,0.0067, 0.0067), 
-    haploid_prior=c(0.9866,0.0134), chromosomes=c('chr1','chr2','chr8','chrX','chrY'), 
+    hard_mask='hard_mask.GRCh38.humans.bed', prior=c(0.9683, 0.0158, 0.0158), 
+    haploid_prior=c(0.9683, 0.0317), chromosomes=c('chr1','chr2','chr8','chrX','chrY'), 
     haploid_chromosomes=c('chrX','chrY'), vcf='snps.vcf.gz', numCPU=12, adjust_method='all', 
     save_composite_files=T, write_browser_files=T, discover_breakpointr_inversions=T,)
 ```
@@ -148,8 +148,8 @@ Open R and move to a directory that contains paired-end BAM files and a VCF of s
 ```
 library(invertyper)
 i <- invertyper_pipeline(regions_to_genotype="hanlon_2021_BMCgenomics_augmented.bed", 
-    hard_mask='hard_mask.GRCh38.humans.bed',  prior=c(0.9866,0.0067, 0.0067), 
-    haploid_prior=c(0.9866,0.0134), chromosomes=c('chr1','chr2','chr8','chrX','chrY'), 
+    hard_mask='hard_mask.GRCh38.humans.bed',  prior=c(0.9683, 0.0158, 0.0158), 
+    haploid_prior=c(0.9683, 0.0317), chromosomes=c('chr1','chr2','chr8','chrX','chrY'), 
     haploid_chromosomes=c('chrX','chrY'), vcf='snps.vcf.gz', numCPU=12, adjust_method='all', 
     save_composite_files=T, write_browser_files=T, discover_breakpointr_inversions=T,)
 ```
