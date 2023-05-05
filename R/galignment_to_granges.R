@@ -19,17 +19,17 @@ galignment_to_granges <- function(galignments = NULL, purpose = NULL, paired_rea
     stopifnot("pair2frgm can only be TRUE for paired-end reads used for BreakpointR" = (pair2frgm && paired_reads && purpose == "BreakpointR") || !pair2frgm)
 
     if (purpose == "StrandPhaseR" && paired_reads && !pair2frgm) {
-        granges.first <- as(GenomicAlignments::first(galignments), "GRanges")
-        granges.last <- as(GenomicAlignments::last(galignments), "GRanges")
+        granges.first <- GenomicRanges::granges(GenomicAlignments::first(galignments), use.mcols=TRUE)
+        granges.last <- GenomicRanges::granges(GenomicAlignments::last(galignments), use.mcols=TRUE)
         GenomicRanges::strand(granges.last) <- GenomicRanges::strand(granges.first)
         granges <- GenomicRanges::sort(c(granges.first, granges.last), ignore.strand = TRUE)
         granges$XA <- NA
     } else if (purpose == "StrandPhaseR" && !paired_reads && !pair2frgm) {
-        granges <- as(galignments, "GRanges")
+        granges <- GenomicRanges::granges(galignments, use.mcols=TRUE)
     } else if (purpose == "BreakpointR" && paired_reads && pair2frgm) {
         galignments.prop.pairs <- galignments[GenomicAlignments::isProperPair(galignments)]
-        granges.first <- as(GenomicAlignments::first(galignments.prop.pairs), "GRanges")
-        granges.last <- as(GenomicAlignments::last(galignments.prop.pairs), "GRanges")
+        granges.first <- GenomicRanges::granges(GenomicAlignments::first(galignments.prop.pairs), use.mcols=TRUE)
+        granges.last <- GenomicRanges::granges(GenomicAlignments::last(galignments.prop.pairs), use.mcols=TRUE)
 
         granges.first.plus <- granges.first[GenomicRanges::strand(granges.first) == "+"]
         granges.first.minus <- granges.first[GenomicRanges::strand(granges.first) == "-"]
