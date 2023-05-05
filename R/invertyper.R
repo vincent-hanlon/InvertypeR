@@ -63,7 +63,8 @@ invertyper <- function(
         "Any haploid chromosomes you specify should be include as chromosomes too. This means including chrX and chrY as chromosomes AND as haploid_chromosomes for human males" =
             all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes)
     )
-    stopifnot("The hard_mask and regions_to_genotype arguments must be GRanges objects. Use import_bed()" = !is.character(regions_to_genotype) & !is.character(hard_mask))
+    stopifnot("hard_mask should be a GRanges object, usually created from a BED file with import_bed()" = is.null(hard_mask) | class(hard_mask) == "GRanges")
+    stopifnot("regions_to_genotype should be a GRanges object, usually created from a BED file with import_bed()" = is.null(regions_to_genotype) | class(regions_to_genotype) == "GRanges")
 
     haploid <- all(sort(haploid_chromosomes) == sort(chromosomes)) & !(is.null(chromosomes) & is.null(haploid_chromosomes))
 

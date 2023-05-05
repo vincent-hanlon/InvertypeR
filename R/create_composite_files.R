@@ -42,6 +42,8 @@ create_composite_files <- function(
             (!any(!type %in% c("wc", "ww")))
     )
     stopifnot("The path to a VCF file is required for a Watson-Crick ('wc') composite file." = !(is.null(vcf) & "wc" %in% type))
+    stopifnot("hard_mask should be a GRanges object, usually created from a BED file with import_bed()" = is.null(hard_mask) | class(hard_mask) == "GRanges")
+    stopifnot("soft_mask should be a GRanges object, usually created from a BED file with import_bed()" = is.null(soft_mask) | class(soft_mask) == "GRanges")
 
     if (is.null(hard_mask)) {
         warning("A hard_mask is highly recommended both for creating composite files and for genotyping inversions.")

@@ -25,6 +25,7 @@ discover_possible_inversions <- function(
     type = c("wc", "ww")) {
 
     stopifnot("The arguments minReads and windowsize should be parallel (have the same length)" = (length(minReads) == length(windowsize)))
+    stopifnot("hard_mask should be a GRanges object, usually created from a BED file with import_bed()" = is.null(hard_mask) | class(hard_mask) == "GRanges")
     stopifnot(
         "This function should be used with two composite files named 'WC' and 'WW', for diploids (names(composite_files)). Also, a CC composite file won't work." =
             (all(names(composite_files) %in% c("WC", "WW")) & length(composite_files) == 2) | all(type == "ww")
