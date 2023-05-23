@@ -13,7 +13,7 @@
 #' @param expected_number_inversions An integer. If you had perfect data and genotyped an average individual using your regions_to_genotype, how many
 #' unique inversions do you think there would be? For example, most humans have something like 100-200 paracentric inversions. If you think your inversion list
 #' probably covers a lot of them, then maybe 100 is a good estimate. On the other hand, if your inversion list is a long shot and probably only a few of them are real,
-#' you could consider a smaller number
+#' you could consider a smaller number. Default 100.
 #'
 #' @return A list with the recommended prior and haploid_prior
 #' @export

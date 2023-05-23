@@ -13,9 +13,6 @@
 #' @param haploid_prior Vector of two prior weights for haploid chromosomes (e.g., chrX and chrY in human males). For example, c("ref", "inv") = c(0.9,0.1).
 #' @param paired_reads Boolean: are the reads paired-end? Default TRUE.
 #' @return A list containing two GRanges objects: the adjusted heterozygous inversions and the adjusted homozygous inversions.
-#'
-#'
-#' @export
 genotype_new_regions <- function(new_regions, het, hom, reads, confidence, base, haploid_chromosomes = NULL, prior, haploid_prior, paired_reads = TRUE) {
 
     # Re-genotyping the adjusted inversions

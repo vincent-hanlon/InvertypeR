@@ -10,16 +10,18 @@
 #' The composite files can be saved to an RData object for later use. However, since the composite files are GenomicAlignments or GenomicAlignmentPairs objects, it should
 #' also be possible to save them as samtools-compatible BAM files using rtracklayer::export().
 #'
-#' @param input_folder The path to a directory containing good-quality Strand-seq BAM files
-#' @param type Either 'ww', or 'wc', or both. The 'wc' file is only available for diploids for which heterozygous SNPs are available, but it greatly improves inversion calls
-#' @param numCPU An integer; the number of threads to use
+#' @param input_folder The path to a directory containing good-quality Strand-seq BAM files. Default "./".
+#' @param type Either 'ww', or 'wc', or both. The 'wc' file is only available for diploids for which heterozygous SNPs are available, but it greatly improves 
+#'     inversion calls. Default c("wc","ww").
+#' @param numCPU An integer; the number of threads to use. Default 4.
 #' @param vcf The path to a VCF file containing heterozygous SNPs for an individual. External SNPs (e.g. from WGS data) are best, but they can also usually be called
 #' directly from the Strand-seq data using BBTOOLS callvariants.sh (see README on GitHub).
-#' @param paired_reads Boolean. Are the reads paired-end?
+#' @param paired_reads Boolean. Are the reads paired-end? Default TRUE. 
 #' @param hard_mask A GRanges object containing regions that are thought to contain unreliable Strand-seq data. Highly recommended.
-#' @param soft_mask A GRanges object containing regions with good Strand-seq data, but which interfere with composite file creation. These reads will appear in composite files and inversion calls, but won't be used to identify regions with a given strand state. Typically these are large, obvious inversions or misorients, like the big chr8 inversion in humans. Initially, using the default NULL value is fine.
-#' @param output_folder The name of a folder to which output files should be written.
-#' @param save_composite_files Boolean. Should composite files be saved as RData objects, or not at all?
+#' @param soft_mask A GRanges object containing regions with good Strand-seq data, but which interfere with composite file creation. These reads will appear in composite files and inversion calls, but won't be used to identify regions with a given strand state. Typically these are large, obvious inversions or misorients, like the big 
+#'     chr8 inversion in humans. Initially, using the default NULL value is fine.
+#' @param output_folder The name of a folder to which output files should be written. Default "./".
+#' @param save_composite_files Boolean. Should composite files be saved as RData objects, or not at all? Default FALSE.
 #' @param chromosomes A character vector of chromosome names for which composite files should be created.
 #'
 #' @return  A list containing 1 or 2 composite files in GenomicAlignments format.
@@ -54,13 +56,13 @@ create_composite_files <- function(
     }
 
     ptm <- startTimedMessage("\n       loading BAM files ...")
-    bamlist <- list.files(input_folder, pattern = "\\.bam$")
+    bamlist <- list.files(input_folder, pattern = "\\.bam$", full.names=TRUE)
     stopifnot("No BAM files found in input_folder for composite file creation." = length(bamlist) > 0)
 
     cl <- suppressMessages(parallel::makeCluster(numCPU))
     galignmentslist <- parallel::parLapply(cl, bamlist, import_bam, hard_mask = hard_mask, chromosomes = chromosomes, paired_reads = paired_reads)
 
-    names(galignmentslist) <- bamlist
+    names(galignmentslist) <- list.files(input_folder, pattern = "\\.bam$", full.names=FALSE)
     found_chromosomes <- unique(sort(do.call("c", lapply(galignmentslist, function(x) unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(x)))))))))
 
     if (!all(chromosomes %in% found_chromosomes)) {
@@ -85,7 +87,7 @@ create_composite_files <- function(
 
     bpr <- suppressMessages(breakpointr_for_invertyper(grangeslist,
         numCPU = numCPU, windowsize = 20000000, binMethod = "size", minReads = 50, background = 0.2, maskRegions = mask,
-        chromosomes = chromosomes
+        chromosomes = chromosomes, parallelize_by_chromosome = FALSE
     ))
 
     rm("grangeslist")
@@ -172,7 +174,7 @@ create_composite_files <- function(
 
     invisible(suppressMessages(breakpointr_for_invertyper(to_plot,
         plotspath = output_folder, numCPU = numCPU, windowsize = 1000000,
-        binMethod = "size", minReads = 50, background = 0.2, maskRegions = NULL, chromosomes = chromosomes
+        binMethod = "size", minReads = 50, background = 0.2, maskRegions = NULL, chromosomes = chromosomes, parallelize_by_chromosome = FALSE
     )))
     stopTimedMessage(ptm)
 

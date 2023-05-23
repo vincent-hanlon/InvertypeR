@@ -4,7 +4,7 @@
 #'
 #' @param bam Path to a BAM file. Alternatively, a GRanges or GAlignments object
 #' @param region A GRanges object of regions from which reads should be taken. Default NULL.
-#' @param paired_reads Boolean. Are the reads paired?
+#' @param paired_reads Boolean. Are the reads paired? Default TRUE.
 #' @param hard_mask A GRanges object of regions from which reads should NOT be taken. Default NULL
 #' @param chromosomes A character vector of chromosome names. Reads from other chromosomes will not be loaded. Default NULL (all chromosomes).
 #'
@@ -42,11 +42,11 @@ import_bam <- function(bam = NULL, region = NULL, paired_reads = TRUE, hard_mask
             # Note that the intervals were already extended by 1Mb (so that we can read in flanking region for other purposes) and reduced so they aren't overlapping
             p1 <- Rsamtools::ScanBamParam(
                 flag = Rsamtools::scanBamFlag(isPaired = TRUE, isUnmappedQuery = FALSE, isDuplicate = FALSE, isSecondaryAlignment = FALSE, hasUnmappedMate = FALSE, isProperPair = TRUE),
-                mapqFilter = 10, which = region, what = c("seq", "qual", "mapq", "cigar", "flag")
+                mapqFilter = 10, which = region, what = c("seq", "qual", "mapq")
             )
             reads <- suppressWarnings(GenomicAlignments::readGAlignmentPairs(bam, param = p1))
         } else {
-            p1 <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isPaired = FALSE, isUnmappedQuery = FALSE, isDuplicate = FALSE, isSecondaryAlignment = FALSE), mapqFilter = 10, which = region, what = c("seq", "qual", "mapq", "cigar", "flag"))
+            p1 <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isPaired = FALSE, isUnmappedQuery = FALSE, isDuplicate = FALSE, isSecondaryAlignment = FALSE), mapqFilter = 10, which = region, what = c("seq", "qual", "mapq"))
             reads <- suppressWarnings(GenomicAlignments::readGAlignments(bam, param = p1))
         }
     } else if (length(region) > 0) {

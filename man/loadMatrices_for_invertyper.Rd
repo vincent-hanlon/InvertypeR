@@ -3,7 +3,7 @@
 \name{loadMatrices_for_invertyper}
 \alias{loadMatrices_for_invertyper}
 \title{Copied from StrandPhaseR so that it accesses InvertypeR's version of bamregion2granges
-The function is unchanged (except for @inheritParams, the bamregions function, and some added package:: tags), and it's just here for namespace finagling}
+Vincent Hanlon changed @inheritParams, the bamregions function, some added package:: tags, and some improvements to memory efficiency}
 \usage{
 loadMatrices_for_invertyper(
   input_folder = NULL,
@@ -11,7 +11,8 @@ loadMatrices_for_invertyper(
   WCregions = NULL,
   pairedEndReads = FALSE,
   min.mapq = 10,
-  min.baseq = 30
+  min.baseq = 30,
+  galignmentslist = galignmentslist
 )
 }
 \arguments{

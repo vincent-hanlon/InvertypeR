@@ -7,10 +7,10 @@
 #' @param WW_reads A GenomicAlignments object for the WW composite file
 #' @param WC_reads A GenomicAlignments object for the WC composite file
 #' @param confidence Cutoff for posterior probabilities of inversions. Inversions more confident than this will be displayed in the files. Default 0.95
-#' @param paired_reads Boolean. Are the reads paired?
-#' @param output_folder Path where files should be written
-#' @param prefix Start of the output filenames
-#' @param type What type of composite files are we dealing with? 'wc' for Watson-Crick, 'ww' for Watson-Watson, or both (for both).
+#' @param paired_reads Boolean. Are the reads paired? Default TRUE.
+#' @param output_folder Path where files should be written. Default "./".
+#' @param prefix Start of the output filenames. Default "".
+#' @param type What type of composite files are we dealing with? 'wc' for Watson-Crick, 'ww' for Watson-Watson, or both (for both). Default c("ww", "wc").
 #'
 #' @return  Nothing. This just writes files
 #'
@@ -47,8 +47,8 @@ write_UCSC_browser_files <- function(
         inversions[, 6] <- "."
         inversions[, 7] <- inversions[, 2]
         inversions[, 8] <- inversions[, 2]
-        inversions[inversions[, 4] == 0 | inversions[, 4] == "0|0", 9] <- "250,250,250"
-        inversions[inversions[, 4] == "1|0" | inversions[, 4] == "0|1", 9] <- "125,125,125"
+        inversions[inversions[, 4] == 0 | inversions[, 4] == "0|0", 9] <- "180,180,180"
+        inversions[inversions[, 4] == "1|0" | inversions[, 4] == "0|1", 9] <- "90,90,90"
         inversions[inversions[, 4] == "1|1" | inversions[, 4] == "1", 9] <- "0,0,0"
         inversions[, 10] <- NULL
 
@@ -61,7 +61,7 @@ write_UCSC_browser_files <- function(
         utils::write.table(inversions, file = savefile.invs.gz, row.names = FALSE, col.names = FALSE, quote = FALSE, append = TRUE, sep = "\t")
         close(savefile.invs.gz)
     } else {
-        message("\n       No confident inversion supplied. Only the composite files will be saved as UCSC browser files")
+        message("\n       write_UCSC_browser_files(): No confident inversion supplied. Only the composite files will be saved as UCSC browser files")
         region <- NULL
         ptm <- startTimedMessage("       writing genome browser files ...")
     }

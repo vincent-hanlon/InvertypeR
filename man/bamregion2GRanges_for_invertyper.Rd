@@ -11,7 +11,7 @@ bamregion2GRanges_for_invertyper(
   pairedEndReads = FALSE,
   min.mapq = 10,
   filterAltAlign = TRUE,
-  all_alignments = galignmentslist_global_for_invertyper
+  galignmentslist = galignmentslist
 )
 }
 \arguments{
@@ -25,9 +25,9 @@ bamregion2GRanges_for_invertyper(
 
 \item{filterAltAlign}{(A parameter used by StrandPhaseR but accepted and then ignored by InvertypeR).}
 
-\item{all_alignments}{A list of GAlignments objects for the Strand-seq libraries. Global so that there are no problems accessing it in parallel}
-
 \item{file}{Bamfile with aligned reads. (Or in InvertypeR, the filename of a bamfile)}
+
+\item{all_alignments}{A list of GAlignments objects for the Strand-seq libraries. Global so that there are no problems accessing it in parallel}
 }
 \value{
 a GRanges object

@@ -11,8 +11,6 @@
 #' @examples
 #'
 #' twopeaks(c(1, 2, 4, 2, 1, 3, 3, 3, 5, 5, 5, 6, 6, 2, 2, 2, 5, 4, 5, 4, 7))
-#'
-#' @export
 twopeaks <- function(x) {
 
     t <- rle(x)

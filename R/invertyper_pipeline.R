@@ -19,21 +19,21 @@
 #' @param soft_mask A BED file containing regions with good Strand-seq data, but which interfere with composite file creation. These reads will appear in composite 
 #'   files and inversion calls, but won't be used to identify regions with a given strand state. Typically these are large, obvious inversions or misorients, like the big chr8 
 #'   inversion in humans. Initially, using the default NULL value is fine.
-#' @param vcf A VCF file containing heterozygous SNVs for the sample. If there is no external source of SNVs, they can be called directly from the Strand-seq BAMs at a pinch
+#' @param vcf Path to a  VCF file containing heterozygous SNVs for the sample. If there is no external source of SNVs, they can be called directly from the Strand-seq BAMs at a pinch (see GitHub README)
 #' @param paired_reads Boolean: are the reads paired-end? Default TRUE.
 #' @param confidence Posterior probability threshold above which you consider genotype calls to be reliable. Used to decide whether to keep adjusted inversions, as well as to identify low-confidence
 #'   calls for adjust_method "low". Default 0.95.
 #' @param prior Vector of three prior weights for inversion genotypes. For example, c("REF","HET","HOM") = c(0.9,0.05,0.05). Default c(0.33,0.33,0.33).
 #' @param haploid_prior Vector of two prior weights for inversions on haploid chromosomes, like chrX and chrY in human males. For example, c("REF", "INV") = c(0.9,0.1). Default c(0.5,0.5).
-#' @param chromosomes Vector of chromosome names to restrict the search for inversions.
+#' @param chromosomes Vector of chromosome names to restrict the search for inversions. Default NULL.
 #' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.
-#' @param numCPU Integer. How many parallel threads to use, where possible?
-#' @param input_folder Path to a directory containing Strand-seq BAM files
-#' @param output_folder Path to a directory for output files
+#' @param numCPU Integer. How many parallel threads to use, where possible? Default 4.
+#' @param input_folder Path to a directory containing Strand-seq BAM files Default "./".
+#' @param output_folder Path to a directory for output files. Default "./".
 #' @param output_file Name of the inversion genotype file(s) to write to. Default "inversions.txt".
-#' @param save_composite_files Should composite files be saved as RData objects?
-#' @param write_browser_files Should inversions and associated reads be saved to UCSC Genome Browser files?
-#' @param adjust_method One of "raw", "merge", "deltas", "minimal", "low", or "all". (default "all"). Specifies which method to use to adjust the inversion coordinates 
+#' @param save_composite_files Should composite files be saved as RData objects? Default FALSE.
+#' @param write_browser_files Should inversions and associated reads be saved to UCSC Genome Browser files? Default FALSE.
+#' @param adjust_method One of "raw", "merge", "deltas", "minimal", "low", or "all". Specifies which method to use to adjust the inversion coordinates 
 #'   (start- and end-points). The adjustment routine ensures that adjusted inversions have the same genotype as they 
 #'   did before adjustment (if applicable), and that they overlap at least one of the original unadjusted inversions in every cluster of
 #'   overlapping events. If after adjustment (except with "raw") overlapping inversions still remain, we merge the ones of the same genotype. If there are still overlapping inversions, we take the largest.
@@ -42,13 +42,13 @@
 #'   highest values (i.e. the two spots with the greates change in read direction, which we hope will correspond to inversion breakpoints). This is done once for every set of overlapping inversions of the
 #'   same genotype. "minimal": An experimental method. For confident overlapping inversions of the same genotype, take the interval common to all of them if one exists. "low": Much like "deltas", except
 #'   that we only adjust inversions for which no confident genotype could be found (i.e., all prior probabilities < confidence). Sometimes this will "find" a confident inversion if the original coordinates
-#'   were slightly off. "all": Does both "deltas" and "low".
+#'   were slightly off. "all": Does both "deltas" and "low". Default "all".
 #' @param discover_breakpointr_inversions Boolean. Should BreakpointR be used to find additional putative inversions not provided in regions_to_genotype? Default TRUE.
-#' @param breakpointr_prior Vector of three prior weights for genotyping putative inversions found using BreakpointR. The default is ok for humans.
-#' @param breakpointr_haploid_prior Vector of two prior weights. See breakpointr_prior
-#' @param windowsize An integer vector, describing the binsizes for running BreakpointR, measured in # reads per bin. The default is ok for humans.
-#' @param minReads An integer vector parallel to windowsize that gives the minimum number of reads allowed in a BreakpointR bin for deciding its strand state
-#' @param background A BreakpointR parameter: how much background would you expect, at most, in a Watson-Watson region?
+#' @param breakpointr_prior Vector of three prior weights for genotyping putative inversions found using BreakpointR. The default, c(0.9, 0.05, 0.05), is ok for humans.
+#' @param breakpointr_haploid_prior Vector of two prior weights. See breakpointr_prior. Default c(0.9, 0.1).
+#' @param windowsize An integer vector, describing the binsizes for running BreakpointR, measured in # reads per bin. The default is ok for humans: c(40, 120, 360).
+#' @param minReads An integer vector parallel to windowsize that gives the minimum number of reads allowed in a BreakpointR bin for deciding its strand state. Default c(15, 50, 50).
+#' @param background A BreakpointR parameter: how much background would you expect, at most, in a Watson-Watson region? Default 0.2.
 #'
 #' @return  A dataframe or list of dataframe containing inversion coordinates, genotypes, posterior probabilities, and more.
 #'
@@ -102,9 +102,13 @@ invertyper_pipeline <- function(
             all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes)
     )
 
-    if (!is.null(regions_to_genotype) & (all(prior == c(0.333, 0.333, 0.333)) & (!all(sort(chromosomes) == sort(haploid_chromosomes)) | is.null(haploid_chromosomes)) |
-        (!is.null(haploid_chromosomes) & all(haploid_prior == c(0.5, 0.5))))) {
-        warning(paste0("Using the default priors (",prior," for homogametic diploids (e.g., human females), ",haploid_prior," for haploids, or both for heterogametic dipoids (e.g., human males)) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes."))
+    if(!is.null(regions_to_genotype) & (!all(sort(chromosomes) == sort(haploid_chromosomes)) | is.null(chromosomes) | is.null(haploid_chromosomes)) &
+        all(prior == c(0.333, 0.333, 0.333))){
+        warning(paste0("Using a default prior (c(",toString(prior),") for diploid chromosomes like the autosomes in humans) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes."))
+    }
+
+    if(!is.null(regions_to_genotype) & !is.null(haploid_chromosomes) & all(haploid_prior == c(0.5, 0.5))){
+        warning(paste0("Using a default haploid_prior (c(",toString(haploid_prior),") for haploid chromosomes like the sex chromosomes in human males) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes."))
     }
 
     if (!is.null(regions_to_genotype)) {

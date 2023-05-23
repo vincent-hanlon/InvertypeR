@@ -8,9 +8,6 @@
 #' @param WC_bam A GRanges object for the WC composite file
 #' @param regions A GRanges object for putative inversions
 #' @return A dataframe with read counts by file
-#'
-#'
-#' @export
 count_regions <- function(WW_reads, WC_reads, regions) {
 
     # Extracting counts of W and C reads by region

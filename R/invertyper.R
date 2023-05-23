@@ -25,7 +25,7 @@
 #' @param chromosomes Vector of chromosome names to restrict the search for inversions.
 #' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.
 #' @param output_file Name of the file to write to. Default "inversions.txt".
-#' @param adjust_method One of "raw", "merge", "deltas", "minimal", "low", or "all". Default "all". Specifies which method to use to adjust the inversion coordinates 
+#' @param adjust_method One of "raw", "merge", "deltas", "minimal", "low", or "all". Specifies which method to use to adjust the inversion coordinates 
 #'   (start- and end-points). The adjustment routine ensures that adjusted inversions have the same genotype as they did before adjustment (if applicable), and that they 
 #'   overlap at least one of the original unadjusted inversions in every cluster of overlapping events. If after adjustment (except with "raw") 
 #'   overlapping inversions still remain, we merge the ones of the same genotype. If there are still overlapping inversions, we take the largest.
@@ -34,7 +34,8 @@
 #'   highest values (i.e. the two spots with the greates change in read direction, which we hope will correspond to inversion breakpoints). This is done once for every set of overlapping inversions of the
 #'   same genotype. "minimal": An experimental method. For confident overlapping inversions of the same genotype, take the interval common to all of them if one exists. "low": Much like "deltas", except
 #'   that we only adjust inversions for which no confident genotype could be found (i.e., all prior probabilities < confidence). Sometimes this will "find" a confident inversion if the original coordinates
-#'   were slightly off. "all": Does both "deltas" and "low".
+#'   were slightly off. "all": Does both "deltas" and "low". Default "all".
+#' @param output_folder Directory for output files. Default "./".
 #' @return A dataframe that associates each entry regions_to_genotype (putative inversions) with a genotype and posterior probability. Cols 1-3 are genomic coordinates, and cols 4-7 are read counts for the
 #'   two composite files (WC and WW, or WC and CC if that's what you submitted) subset by Watson (W) and Crick (C) strands. Col 8 is the most probable genotype, and col 9 is the posterior probability
 #'   associated with that genotype. Col 10 labels inversions with low read density. The start and end coordinates of such inversions should be checked by viewing Strand-seq data in a genome browser.
@@ -60,7 +61,7 @@ invertyper <- function(
             all(length(adjust_method) == 1 & adjust_method %in% c("raw", "merge", "deltas", "minimal", "low", "all"))
     )
     stopifnot(
-        "Any haploid chromosomes you specify should be include as chromosomes too. This means including chrX and chrY as chromosomes AND as haploid_chromosomes for human males" =
+        "Any haploid chromosomes you specify should be included as chromosomes too. This means including chrX and chrY as chromosomes AND as haploid_chromosomes for human males" =
             all(haploid_chromosomes %in% chromosomes) || is.null(chromosomes)
     )
     stopifnot("hard_mask should be a GRanges object, usually created from a BED file with import_bed()" = is.null(hard_mask) | class(hard_mask) == "GRanges")
@@ -68,24 +69,34 @@ invertyper <- function(
 
     haploid <- all(sort(haploid_chromosomes) == sort(chromosomes)) & !(is.null(chromosomes) & is.null(haploid_chromosomes))
 
-    if (all(prior == c(0.333, 0.333, 0.333)) & !haploid | (haploid & all(haploid_prior == c(0.5, 0.5)))) {
-        warning(paste0("Using the default priors (",prior," for homogametic diploids (e.g., human females), ",haploid_prior," for haploids, or both for heterogametic dipoids (e.g., human males)) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes."))
+    if((!all(sort(chromosomes) == sort(haploid_chromosomes)) | is.null(chromosomes) | is.null(haploid_chromosomes)) &
+        all(prior == c(0.333, 0.333, 0.333))){
+        warning(paste0("Using a default prior (c(",toString(prior),") for diploid chromosomes like the autosomes in humans) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes."))
+    }
+
+    if(!is.null(haploid_chromosomes) & all(haploid_prior == c(0.5, 0.5))){
+        warning(paste0("Using a default haploid_prior (c(",toString(haploid_prior),") for haploid chromosomes like the sex chromosomes in human males) is not recommended. Consider what fraction of the putative inversions you wish to genotype are likely to have non-reference genotypes."))
     }
 
     # An irrelevant internal name change
     regions <- regions_to_genotype
-
-    if (length(regions) == 0 || length(WW_reads) == 0 || (length(WC_reads) == 0 & !haploid)) {
-        warning("Non-empty composite files and a non-empty list of regions_to_genotype are required to genotype inversions")
+    if (length(regions) == 0 || ((is(WW_reads, "GAlignmentPairs") || is(WW_reads, "GAlignments")) & length(WW_reads) < 5) || (((is(WC_reads, "GAlignmentPairs") || is(WC_reads, "GAlignments")) & length(WC_reads) < 5) & !haploid)) {
+        warning("Non-empty composite files (min. 5 reads) and a non-empty GRanges for regions_to_genotype are required to genotype inversions")
 
         inversions <- data.frame(character(), integer(), integer(), integer(), integer(), integer(), integer(), character(), double())
-        colnames(inversions) <- c("chr", "start", "end", paste0(base_state, "_counts_W"), paste0(base_state, "_counts_C"), "WC_counts_W", "WC_counts_C", "genotype", "probability")
+        colnames(inversions) <- c("chr", "start", "end", "WW_counts_W", "WW_counts_C", "WC_counts_W", "WC_counts_C", "genotype", "probability")
 
         return(inversions)
-    } else {
-        if (!is.null(chromosomes)) {
-            found_chromosomes <- unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(WW_reads)))))
 
+    } else {
+	
+	if(!is.character(WW_reads)){
+            found_chromosomes <- unique(sort(as.vector(S4Vectors::runValue(GenomicRanges::seqnames(WW_reads)))))
+        } else {
+            found_chromosomes <- unique(sort(as.vector(GenomicRanges::seqnames(regions_to_genotype))))
+        }
+
+        if (!is.null(chromosomes) & !is.character(WW_reads)) {
             if (!all(chromosomes %in% found_chromosomes)) {
                 warning(paste0(
                     "Some chromosomes you provided (",
@@ -123,7 +134,7 @@ invertyper <- function(
         }
 
         # Accurate background estimate, plus base strand state for the WW/CC file
-        base <- WW_background(WW_reads, binsize = 1000000, paired_reads = paired_reads, chromosomes = chromosomes)
+        base <- WW_background(WW_reads, binsize = 1000000, paired_reads = paired_reads, chromosomes = found_chromosomes)
 
         WW_reads <- import_bam(WW_reads, region = GenomicRanges::reduce(widen(
             granges = regions, seqlengths = seqlengths_WW,
@@ -131,7 +142,7 @@ invertyper <- function(
         ), min.gapwidth = 1000), paired_reads = paired_reads, hard_mask = hard_mask)
         stopTimedMessage(ptm)
         # Genotyping the inversions
-        msg <- paste0("       genotyping ", length(regions), " putative inversions ...")
+        msg <- paste0("       genotyping ", length(regions), " putative inversion(s) ...")
 
         ptm <- startTimedMessage(msg)
         inversions <- genotype_inversions(

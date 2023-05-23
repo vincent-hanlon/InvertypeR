@@ -10,9 +10,6 @@
 #' @param paired_reads Boolean: are the reads paired-end? Default TRUE.
 #' @param haploid_chromosomes A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males).
 #' @return A list of four GRanges objects: the input objects WW_reads and WC_reads and the two output objects (for WW and WC composite files) that have been annotated with deltaW values.
-#'
-#'
-#' @export
 process_reads <- function(WW_reads, WC_reads, haploid_chromosomes, paired_reads = TRUE) {
 
     # Processing input reads for Aaron's deltaWCalculator
@@ -44,8 +41,16 @@ process_reads <- function(WW_reads, WC_reads, haploid_chromosomes, paired_reads 
     WC_d_80 <- suppressWarnings(breakpointR::deltaWCalculator(WC_reads, 80))
 
     # Taking an arbitrary sum of deltaWs to look near and far (including 2x the deltaW10)
-    WW_d$deltaW <- WW_d$deltaW + 2 * WW_d_10$deltaW + WW_d_20$deltaW + WW_d_40$deltaW + WW_d_80$deltaW
-    WC_d$deltaW <- WC_d$deltaW + 2 * WC_d_10$deltaW + WC_d_20$deltaW + WC_d_40$deltaW + WC_d_80$deltaW
+    t <- tryCatch({
+        WW_d$deltaW <- WW_d$deltaW + 2 * WW_d_10$deltaW + WW_d_20$deltaW + WW_d_40$deltaW + WW_d_80$deltaW
+        WC_d$deltaW <- WC_d$deltaW + 2 * WC_d_10$deltaW + WC_d_20$deltaW + WC_d_40$deltaW + WC_d_80$deltaW
+    }, error = function(e) {
+        message("error combining deltaW values in InvertypeR's process_reads() function")
+        message(e)
+    }, warning = function(w) {
+        message("\nWarning while combining deltaW values in invertyper::process_reads(). Did you provide the wrong haploid sex chromosomes? (e.g., setting haploid_chromosomes='chrY' for a human female)")
+        message(paste0(w, "\n"))
+    })
 
     return(list(WW_reads, WC_reads, WW_d, WC_d))
 }

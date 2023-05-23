@@ -21,14 +21,12 @@
 #' @param exportVCF ...
 #'
 #' @return A subset of the StrandPhaseR output that phases the strand state of wc regions
-#'
-#' @export
-phaseChromosome_for_invertyper <- function(input_folder, output_folder = "./StrandPhaseR_analysis", positions = NULL, WCregions = NULL, chromosome = NULL, pairedEndReads = TRUE, min.mapq = 10, min.baseq = 30, num.iterations = 2, translateBases = TRUE, fillMissAllele = NULL, splitPhasedReads = FALSE, compareSingleCells = FALSE, exportVCF = NULL) {
+phaseChromosome_for_invertyper <- function(input_folder, output_folder = "./StrandPhaseR_analysis", positions = NULL, WCregions = NULL, chromosome = NULL, pairedEndReads = TRUE, min.mapq = 10, min.baseq = 30, num.iterations = 2, translateBases = TRUE, fillMissAllele = NULL, splitPhasedReads = FALSE, compareSingleCells = FALSE, exportVCF = NULL, galignmentslist = NULL) {
 
     GenomeInfoDb::seqlevels(positions, pruning.mode = "coarse") <- chromosome
     GenomeInfoDb::seqlevels(WCregions, pruning.mode = "coarse") <- chromosome
     # load data into matrix
-    matrices <- loadMatrices_for_invertyper(input_folder = input_folder, positions = positions, WCregions = WCregions, pairedEndReads = pairedEndReads, min.mapq = min.mapq, min.baseq = min.baseq)
+    matrices <- loadMatrices_for_invertyper(input_folder = input_folder, positions = positions, WCregions = WCregions, pairedEndReads = pairedEndReads, min.mapq = min.mapq, min.baseq = min.baseq, galignmentslist = galignmentslist)
     # Check if sufficient data were loaded
     if (length(matrices) > 0) {
         # phase data
@@ -37,6 +35,11 @@ phaseChromosome_for_invertyper <- function(input_folder, output_folder = "./Stra
         hap1 <- data.frame(names(assem.haps$hap1.files), do.call(rbind, lapply(assem.haps$hap1.files, rbind)))
         names(hap1) <- c("Filenames", "Simil", "Disimil")
 
+        # Some additional rm() and gc() which will hopefully free up more memory, but in reality I'm not sure they will.
+        list <- ls()
+        list <- list[list!="hap1"]
+        rm(list=list)
+        invisible(gc())
         return(hap1$Filenames)
     }
 }

@@ -54,7 +54,7 @@ were slightly off. "all": Does both "deltas" and "low".}
 
 \item{haploid_chromosomes}{A vector of the names of chromosomes expected to be haploid (e.g., chrX and chrY in human males). Default NULL.}
 
-\item{vcf}{A VCF file containing heterozygous SNVs for the sample. If there is no external source of SNVs, they can be called directly from the Strand-seq BAMs at a pinch}
+\item{vcf}{Path to a  VCF file containing heterozygous SNVs for the sample. If there is no external source of SNVs, they can be called directly from the Strand-seq BAMs at a pinch (see GitHub README)}
 
 \item{paired_reads}{Boolean: are the reads paired-end? Default TRUE.}
 

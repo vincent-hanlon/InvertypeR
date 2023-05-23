@@ -13,7 +13,8 @@ breakpointr_for_invertyper(
   minReads = 50,
   background = 0.2,
   maskRegions = NULL,
-  chromosomes = NULL
+  chromosomes = NULL,
+  parallelize_by_chromosome = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,10 @@ breakpointr_for_invertyper(
 \item{maskRegions}{See BreakpointR}
 
 \item{chromosomes}{See BreakpointR}
+
+\item{parallelize_by_chromosome}{Set TRUE only if you wish to run different chromosomes on different threads, and then combine the results late. Use with care!
+This will return a list() rather than a Breakpoint class object, it will ignore chromosomes with very few reads, and it will not combine plots or library metrics
+nicely. It really is only compatible with discover_possible_inversions()}
 }
 \value{
 A Breakpoints object from BreakpointR

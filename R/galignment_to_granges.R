@@ -4,9 +4,9 @@
 #'
 #' @param galignments A GenomicAlignments object
 #' @param purpose Either 'StrandPhaseR' or 'BreakpointR'. Different purposes result in different formats.
-#' @param paired_reads Boolean. Are the reads paired?
+#' @param paired_reads Boolean. Are the reads paired? Default TRUE.
 #' @param region A GRanges object, to which the GAlignments object can be subset.
-#' @param pair2frgm Boolean. Should paired reads be merged into a single fragment, for BreakpointR?
+#' @param pair2frgm Boolean. Should paired reads be merged into a single fragment, for BreakpointR? Default FALSE.
 #'
 #' @return A GRanges object
 #'
@@ -21,11 +21,14 @@ galignment_to_granges <- function(galignments = NULL, purpose = NULL, paired_rea
     if (purpose == "StrandPhaseR" && paired_reads && !pair2frgm) {
         granges.first <- GenomicRanges::granges(GenomicAlignments::first(galignments), use.mcols=TRUE)
         granges.last <- GenomicRanges::granges(GenomicAlignments::last(galignments), use.mcols=TRUE)
+        granges.first$cigar <- GenomicAlignments::cigar(GenomicAlignments::first(galignments))
+        granges.last$cigar <- GenomicAlignments::cigar(GenomicAlignments::last(galignments))
         GenomicRanges::strand(granges.last) <- GenomicRanges::strand(granges.first)
         granges <- GenomicRanges::sort(c(granges.first, granges.last), ignore.strand = TRUE)
         granges$XA <- NA
     } else if (purpose == "StrandPhaseR" && !paired_reads && !pair2frgm) {
         granges <- GenomicRanges::granges(galignments, use.mcols=TRUE)
+        granges$cigar <- GenomicAlignments::cigar(galignments)
     } else if (purpose == "BreakpointR" && paired_reads && pair2frgm) {
         galignments.prop.pairs <- galignments[GenomicAlignments::isProperPair(galignments)]
         granges.first <- GenomicRanges::granges(GenomicAlignments::first(galignments.prop.pairs), use.mcols=TRUE)

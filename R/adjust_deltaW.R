@@ -14,9 +14,6 @@
 #' @param inversions A GRanges object containing inversions of the specified genotype
 #' @param genotype What genotype of inversion are we adjusting? "het", "hom", or "low", where low means posterior probability < confidence.
 #' @return A GRanges object of inversions with adjusted coordinates,
-#'
-#'
-#' @export
 adjust_deltaW <- function(WW_reads, WC_reads, WW_d, WC_d, inversions, genotype = c("het", "hom", "low")) {
 
     # Next I want to merge and expand the inversions. The wider, expanded inversion intervals will be used to look for alternative breakpoints

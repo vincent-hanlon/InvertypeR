@@ -16,7 +16,9 @@
 #'
 #'
 #' @export
-WW_background <- function(WW_reads, binsize = 1000000, paired_reads = TRUE, chromosomes = chromosomes) {
+WW_background <- function(WW_reads, binsize = 1000000, paired_reads = TRUE, chromosomes = NULL) {
+
+    stopifnot("The argument chromosomes cannot be NULL" = !is.null(chromosomes))
 
     # chromosome lengths
     lengths <- GenomeInfoDb::seqlengths(WW_reads)

@@ -21,8 +21,8 @@ import_bed <- function(path) {
 #' For example, Watson-Crick regions for phasing
 #'
 #' @param list_of_breakpoint_objects A list of Breakpoint objects from BreakpointR
-#' @param states The desired Strand-state ('ww', 'wc', or 'cc')
-#' @param region_size The minimum size of regions to select
+#' @param states The desired Strand-state ('ww', 'wc', or 'cc'). Default 'wc'.
+#' @param region_size The minimum size of regions to select. Default 100000.
 #'
 #' @return  A GRanges object containing genomic intervals of the desired strand state(s)
 #'
@@ -61,7 +61,7 @@ find_regions_with_strand_state <- function(list_of_breakpoint_objects = list(), 
 #'
 #' @param galignmentslist A list of GAlignments objects
 #' @param regions A GRanges object with a 'states' mcol and a 'filename' mcol matching the GAlignments objects
-#' @param paired_reads Boolean
+#' @param paired_reads Boolean.
 #' @param states The desired strand state(s)
 #' @param filename The filename for the GAlignments object in the list from which reads should be extracted
 #' @param flip_reads Whether to reorient reads for composite file creation (e.g., reorient cc regions for a ww composite file)
@@ -94,7 +94,7 @@ extract_reads_by_region_and_state <- function(galignmentslist = NULL, regions = 
 #' I'm concerned that these fields are burdensome to store, so I want to get rid of them in the standard implementation
 #'
 #' @param galignments A GAlignments object
-#' @param paired_reads Boolean
+#' @param paired_reads Boolean. Default TRUE.
 #'
 #' @return  A GAlignments object without the offending mcols
 #'

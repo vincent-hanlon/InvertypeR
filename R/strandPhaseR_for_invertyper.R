@@ -58,23 +58,20 @@ strandPhaseR_for_invertyper <- function(numCPU = 4, positions = NULL, WCregions 
 
     all_phased_WCregions <- list()
 
-    # need to awkwardly make this accessible to all sub-functions...
-    galignmentslist_global_for_invertyper <<- galignmentslist
-
-    if (conf[["numCPU"]] > 1) {
-        cl <- parallel::makeCluster(conf[["numCPU"]])
-        doParallel::registerDoParallel(cl)
-        parallel::clusterExport(cl = cl, "galignmentslist_global_for_invertyper")
+    if (conf[["numCPU"]] > 1 & length(conf[["chromosomes"]]) > 1) {
+        doParallel::registerDoParallel(conf[["numCPU"]])
         all_phased_WCregions <- foreach::foreach(i = conf[["chromosomes"]], .packages = c("StrandPhaseR", "invertyper")) %dopar% {
             tC <- tryCatch(
                 {
+                    galignmentslist_by_chr <- lapply(galignmentslist, function(x)x[seqnames(x) == i])
                     suppressMessages(phaseChromosome_for_invertyper(
                         input_folder = input_folder,
                         output_folder = output_folder, positions = snvs[GenomicRanges::seqnames(snvs) == i],
                         chromosome = i,
                         WCregions = WCregions[GenomicRanges::seqnames(WCregions) == i], pairedEndReads = conf[["pairedEndReads"]], min.mapq = conf[["min.mapq"]],
                         min.baseq = 20, num.iterations = conf[["num.iterations"]],
-                        translateBases = TRUE, fillMissAllele = NULL, splitPhasedReads = FALSE, compareSingleCells = FALSE, exportVCF = NULL
+                        translateBases = TRUE, fillMissAllele = NULL, splitPhasedReads = FALSE, compareSingleCells = FALSE, exportVCF = NULL, 
+                        galignmentslist = galignmentslist_by_chr
                     ))
                 },
                 error = function(err) {
@@ -82,7 +79,7 @@ strandPhaseR_for_invertyper <- function(numCPU = 4, positions = NULL, WCregions 
                 }
             )
         }
-        parallel::stopCluster(cl)
+         doParallel::stopImplicitCluster()
     } else {
         for (i in conf[["chromosomes"]]) {
             temp <- suppressMessages(phaseChromosome_for_invertyper(
@@ -90,13 +87,12 @@ strandPhaseR_for_invertyper <- function(numCPU = 4, positions = NULL, WCregions 
                 chromosome = i,
                 WCregions = WCregions[GenomicRanges::seqnames(WCregions) == i], pairedEndReads = conf[["pairedEndReads"]], min.mapq = conf[["min.mapq"]],
                 min.baseq = 20, num.iterations = conf[["num.iterations"]],
-                translateBases = TRUE, fillMissAllele = NULL, splitPhasedReads = FALSE, compareSingleCells = FALSE, exportVCF = NULL
+                translateBases = TRUE, fillMissAllele = NULL, splitPhasedReads = FALSE, compareSingleCells = FALSE, exportVCF = NULL, galignmentslist = galignmentslist
             ))
             all_phased_WCregions <- append(all_phased_WCregions, temp)
         }
     }
 
-    rm("galignmentslist_global_for_invertyper", envir = globalenv())
     invisible(gc())
 
     all_phased_WCregions <- lapply(unlist(all_phased_WCregions), extract_wc)

@@ -9,10 +9,7 @@
 #' @importFrom Biostrings alphabetFrequency DNAStringSet
 #'
 #' @author David Porubsky
-#' @export
-
-
-loadMatrices_for_invertyper <- function(input_folder = NULL, positions = NULL, WCregions = NULL, pairedEndReads = FALSE, min.mapq = 10, min.baseq = 30) {
+loadMatrices_for_invertyper <- function(input_folder = NULL, positions = NULL, WCregions = NULL, pairedEndReads = FALSE, min.mapq = 10, min.baseq = 30, galignmentslist=galignmentslist) {
 
     ## function to collapse list of letters
     collapse.str <- function(x) {
@@ -34,8 +31,7 @@ loadMatrices_for_invertyper <- function(input_folder = NULL, positions = NULL, W
     covered_snvs_file <- function(file, input_folder, positions, pairedEndReads, min.mapq) {
         # message("Processing ", file)
 
-        bamfile <- file.path(input_folder, file)
-        bam.reads <- bamregion2GRanges_for_invertyper(bamfile, region = positions, pairedEndReads = pairedEndReads, min.mapq = min.mapq)
+        bam.reads <- bamregion2GRanges_for_invertyper(file, region = positions, pairedEndReads = pairedEndReads, min.mapq = min.mapq, galignmentslist=galignmentslist)
         seqlengths(WCregions) <- seqlengths(bam.reads)
 
         regions <- WCregions[WCregions$filename == file]
@@ -143,7 +139,9 @@ loadMatrices_for_invertyper <- function(input_folder = NULL, positions = NULL, W
         ## filter region with only one snv coveraged either on W or C reads
         crickBaseCov <- rowSums(crickBaseFreq.m)
         watsonBaseCov <- rowSums(watsonBaseFreq.m)
-        if (length(crickBaseCov[crickBaseCov > 0]) < 2 | length(watsonBaseCov[watsonBaseCov > 0]) < 2) next
+        if (length(crickBaseCov[crickBaseCov > 0]) < 2 | length(watsonBaseCov[watsonBaseCov > 0]) < 2) {
+            return(list(list(),list(),list(),list(),list()))
+        }
 
         ## get covered positions
         crickBaseFreq.collapsed <- which(crickBaseFreq.m > 0, arr.ind = T) # find postions of covered SNVs and column index for A,C,G,T as 1,2,3,4

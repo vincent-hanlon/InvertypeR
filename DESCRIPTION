@@ -1,6 +1,6 @@
 Package: invertyper
 Title: Bayesian Inversion Genotyping with Strand-Seq
-Version: 0.0.0.2
+Version: 1.0.0.0
 Authors@R: 
     person(given = "Vincent",
            family = "Hanlon",
@@ -17,6 +17,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 biocViews:
 Depends:
+	R (>= 4.3.0),
 	StrandPhaseR,
 Imports:
 	GenomicRanges,
@@ -47,4 +48,4 @@ Imports:
 	zoo,
 	BSgenome,
 Remotes:
-	github::daewoooo/StrandPhaseR@95f77a8
+	github::daewoooo/StrandPhaseR@5931a9d

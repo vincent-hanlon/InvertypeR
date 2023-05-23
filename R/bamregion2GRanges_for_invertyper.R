@@ -11,18 +11,10 @@
 #' @param min.mapq Minimum mapping quality when importing from BAM files. (not actually used by InvertypeR, same as filterAltAlign)
 #' @param all_alignments A list of GAlignments objects for the Strand-seq libraries. Global so that there are no problems accessing it in parallel
 #' @return a GRanges object
-#' @export
-bamregion2GRanges_for_invertyper <- function(
-
-    bamfile, bamindex, region = NULL, pairedEndReads = FALSE, min.mapq = 10, filterAltAlign = TRUE,
-    all_alignments = galignmentslist_global_for_invertyper) {
+bamregion2GRanges_for_invertyper <- function(bamfile, bamindex, region = NULL, pairedEndReads = FALSE, min.mapq = 10, filterAltAlign = TRUE, galignmentslist = galignmentslist) {
     # Extracting the BAM name from the BAM file path + name
-    bamfile <- intToUtf8(rev(utf8ToInt(bamfile)))
-    bamfile <- gsub("/.*", "", bamfile)
 
-    bamfile <- intToUtf8(rev(utf8ToInt(bamfile)))
-
-    galignment <- all_alignments[[bamfile]]
+    galignment <- galignmentslist[[bamfile]]
 
     reads <- galignment_to_granges(galignment, purpose = "StrandPhaseR", paired_reads = pairedEndReads, region = region)
 
