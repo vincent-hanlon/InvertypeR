@@ -112,7 +112,7 @@ If the inversions you wish to genotype are well-characterized and you have infor
 
 The `haploid_prior` argument is there for chrX and chrY in human males (or more generally, the sex chromosomes of the heterogametic sex), or for all chromosomes if the Strand-seq libraries are from haploid cells.
 
-<em>Some recommended priors for provided regions to genotype (for humans, GRCh38). The first two rows were done using InvertypeR's `choose_priors()` function, the third row was done using the genotypes of simple inversions from [Porubsky et al. 2022](https://doi.org/10.1016/j.cell.2022.04.017), and the last row is a rule of thumb used used for the arguments `breakpointr_prior` and `breakpointr_haploid_prior`.</em>
+<strong>Table 1. </strong><em>Some recommended priors for provided regions to genotype (for humans, GRCh38). The first two rows were done using InvertypeR's `choose_priors()` function, the third row was done using the genotypes of simple inversions from [Porubsky et al. 2022](https://doi.org/10.1016/j.cell.2022.04.017), and the last row is a rule of thumb used used for the arguments `breakpointr_prior` and `breakpointr_haploid_prior`.</em>
 | `regions_to_genotype`  | `prior` | `haploid_prior` |
 | ------------- | ------------- | ------------- |
 | hanlon_2021_BMCgenomics_augmented.bed |  `c(0.9683, 0.0158, 0.0158)` | `c(0.9683, 0.0317)` |
@@ -169,7 +169,7 @@ Composite file creation isn't perfect. The function `create_composite_files()` g
 For humans, the big inversion on chr8 very occasionally causes this problem, or in some males the large inversion at the start of chrY. The coordinates for these using GRCh38 are chr8:8129404-12608295 and chrY:6240762-9910296, respectively. Even if you don't expect to have composite file creation issues, it would be reasonable to put them in a BED file and pass them to InvertypeR using `soft_mask` as a preventative measure. 
 
 <img src="https://github.com/vincent-hanlon/InvertypeR/blob/main/composite_errors.png" width=680>
-<em>An example of a non-human WW composite file with an error caused by reference assembly misorients on chromosome 16 (green bumps). </em>
+<strong>Figure 1. </strong><em>An example of a non-human WW composite file with an error caused by reference assembly misorients on chromosome 16 (green bumps). </em>
 <br>
 <br>
 
@@ -184,7 +184,7 @@ The first 3 columns of InvertypeR's primary output file (below) are the genomic 
 <br>
 
 <img src="https://github.com/vincent-hanlon/InvertypeR/blob/main/output_example.png">
-<em>InvertypeR's primary output file.</em>
+<strong>Figure 2. </strong><em>InvertypeR's primary output file.</em>
 
 <br>
 
