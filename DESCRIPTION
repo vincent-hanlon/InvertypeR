@@ -1,6 +1,6 @@
 Package: invertyper
 Title: Bayesian Inversion Genotyping with Strand-Seq
-Version: 1.0.0.0
+Version: 1.0.0.1
 Authors@R: 
     person(given = "Vincent",
            family = "Hanlon",

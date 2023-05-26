@@ -188,7 +188,7 @@ loadMatrices_for_invertyper <- function(input_folder = NULL, positions = NULL, W
 
     covered <- do.call(Map, c(c, covered))
 
-    genomic.pos <- unique(covered[[1]])
+    genomic.pos <- unlist(unique(covered[[1]]))
     crick.bases <- covered[[2]]
     watson.bases <- covered[[3]]
     crick.quals <- covered[[4]]
