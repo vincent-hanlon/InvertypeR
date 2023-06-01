@@ -80,7 +80,7 @@ Typically, I use at least 30 libraries with at least 20 million non-duplicate al
 
 InvertypeR uses two composite files consisting of reads merged from all the Strand-seq libraries. Phase/haplotype information is required to create one of the two composite files: luckily, Strand-seq is very good at phasing. However, Strand-seq libraries have shallow depth of coverage, so they are not ideal for calling high-confidence heterozygous SNVs. If WGS sequence data is available for the individual you wish to genotype, it is best to use that to call SNVs and provide the VCF file as input to InvertypeR. 
 
-However, if that is not possible, then it is usually feasible to call enough SNVs from both good- and poor-quality Strand-seq libraries using call_variants.sh from [bbtools](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/), which can be installed using [conda](https://anaconda.org/agbiome/bbtools). 
+However, if that is not possible, then it is usually feasible to call enough SNVs from both good- and poor-quality Strand-seq libraries using call_variants.sh from [bbtools](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/), which can be installed using [conda](https://anaconda.org/agbiome/bbtools). The resulting SNVs can contain lots of false positives, although I have generally been able to make good composite files anyway.
 
 To install:
 ```
