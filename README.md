@@ -6,9 +6,10 @@ InvertypeR is an R package for genotyping (and discovering) inversions using Str
 For further details beyond what is provided below, or to cite InvertypeR, please see the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9). If you should run into trouble, please feel free to post an Issue or contact me at vincent [AT] alumni.ubc.ca 
 ## Quick start guide
 
-Install InvertypeR from GitHub using the R package devtools:
+Install InvertypeR from GitHub using the R package [pak](https://cran.r-project.org/web/packages/pak/index.html) (or [devtools](https://www.r-project.org/nosvn/pandoc/devtools.html) if you prefer):
 ```
-devtools::install_github(repo="vincent-hanlon/InvertypeR")
+install.packages("pak")
+pak::pkg_install("vincent-hanlon/InvertypeR")
 ```
 
 Then collect good-quality Strand-seq libraries for a single diploid individual in an input directory (see below for haploid species), along with a VCF file of their SNVs. 
@@ -132,12 +133,17 @@ Results for the [InvertypeR paper](https://doi.org/10.1186/s12864-021-07892-9) a
 
 #### Installation and overview
 
-InvertypeR can be installed from GitHub with [devtools](https://cran.r-project.org/web/packages/devtools/index.html):
+InvertypeR can be installed from GitHub with [pak](https://cran.r-project.org/web/packages/pak/index.html):
 ```
-devtools::install_github(repo="vincent-hanlon/InvertypeR")
+install.packages("pak")
+pak::pkg_install("vincent-hanlon/InvertypeR")
 ```
 
-If that doesn't work, try `devtools::install_github(url="https://github.com/vincent-hanlon/InvertypeR")`. If the dependency BreakpointR fails to install automatically, try installing it from [Bioconductor](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) beforehand. Likewise, StrandPhaseR may or may need to be installed separately using `devtools::install_github()`. 
+Alternatively, [devtools](https://www.r-project.org/nosvn/pandoc/devtools.html) can also be used, although devtools itself can be more difficult to install than pak:
+```
+install.packages("devtools")
+devtools::install_github("vincent-hanlon/InvertypeR")
+```
 
 Once everything is installed and the various inputs are assembled, running InvertypeR is straightforward. The function `invertyper_pipeline()` will create composite files for an individual, attempt to discover putative inversions using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) and the genotype them if desired, and of course genotype a user-provide list of putative inversions as well. It can also save the composite files as .RData files and write any inversions it finds to UCSC Genome Browser files along with the relevant Strand-seq reads. 
 
