@@ -1,5 +1,5 @@
 # InvertypeR
-v1.0.0.1
+v1.0.0.2
 
 InvertypeR is an R package for genotyping (and discovering) inversions using Strand-seq data. This is supplemented by an "Inversion visualization" section, at bottom, which uses R/PERL scripts to make ideograms linked to the UCSC Genome Browser.
 

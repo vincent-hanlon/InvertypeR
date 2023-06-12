@@ -166,7 +166,7 @@ invertyper_pipeline <- function(
     if (!is.null(regions_to_genotype)) {
         inversions <- invertyper(
             WW_reads = composite_files$WW, WC_reads = composite_files$WC, regions_to_genotype = regions_to_genotype, hard_mask = hard_mask, paired_reads = paired_reads, 
-            haploid_chromosomes = haploid_chromosomes, confidence = confidence, prior = prior, haploid_prior = haploid_prior,
+            haploid_chromosomes = haploid_chromosomes, confidence = confidence, prior = prior, haploid_prior = haploid_prior, chromosomes = chromosomes,
             output_file = output_file, adjust_method = adjust_method, output_folder = output_folder
         )
 
