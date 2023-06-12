@@ -12,6 +12,8 @@ install.packages("pak")
 pak::pkg_install("vincent-hanlon/InvertypeR")
 ```
 
+Note: pak, but not devtools, requires that any GitHub credentials you have are valid.
+
 Then collect good-quality Strand-seq libraries for a single diploid individual in an input directory (see below for haploid species), along with a VCF file of their SNVs. 
 Provide a list of putative inversions (for humans: hanlon_2021_BMCgenomics_augmented.bed from this repo) and appropriate priors. Provide a list of hard masked regions (for humans: hard_mask.GRCh38.humans.bed from this repo).
 
@@ -144,6 +146,8 @@ Alternatively, [devtools](https://www.r-project.org/nosvn/pandoc/devtools.html) 
 install.packages("devtools")
 devtools::install_github("vincent-hanlon/InvertypeR")
 ```
+
+I find that pak generally works more smoothly than devtools, but unlike devtools it does (June 2023) require that any GitHub credentials you have be currently valid. If pak gives you the error `Bad GitHub credentials` then either update your GitHub personal access token (or equivalent), or use devtools.
 
 Once everything is installed and the various inputs are assembled, running InvertypeR is straightforward. The function `invertyper_pipeline()` will create composite files for an individual, attempt to discover putative inversions using [BreakpointR](https://bioconductor.org/packages/release/bioc/html/breakpointR.html) and the genotype them if desired, and of course genotype a user-provide list of putative inversions as well. It can also save the composite files as .RData files and write any inversions it finds to UCSC Genome Browser files along with the relevant Strand-seq reads. 
 
