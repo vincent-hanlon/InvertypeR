@@ -7,7 +7,7 @@
 #' This is not intended for cases where the inversion list does not have self-intersections----for example, if you are just genotyping a handful of well-characterized
 #' inversions. Then you should create a prior based on known allele frequencies or something.
 #'
-#' This function could give ridiculous suggestions for priors if there are regions_to_genotype, for example. Use your judgement.
+#' This function could give ridiculous suggestions for priors if there are very few regions_to_genotype, for example. Use your judgement.
 #'
 #' @param regions_to_genotype A GRanges object of putative inversions. If you have a BED file, see import_bed()
 #' @param expected_number_inversions An integer. If you had perfect data and genotyped an average individual using your regions_to_genotype, how many
